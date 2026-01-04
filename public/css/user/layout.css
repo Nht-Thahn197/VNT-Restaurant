@@ -1,0 +1,654 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 400;
+  scroll-behavior: smooth;
+}
+
+/* BODY START */
+body {
+  background-color: #1B4E30;
+  background-image: url('/VNT-Restaurant/public/images/background/body-bg.jpg');
+  background-size: 100% auto;
+  background-position: left top;
+  background-repeat: repeat-y;
+  margin: 0;
+  padding: 0;
+  padding-top: 80px;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+/* BODY END */
+
+/* HEADER START */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1B4E30;
+  background-image: url('/VNT-Restaurant/public/images/background/header-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 0 150px;
+  height: 80px;
+  overflow: hidden;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #1B4E30;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2); 
+}
+
+.left-group {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  position: relative;
+}
+
+.left-group::after {
+  content: "";
+  width: 2px;
+  height: 70%;
+  background: #1b4e30;
+  position: absolute;
+  left: 120px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  opacity: 0.9;
+}
+
+.logo {
+  height: 60px;
+  cursor: pointer;
+}
+
+.logo img {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+}
+
+.hotline {
+  text-align: left; 
+  line-height: 1.2;
+}
+
+.hotline .label {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: "PlusJakartaSans-SemiBold", sans-serif !important;
+}
+
+.hotline .number {
+  color: #FFA827;
+  font-weight: 400;
+  font-size: 22px;
+  font-family: "Tilt Warp", sans-serif;
+}
+
+.hotline a {
+  color: #fff;
+}
+
+.list {
+  display: flex;
+  align-items: center;
+}
+
+
+.list li a {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: #fff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.list li a:hover {
+  color: #FFA827;
+}
+
+.list li a.active {
+  color: #FFA827 !important;
+}
+
+.btn-booking {
+  border: 2px solid #FFA827;
+  border-radius: 10px;
+  padding: 12px 22px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  background: transparent;
+  cursor: pointer;
+}
+
+.btn-booking:hover {
+  background-color: #FFA827;
+  color: #1B4E30; 
+}
+
+.list li .btn-booking {
+  border: 2px solid #FFA827;
+  border-radius: 10px;
+  padding: 12px 22px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  background: transparent;
+  cursor: pointer;
+}
+
+.list li .btn-booking:hover {
+  background-color: #FFA827;
+  color: #1B4E30; 
+}
+
+.list > li {
+  padding: 0 12px;
+}
+/* HEADER END */
+
+/* FORM BOOKING START */
+.booking-overlay {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100%; 
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  transition: opacity .25s ease;
+  z-index: 999;
+}
+
+.booking-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.booking-popup {
+  background: #fff;
+  width: 550px;
+  height: 750px;
+  max-width: 800px;
+  max-height: 800px;
+  border-top: 5px solid #FFA827;
+  border-radius: 8px;
+  padding: 40px 50px;
+  position: relative;
+  animation: popupShow .25s ease;
+}
+
+@keyframes popupShow {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+h2 {
+  font-size: 39px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #1b4e30;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.booking-section h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 15px 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.yellow-bar {
+  display: inline-block;
+  width: 3px;
+  height: 18px;
+  background-color: #FFA827;
+  border-radius: 2px;
+}
+
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  font-size: 14px;
+  user-select: none;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  overflow:visible;
+}
+
+.custom-dropdown.open .dropdown-selected{
+  border-color:#1B4E30;
+  box-shadow:0 4px 18px rgba(27,78,48,0.08);
+}
+
+.dropdown-selected {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 14px;
+  background:#fff;
+  border:1px solid #ccc;
+  border-radius:8px;
+  cursor:pointer;
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #1B4E30;
+  transition: 0.2s;
+}
+
+.custom-dropdown.open .arrow {
+  transform: rotate(180deg);
+}
+
+.dropdown-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #1B4E30;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  overflow-y: auto;
+  max-height: 190px;
+  display: none;
+  z-index: 50;
+}
+
+.dropdown-list li {
+  padding: 12px;
+  cursor: pointer;
+  color: #111;
+  transition: 0.15s;
+}
+
+.dropdown-list li:hover {
+  background: #f2f2f2;
+}
+
+.booking-section input:not(.guest-input),
+.booking-section select,
+.booking-section textarea {
+  width: 100%;
+  padding: 12px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  outline: none;
+  transition: 0.2s ease
+}
+
+.booking-section input:hover:not(.guest-input),
+.booking-section select:hover,
+.booking-section textarea:hover {
+  border-color: #1B4E30;
+}
+
+.booking-section input:focus:not(.guest-input),
+.booking-section select:focus,
+.booking-section textarea:focus {
+  border-color: #1B4E30;
+  box-shadow: 0 0 0 2px rgba(27, 78, 48, 0.2);
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.row input[type="date"],
+.row select {
+  height: 45px !important;
+  padding: 0 12px !important;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.row input[type="date"]:hover,
+.row select:hover,
+.row input[type="date"]:focus,
+.row select:focus {
+  border-color: #888;
+}
+
+.row select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23777' stroke-width='1.5' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: calc(100% - 12px) center;
+  background-size: 10px;
+  padding-right: 32px;
+}
+
+.guest {
+  display: flex;
+  width: 95%;
+  height: 45px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.guest button {
+  width: 40px; 
+  height: 100%;
+  border: none;
+  background: none;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.guest button:hover {
+  background: #f5f5f5;
+}
+
+.guest-input {
+  width: 55px !important;
+  border: none !important;
+  text-align: center !important;
+  font-size: 16px !important;
+  outline: none !important;
+  pointer-events: none !important;
+  border-right: 1px solid #e0e0e0 !important;
+}
+
+.guest input::-webkit-inner-spin-button,
+.guest input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.guest button:not(:last-child) {
+  border-right: 1px solid #e0e0e0;
+}
+
+.guest input {
+  border-right: 1px solid #e0e0e0 !important;
+}
+
+.guest input:hover,
+.guest input:focus {
+  border-color: #ccc !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.field {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  color: #777;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+textarea {
+  resize: none;
+  min-height: 70px;
+}
+
+.action-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.cancel-btn {
+  background: none;
+  border: none;
+  color: #777;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background-color: #FFA827;
+  border: none;
+  color: #111111;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 15px;
+}
+
+.submit-btn:hover {
+  background-color: #1B4E30;
+  color: #FFA827;
+}
+/* FORM BOOKING END */
+
+/* FOOTER START */
+ol, ul {
+  list-style: none;
+}
+
+.footer {
+  background: #0F361F;
+  padding: 0 30px;
+  position: relative;
+  z-index: 11;
+  padding-bottom: 25px;
+}
+
+.footer-content {
+  width: 1400px;
+  max-width: 100%;
+  margin: 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  justify-content: space-between;
+  padding: 25px 0 20px;
+  gap: 108px;
+  position: relative;
+}
+
+.footer-left {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  gap: 175px;
+  align-items: flex-end;
+}
+
+.content-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.content-left .logo img {
+  height: 70px;
+  width: auto;
+  display: block;
+}
+
+.footer-left .list-nav {
+  transform: translateY(15px);
+}
+
+.link-nav {
+  font-size: 14px;
+  line-height: 220%;
+  font-family: 'PlusJaS-Medium', 'Plus Jakarta Sans', sans-serif;
+  color: #fff;
+  text-decoration: none;
+}
+
+.link-nav:hover {
+  color: #FFA827;
+}
+
+.footer-right {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-left: 40px;
+}
+
+.footer-right .info {
+  transform: translateY(30px);
+}
+
+.info-type .type {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+}
+
+.info-type .type-text {
+  font-size: 15px;
+  color: #FFA827;
+}
+
+.list-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.social-link {
+  width: 32px;
+  height: 32px;
+  display: inline-block;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: 0.3s;
+}
+
+/* Đường dẫn chính xác */
+.social-link.fb {
+  background-image: url('/VNT-Restaurant/public/images/web_images/icn-fb.svg');
+}
+
+.social-link.tiktok {
+  background-image: url('/VNT-Restaurant/public/images/web_images/icn-tiktok.svg');
+}
+
+.social-link.ig {
+  background-image: url('/VNT-Restaurant/public/images/web_images/icn-ig.svg');
+}
+
+.social-link.yt {
+  background-image: url('/VNT-Restaurant/public/images/web_images/icn-yt.svg');
+}
+
+.credit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: absolute;
+  right: 10px;
+  bottom: 60px;
+}
+
+.list-social {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cre {
+  font-size: 14px;
+  line-height: 150%;
+  font-family: 'PlusJaS-Medium', 'Plus Jakarta Sans', sans-serif;
+  color: #fff;
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.scrollTop {
+  position: absolute;
+  top: -24px;
+  right: -5px;
+  display: block;
+  width: 48px;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+svg:not(:root) {
+  overflow-clip-margin: content-box;
+  overflow: hidden;
+}
+
+circle {
+  cx: 24;
+  cy: 24;
+  r: 24;
+  fill: rgb(255, 168, 39);
+}
+/* FOOTER END */
