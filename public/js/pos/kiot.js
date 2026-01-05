@@ -1,107 +1,250 @@
-// --------- helper random data ----------
-function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
-function currency(v){ return v.toLocaleString('vi-VN') + '₫'; }
+function timeAgo(dateString) {
+    const now  = new Date();
+    const past = new Date(dateString);
+    const diff = Math.floor((now - past) / 1000); // giây
 
-// ---------- Activity mock ----------
-const activities = [
-  {t:'08:12', txt: 'Khách đặt bàn 4 người - Cơ sở Hà Đông'},
-  {t:'08:45', txt: 'Hoàn thành đơn #1234 - Ốc hương'},
-  {t:'09:10', txt: 'Nhập kho 10kg nghêu'},
-  {t:'10:02', txt: 'Khách gọi đặt giao hàng - 2 phần'},
-  {t:'11:05', txt: 'Đổi trạng thái bàn B12 -> Đang phục vụ'},
-  {t:'12:00', txt: 'Khách check-in, áp dụng KM 10%'},
-];
-
-const actList = document.getElementById('activityList');
-activities.forEach(a=>{
-  const li = document.createElement('li');
-  li.className = 'activity-item';
-  li.innerHTML = `<div class="activity-dot">!</div>
-                  <div class="activity-content">
-                    <div class="activity-time">${a.t}</div>
-                    <div class="activity-text">${a.txt}</div>
-                  </div>`;
-  actList.appendChild(li);
-});
-
-// ---------- Chart.js setup ----------
-const ctx = document.getElementById('revenueChart').getContext('2d');
-
-let currentRange = 'day';
-
-function generateLabels(range){
-  if(range==='day'){
-    // show last 7 days
-    const d = new Date();
-    const arr=[];
-    for(let i=6;i>=0;i--){
-      const dt = new Date(d); dt.setDate(d.getDate()-i);
-      arr.push(dt.getDate()+ '/' + (dt.getMonth()+1));
+    if (diff < 60) {
+        return diff + ' giây trước';
     }
-    return arr;
-  } else if(range==='hour'){
-    const arr=[]; for(let h=6; h<=22; h+=2) arr.push(h + ':00'); return arr;
-  } else { // weekday
-    return ['CN','T2','T3','T4','T5','T6','T7'];
-  }
-}
 
-function generateData(range){
-  const labels = generateLabels(range);
-  return labels.map(()=> randInt(0, 1200000));
-}
-
-let chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: generateLabels(currentRange),
-    datasets: [{
-      label: 'Doanh số',
-      data: generateData(currentRange),
-      fill: true,
-      borderColor: 'rgba(27,78,48,0.95)',
-      backgroundColor: 'rgba(27,78,48,0.12)',
-      tension: 0.25,
-      pointRadius: 3,
-      pointBackgroundColor: 'rgba(27,78,48,1)'
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false }
-    },
-    scales: {
-      x: { grid: {display:false} },
-      y: { ticks: { callback: v => (v>=1000? (v/1000)+'k' : v) } }
+    const minutes = Math.floor(diff / 60);
+    if (minutes < 60) {
+        return minutes + ' phút trước';
     }
-  }
-});
 
-// Tabs
-document.querySelectorAll('.tab').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    btn.classList.add('active');
-    currentRange = btn.dataset.range;
-    updateChart();
-  });
-});
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+        return hours + ' giờ trước';
+    }
 
-function updateChart(){
-  const labels = generateLabels(currentRange);
-  const data = generateData(currentRange);
-  chart.data.labels = labels;
-  chart.data.datasets[0].data = data;
-  chart.update();
+    const days = Math.floor(hours / 24);
+    if (days < 30) {
+        return days + ' ngày trước';
+    }
+
+    const months = Math.floor(days / 30);
+    if (months < 12) {
+        return months + ' tháng trước';
+    }
+
+    const years = Math.floor(months / 12);
+    return years + ' năm trước';
 }
 
-// optional: refresh random data every 20s (demo)
-setInterval(()=> {
-  // randomize small values in cards
-  document.getElementById('ordersDone').textContent = randInt(5, 90);
-  document.getElementById('ordersServ').textContent = randInt(0, 12);
-  document.getElementById('customersToday').textContent = randInt(20,150);
-  updateChart();
-}, 20000);
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('section').forEach(section => {
+
+        const canvas = section.querySelector('canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+
+        let currentMode    = 'hour';
+        let currentRange   = 'today';
+        let currentMetric  = 'quantity';
+        let chart = null;
+
+        const baseUrl =
+            document.querySelector('meta[name="base-url"]')
+            ?.getAttribute('content') || '';
+
+        /* ================= API ================= */
+        function getApi() {
+            if (section.classList.contains('revenue-section')) return 'revenue';
+            if (section.classList.contains('order-section'))   return 'orders';
+            if (section.classList.contains('product-section')) return 'products';
+            return '';
+        }
+
+        /* ================= FETCH ================= */
+        async function loadData() {
+
+            const api = getApi();
+            if (!api) return;
+
+            let url = `${baseUrl}/pos/${api}?range=${currentRange}`;
+
+            if (api === 'products') {
+                url += `&metric=${currentMetric}`;
+            } else {
+                url += `&mode=${currentMode}`;
+            }
+
+            const res  = await fetch(url);
+            const data = await res.json();
+            renderChart(data);
+        }
+
+        /* ================= LABEL ================= */
+        function formatLabel(label) {
+
+            if (section.classList.contains('product-section')) {
+                return label;
+            }
+
+            if (currentMode === 'hour') {
+                return `${label}h`;
+            }
+
+            if (currentMode === 'day') {
+                return new Date(label).toLocaleDateString('vi-VN');
+            }
+
+            if (currentMode === 'weekday') {
+                const map = { 1:'CN',2:'T2',3:'T3',4:'T4',5:'T5',6:'T6',7:'T7' };
+                return map[label];
+            }
+        }
+
+        /* ================= CHART ================= */
+        function renderChart(data) {
+
+            const isProduct = section.classList.contains('product-section');
+
+            const labels = isProduct
+                ? data.map(i => i.label)
+                : data.map(i => formatLabel(i.label));
+
+            const values = data.map(i => i.total);
+
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: '#0A8BD6',
+                        borderRadius: 6,
+                        barThickness: 36
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: isProduct ? 'y' : 'x',
+                    plugins: { legend: { display: false } },
+                    scales: {
+
+                        // ===== TRỤC X =====
+                        x: {
+                            grid: { display: false },
+
+                            // 👉 CHỈ FORMAT KHI X LÀ VALUE
+                            ticks: isProduct ? {
+                                callback: v =>
+                                    currentMetric === 'revenue'
+                                        ? v.toLocaleString('vi-VN') + ' ₫'
+                                        : v.toLocaleString('vi-VN')
+                            } : {}
+                        },
+
+                        // ===== TRỤC Y =====
+                        y: {
+                            ticks: !isProduct ? {
+                                callback: v => v.toLocaleString('vi-VN')
+                            } : {
+                                autoSkip: false // giữ đủ tên món
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /* ================= TABS (chỉ revenue & order) ================= */
+        if (!section.classList.contains('product-section')) {
+            section.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    section.querySelectorAll('.tab')
+                        .forEach(t => t.classList.remove('active'));
+
+                    tab.classList.add('active');
+                    currentMode = tab.dataset.mode;
+                    loadData();
+                });
+            });
+        }
+
+    /* ================= DROPDOWN (range + metric) ================= */
+    section.querySelectorAll('.range-dropdown').forEach(dropdown => {
+
+        const btn  = dropdown.querySelector('.range-btn');
+        const menu = dropdown.querySelector('.range-menu');
+
+        btn.addEventListener('click', e => {
+            e.stopPropagation(); // ⛔ chặn click lan ra document
+            menu.classList.toggle('show');
+        });
+
+        menu.querySelectorAll('div').forEach(item => {
+            item.addEventListener('click', () => {
+
+                if (item.dataset.range) {
+                    currentRange = item.dataset.range;
+                }
+
+                if (item.dataset.metric) {
+                    currentMetric = item.dataset.metric;
+                }
+
+                btn.innerText = item.innerText + ' ▾';
+                menu.classList.remove('show');
+                loadData();
+            });
+        });
+    });
+
+    /* đóng menu khi click ra ngoài */
+    document.addEventListener('click', () => {
+        section.querySelectorAll('.range-menu')
+            .forEach(m => m.classList.remove('show'));
+    });
+
+
+        /* ================= INIT ================= */
+        loadData();
+    });
+
+    fetch('/VNT-Restaurant/public/pos/dashboard/activity')
+    .then(r => r.json())
+    .then(data => {
+
+        const ul = document.getElementById('activityList');
+        ul.innerHTML = '';
+
+        data.forEach(i => {
+
+            ul.innerHTML += `
+            <li class="activity-item activity-${i.action}">
+                <div class="activity-icon">
+                    ${getActivityIcon(i.action)}
+                </div>
+
+                <div class="activity-content">
+                    <strong>${i.staff_name ?? 'Ốc Năm Tư'}</strong>
+                    ${i.description}
+                    <div class="activity-time">
+                        ${timeAgo(i.created_at)}
+                    </div>
+                </div>
+            </li>
+            `;
+        });
+    });
+
+    function getActivityIcon(action) {
+        switch (action) {
+            case 'checkout':       return '🛒';
+            case 'import':         return '📥';
+            case 'export':         return '📤';
+            case 'cancel_import':  return '❌';
+            case 'cancel_export':  return '❌';
+            case 'cancel_invoice': return '⚠️';
+            default:               return '📌';
+        }
+    }
+
+});

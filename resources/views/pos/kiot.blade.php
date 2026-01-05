@@ -18,7 +18,9 @@
               <div class="card-title">Doanh Thu Hôm Nay</div>
               <div class="card-sub">Hôm nay</div>
             </div>
-            <div class="card-value" id="ordersDone">11.370.980₫</div>
+            <div class="card-revenue" id="ordersDone">
+              {{ number_format($todayRevenue, 0, ',', '.') }}₫
+            </div>
           </div>
 
           <div class="card">
@@ -26,7 +28,9 @@
               <div class="card-title">Đã Hoàn Thành</div>
               <div class="card-sub">Đơn</div>
             </div>
-            <div class="card-value" id="ordersServ">10</div>
+            <div class="card-order" id="ordersServ">
+              {{ $completedOrders }}
+            </div>
           </div>
 
           <div class="card">
@@ -34,7 +38,9 @@
               <div class="card-title">Đang Phục Vụ</div>
               <div class="card-sub">Bàn</div>
             </div>
-            <div class="card-value small" id="servicing">9</div>
+            <div class="card-serving" id="servicing">
+              {{ $servicingTables }}
+            </div>
           </div>
         </section>
 
@@ -42,36 +48,77 @@
         <section class="revenue-section">
           <div class="revenue-header">
             <h3>Doanh số</h3>
-            <div class="tabs">
-              <button class="tab active" data-range="day">Theo ngày</button>
-              <button class="tab" data-range="hour">Theo giờ</button>
-              <button class="tab" data-range="weekday">Theo thứ</button>
+            <div class="revenue-controls">
+              <div class="tabs">
+                <button class="tab active" data-mode="hour">Theo giờ</button>
+                <button class="tab" data-mode="day">Theo ngày</button>
+                <button class="tab" data-mode="weekday">Theo thứ</button>
+              </div>
+              <div class="range-dropdown">
+                <button class="range-btn">Hôm nay ▾</button>
+                <div class="range-menu">
+                  <div data-range="today">Hôm nay</div>
+                  <div data-range="yesterday">Hôm qua</div>
+                  <div data-range="7days">7 ngày qua</div>
+                  <div data-range="this_month">Tháng này</div>
+                  <div data-range="last_month">Tháng trước</div>
+                </div>
+              </div>
             </div>
           </div>
+          <canvas id="revenueChart"></canvas>
         </section>
 
         <!-- Order / Tabs -->
         <section class="order-section">
           <div class="order-header">
             <h3>Số Đơn Hàng</h3>
-            <div class="tabs">
-              <button class="tab active" data-range="day">Theo ngày</button>
-              <button class="tab" data-range="hour">Theo giờ</button>
-              <button class="tab" data-range="weekday">Theo thứ</button>
+            <div class="order-controls">
+              <div class="tabs">
+                <button class="tab active" data-mode="hour">Theo giờ</button>
+                <button class="tab" data-mode="day">Theo ngày</button>
+                <button class="tab" data-mode="weekday">Theo thứ</button>
+              </div>
+              <div class="range-dropdown">
+                <button class="range-btn">Hôm nay ▾</button>
+                <div class="range-menu">
+                  <div data-range="today">Hôm nay</div>
+                  <div data-range="yesterday">Hôm qua</div>
+                  <div data-range="7days">7 ngày qua</div>
+                  <div data-range="this_month">Tháng này</div>
+                  <div data-range="last_month">Tháng trước</div>
+                </div>
+              </div>
             </div>
           </div>
+          <canvas id="orderChart"></canvas>
         </section>
 
         <!--  / Tabs -->
         <section class="product-section">
           <div class="product-header">
             <h3>Top Hàng Hóa Bán Chạy</h3>
-            <div class="tabs">
-              <button class="tab active" data-range="day">Theo ngày</button>
-              <button class="tab" data-range="hour">Theo giờ</button>
-              <button class="tab" data-range="weekday">Theo thứ</button>
+            <div class="product-controls">
+              <div class="range-dropdown">
+                <button class="range-btn metric-btn">Theo số lượng ▾</button>
+                <div class="range-menu metric-menu">
+                  <div data-metric="quantity">Theo số lượng</div>
+                  <div data-metric="revenue">Theo doanh thu</div>
+                </div>
+              </div>
+              <div class="range-dropdown">
+                <button class="range-btn">Hôm nay ▾</button>
+                <div class="range-menu">
+                  <div data-range="today">Hôm nay</div>
+                  <div data-range="yesterday">Hôm qua</div>
+                  <div data-range="7days">7 ngày qua</div>
+                  <div data-range="this_month">Tháng này</div>
+                  <div data-range="last_month">Tháng trước</div>
+                </div>
+              </div>
             </div>
           </div>
+          <canvas id="productChart"></canvas>
         </section>
 
       </div>
@@ -90,6 +137,7 @@
   </main>
 @endsection
 
-@section('js')
+@push('js')
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="{{ asset('js/pos/kiot.js') }}"></script>
-@endsection
+@endpush

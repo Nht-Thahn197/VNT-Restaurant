@@ -54,22 +54,8 @@ class InvoiceController extends Controller
                 ->where('status', 'serving')
                 ->lockForUpdate()
                 ->first();
-                
-            $timeStart = $request->time_start 
-            ? Carbon::parse($request->time_start)->setTimezone('Asia/Ho_Chi_Minh') 
-            : null;
-
             if (!$invoice) {
-                $invoice = Invoice::create([
-                    'table_id' => $request->table_id,
-                    'user_id' => $userId,
-                    'status' => 'serving',
-                    'time_start' => $timeStart,
-                ]);
-            }else {
-                if (!$invoice->time_start) {
-                    $invoice->update(['time_start' => $timeStart]);
-                }
+                throw new \Exception('Không tìm thấy hóa đơn đang phục vụ cho bàn này');
             }
 
             $invoice->update([
@@ -129,6 +115,17 @@ class InvoiceController extends Controller
             }
 
             DB::commit();
+            DB::table('activity_log')->insert([
+                'staff_id' => $userId,
+                'action'   => 'checkout',
+                'subject_type' => 'invoice',
+                'subject_id'   => $invoice->id,
+                'amount'   => $invoice->pay_amount,
+                'description' =>
+                    ' vừa bán hóa đơn #' . $invoice->id .
+                    ' với giá trị ' . number_format($invoice->pay_amount) . 'đ',
+                'created_at' => now(),
+            ]);
 
             return response()->json([
                 'success' => true,

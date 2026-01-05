@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableSearch = document.getElementById('tableSearch');
     
     let currentPage = 1;
-    const rowsPerPage = 10;
+    const rowsPerPage = 15;
 
     // Object lưu trữ trạng thái filter
     window.filters = {

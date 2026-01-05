@@ -65,12 +65,37 @@ class ImportController extends Controller
                         auth('staff')->id(),
                     ]
                 );
+
+                $ingredientNames = DB::table('ingredient')
+                    ->whereIn('id', collect($request->items)->pluck('ingredient_id'))
+                    ->pluck('name')
+                    ->toArray();
+
+                $shortNames = implode(', ', array_slice($ingredientNames, 0, 2));
+                if (count($ingredientNames) > 2) {
+                    $shortNames .= '...';
+                }
+
+                DB::table('activity_log')->insert([
+                    'staff_id' => auth('staff')->id(),
+                    'action'   => 'import',
+                    'subject_type' => 'import',
+                    'subject_id'   => $import->id,
+                    'amount'   => $totalPrice,
+                    'description' =>
+                        ' nhập hàng (' . count($ingredientNames) . ' nguyên liệu: ' .
+                        $shortNames . ') trị giá ' .
+                        number_format($totalPrice) . 'đ',
+                    'created_at' => now(),
+                ]);
             }
         });
 
-        return redirect()
-            ->route('pos.import')
-            ->with('success', 'Đã nhập hàng');
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã nhập hàng',
+            'import_id' => $import->id ?? null
+        ]);
     }
 
     public function cancel($id)
@@ -108,6 +133,18 @@ class ImportController extends Controller
 
             $import->update([
                 'status' => 'cancelled'
+            ]);
+
+            DB::table('activity_log')->insert([
+                'staff_id'     => auth('staff')->id(),
+                'action'       => 'cancel_import',
+                'subject_type' => 'import',
+                'subject_id'   => $import->id,
+                'amount'       => $import->total_price,
+                'description'  =>
+                    '❗ hủy phiếu nhập #' . $import->id .
+                    ' trị giá ' . number_format($import->total_price) . 'đ',
+                'created_at'   => now(),
             ]);
         });
 

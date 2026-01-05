@@ -60,9 +60,32 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
 
     // DASHBOARD
     Route::get('/kiot', [KiotController::class, 'index'])->name('pos.kiot');
+    Route::get('/revenue', [KiotController::class, 'revenue']);
+    Route::get('/orders',   [KiotController::class, 'orders']);
+    Route::get('/products', [KiotController::class, 'products']);
+    Route::get('/dashboard/activity', function () {
+    return DB::table('activity_log')
+        ->leftJoin('users', 'users.id', '=', 'activity_log.staff_id')
+        ->select(
+            'activity_log.*',
+            'users.name as staff_name'
+        )
+        ->orderByDesc('activity_log.created_at')
+        ->limit(10)
+        ->get();
+});
+
+
 
     // CASHIER
     Route::get('/cashier', [CashierController::class, 'index'])->name('pos.cashier');
+    Route::post('/cashier/start-serving', [CashierController::class, 'startServing']);
+    Route::post('/cashier/remove-serving', [CashierController::class, 'removeServing']);
+    Route::get('/cashier/servicing-count', function () {
+        return response()->json([
+            'count' => \App\Models\Invoice::where('status', 'serving')->count()
+        ]);
+    });
 
     // BOOKING
     Route::get('/booking', [BookingController::class, 'index'])->name('pos.booking');

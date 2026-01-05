@@ -32,4 +32,11 @@ class Export extends Model
     {
         return $this->hasMany(ExportDetail::class);
     }
+
+    public function getTotalPriceAttribute()
+    {
+        return $this->details->sum(
+            fn ($d) => $d->quantity * $d->price
+        );
+    }
 }

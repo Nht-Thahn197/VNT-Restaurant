@@ -176,7 +176,7 @@
                                         <tr>
                                             <td>{{ $d->ingredient->code }}</td>
                                             <td>{{ $d->ingredient->name }}</td>
-                                            <td>{{ $d->quantity }}</td>
+                                            <td>{{ rtrim(rtrim($d->quantity, '0'), '.') }}</td>
                                             <td>{{ number_format($d->price) }}</td>
                                             <td>{{ number_format($d->quantity * $d->price) }}</td>
                                         </tr>

@@ -68,12 +68,24 @@ class ExportController extends Controller
                         auth('staff')->id(),
                     ]
                 );
+
+                DB::table('activity_log')->insert([
+                    'staff_id' => auth('staff')->id(),
+                    'action'   => 'export',
+                    'subject_type' => 'export',
+                    'subject_id'   => $export->id,
+                    'amount'   => 0,
+                    'description' =>
+                        ' xuất kho phiếu #' . $export->id,
+                    'created_at' => now(),
+                ]);
             }
         });
 
-        return redirect()
-            ->route('pos.export')
-            ->with('success', 'Đã xuất kho');
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã xuất kho',
+        ]);
     }
 
     public function cancel($id)
@@ -101,6 +113,17 @@ class ExportController extends Controller
             }
             $export->update([
                 'status' => 'cancelled'
+            ]);
+
+            DB::table('activity_log')->insert([
+                'staff_id'     => auth('staff')->id(),
+                'action'       => 'cancel_export',
+                'subject_type' => 'export',
+                'subject_id'   => $export->id,
+                'amount'       => 0,
+                'description'  =>
+                    '❗ hủy phiếu xuất #' . $export->id,
+                'created_at'   => now(),
             ]);
         });
 

@@ -25,17 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
         otherDefaultText: 'Chọn khu vực'
     });
 
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
-        const timeBtn = document.getElementById('timeBtn');
-        if (timeBtn) timeBtn.parentElement.classList.remove('open');
-    });
-
     const btn = document.getElementById('timeBtn');
     const menu = document.getElementById('timeMenu');
 
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // 🔥 NGĂN document click
         btn.parentElement.classList.toggle('open');
+    });
+
+    menu.addEventListener('click', (e) => {
+        e.stopPropagation(); // click item không đóng ngay
     });
 
     document.addEventListener('click', e => {

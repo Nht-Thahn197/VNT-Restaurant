@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-
+    updateServicingCount();
+    const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    ?.getAttribute('content');
+    
     /* ================= ELEMENT ================= */
     const tabLinks = document.querySelectorAll('.nav-tabs li a');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -473,10 +477,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /* ================= RENDER ================= */
+    let hadItemsBefore = false;
+
     function renderOrderList() {
+
         orderList.innerHTML = '';
         const items = Object.values(orderItems);
         if (items.length === 0) {
+            if (hadItemsBefore) {
+                removeServing(getSelectedTable().id);
+                updateServicingCount();
+            }
+            hadItemsBefore = false;
             orderList.innerHTML = `
                 <p class="empty">
                     Chưa có món trong đơn<br>
@@ -487,6 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTotal();
             return;
         }
+        hadItemsBefore = true;
+
         items.forEach((item, index) => {
             const itemTotal = item.qty * item.price;
             const div = document.createElement('div');
@@ -558,6 +572,53 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPriceEl.textContent = formatPrice(sum);
     }
 
+    async function startServingIfNeeded(tableId) {
+        try {
+            const res = await fetch(`${APP_URL}/pos/cashier/start-serving`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ table_id: tableId })
+            });
+
+            const data = await res.json();
+
+            if (data.ok) {
+                updateServicingCount();
+            }
+        } catch (e) {
+            console.error('Error starting service:', e);
+        }
+    }
+
+    async function removeServing(tableId) {
+        await fetch(`${BASE_URL}/pos/cashier/remove-serving`, {
+            method: 'POST',
+            credentials: 'same-origin', // 🔥
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ table_id: tableId })
+        });
+    }
+
+    async function updateServicingCount() {
+        try {
+            const res = await fetch(`${BASE_URL}/pos/cashier/servicing-count`, {
+                credentials: 'same-origin'
+            });
+            const data = await res.json();
+            const el = document.getElementById('servicing');
+            if (el) el.textContent = data.count;
+        } catch (e) {
+            console.error('Không lấy được số bàn đang phục vụ', e);
+        }
+    }
+
     /* ================= ADD PRODUCT ================= */
     function addProduct(product) {
         const table = getSelectedTable();
@@ -565,10 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Vui lòng chọn bàn trước khi chọn món', 'warning');
             return;
         }
-        const startKey = `order_start_${table.id}`;
-        if (!localStorage.getItem(startKey)) {
-            localStorage.setItem(startKey, new Date().toISOString());
-        }
+        startServingIfNeeded(table.id);
         if (orderItems[product.id]) {
             orderItems[product.id].qty++;
         } else {
@@ -656,6 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadOrder();
     updateTableStatus();
     renderOrderList();
+    updateServicingCount();
     checkBookingFromUrl();
     paginateTables();
     paginateMenu();
@@ -1002,16 +1061,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const isUsing = table.classList.contains('using');
 
             if (status === 'all') {
-                table.style.display = '';
-            } 
+                table.setAttribute('data-filtered', 'visible');
+            }
             else if (status === 'active') {
-                table.style.display = isUsing ? '' : 'none';
-            } 
+                table.setAttribute('data-filtered', isUsing ? 'visible' : 'hidden');
+            }
             else if (status === 'inactive') {
-                table.style.display = !isUsing ? '' : 'none';
+                table.setAttribute('data-filtered', !isUsing ? 'visible' : 'hidden');
             }
         });
+
+        currentTablePage = 1;   // 🔥 CỰC KỲ QUAN TRỌNG
+        paginateTables();
     }
+
     
 });
 
