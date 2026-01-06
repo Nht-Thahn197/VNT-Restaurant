@@ -218,7 +218,7 @@
             <!-- TAB -->
             <div class="staff-tabs">
                 <button class="staff-tab active" data-tab="info">Thông tin</button>
-                <button class="staff-tab" data-tab="salary">Thành phần</button>
+                <button class="staff-tab" data-tab="salary">Bảng Lương</button>
             </div>
 
             <!-- TAB 1: THÔNG TIN NHÂN VIÊN -->

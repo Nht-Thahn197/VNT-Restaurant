@@ -621,7 +621,7 @@
 
 .btn-status {
   align-content: center;
-  background: #ff0000;
+  background: #ff0000 !important;
   color: white;
   padding: 12px 18px;
   border-radius: 6px;
@@ -630,12 +630,12 @@
 }
 
 .btn-status:hover {
-  background: #b92c28;
+  background: #b92c28 !important;
 }
 
 .btn-delete {
   align-content: center;
-  background: #ff0000;
+  background: #ff0000 !important;
   color: white;
   padding: 12px 18px;
   border-radius: 6px;
@@ -644,7 +644,7 @@
 }
 
 .btn-delete:hover {
-  background: #b92c28;
+  background: #b92c28 !important;
 }
 
 .d-none {

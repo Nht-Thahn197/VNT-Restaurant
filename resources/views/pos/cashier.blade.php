@@ -251,6 +251,11 @@
                             <span>Thẻ</span>
                         </label>
                     </div>
+                    <!-- QR TRANSFER -->
+                    <div id="qrTransferBox" class="qr-transfer" style="display:none;">
+                        <p><strong>Quét mã để chuyển khoản</strong></p>
+                        <img id="vietqrImg" src="{{ asset('images/qr/my-qr.jpg') }}" alt="QR Chuyển khoản">
+                    </div>
                     <button class="btn-confirm-pay">Thanh toán</button>
                 </div>
             </div>

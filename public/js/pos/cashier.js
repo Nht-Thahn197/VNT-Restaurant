@@ -60,6 +60,44 @@ document.addEventListener('DOMContentLoaded', () => {
     Other: 'Khác'
     };
 
+    function generateVietQR(amount, description = '') {
+        const bankId = 'MB';                  // MB Bank
+        const accountNo = '8410113801888';    // STK
+        const accountName = 'NGUYEN PHUC NHAT THANH';
+
+        const encodedDesc = encodeURIComponent(description);
+
+        return `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png`
+            + `?amount=${amount}`
+            + `&addInfo=${encodedDesc}`
+            + `&accountName=${encodeURIComponent(accountName)}`;
+    }
+
+    const qrTransferBox = document.getElementById('qrTransferBox');
+    const vietqrImg = document.getElementById('vietqrImg');
+    const payMethodRadios = document.querySelectorAll('input[name="pay_method"]');
+
+payMethodRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+        if (radio.value === 'transfer' && radio.checked) {
+
+            const needPayText = document.getElementById('needPay').innerText;
+            const amount = Number(needPayText.replace(/[^\d]/g, ''));
+
+            const table = getSelectedTable();
+            const desc = table
+                ? `ToiBenQuan-${table.name}`
+                : 'ToiBenQuan';
+
+            vietqrImg.src = generateVietQR(amount, desc);
+            qrTransferBox.style.display = 'block';
+
+        } else {
+            qrTransferBox.style.display = 'none';
+        }
+    });
+});
+
     /* ================= DROPDOWN ================= */
     menuBtn.addEventListener('click', function(e) {
         e.stopPropagation(); // Ngăn sự kiện nổi bọt
@@ -740,6 +778,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPayOrder();
         document.getElementById('orderNo').innerText =
         `#${parseInt(localStorage.getItem('pos_order_no') || 0) + 1}`;
+        document.querySelector('input[name="pay_method"][value="cash"]').checked = true;
+        qrTransferBox.style.display = 'none';
     }
 
     function closePayDrawer() {
@@ -765,6 +805,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('sumPrice').textContent = formatPrice(total);
         document.getElementById('needPay').textContent = formatPrice(total - discount);
+        const transferRadio = document.querySelector('input[name="pay_method"][value="transfer"]');
+        if (transferRadio.checked) {
+            const amount = Math.max(total - discount, 0);
+            const table = getSelectedTable();
+            const desc = table ? `ToiBenQuan-${table.name}` : 'ToiBenQuan';
+            vietqrImg.src = generateVietQR(amount, desc);
+        }
     }
 
     function renderPayOrder() {

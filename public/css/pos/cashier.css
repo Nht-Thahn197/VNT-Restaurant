@@ -1055,6 +1055,43 @@ body {
     border-color: #0066ff;
 }
 
+.qr-transfer {
+    margin-top: 14px;
+    padding: 14px 12px;
+    border: 1px dashed #ccc;
+    border-radius: 10px;
+    background: #fafafa;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    text-align: center;
+}
+
+.qr-transfer p {
+    margin: 0 0 6px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.qr-transfer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: inline;
+    margin: 4px 0;
+}
+
+.qr-transfer small {
+    display: block;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #555;
+}
+
+
 .btn-confirm-pay {
     margin-top: 20px;
     width: 100%;
