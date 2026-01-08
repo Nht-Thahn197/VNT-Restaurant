@@ -340,17 +340,39 @@ if (logoutLink) {
 }
 
 // ===== OPEN / CLOSE MODAL =====
-btnCreate.addEventListener('click', () => {
-    modal.style.display = 'flex';
+btnCreate.addEventListener('click',  () => {
+
+    currentBookingId = null;
+    document.getElementById('bookingForm').reset();
 
     phoneInput.value = '';
     nameInput.value = '';
     customerIdInput.value = '';
 
     nameInput.disabled = true;
+    phoneInput.disabled = false;
+
     nameInput.placeholder = 'Nhập số điện thoại trước';
     nameInput.classList.remove('new-customer', 'input-readonly');
+
+    document.querySelector('[name="table_id"]').value = '';
+
+    preorderItems = {};
+    renderPreorderSummary();
+
+    const st = document.getElementById('bookingStatusLine');
+    if (st) st.remove();
+
+    cancelBookingBtn.style.display = 'none';
+
+    modal.querySelector('h3').textContent = 'Thêm mới đặt bàn';
+
+    resetSaveButton(async () => await createBooking());
+
+    modal.style.display = 'flex';
+
 });
+
 
 btnClose.addEventListener('click', closeModal);
 btnCancel.addEventListener('click', closeModal);

@@ -15,11 +15,16 @@
         <section class="summary-cards">
           <div class="card">
             <div class="card-head">
-              <div class="card-title">Doanh Thu Hôm Nay</div>
+              <div class="card-title">Doanh Thu</div>
               <div class="card-sub">Hôm nay</div>
             </div>
-            <div class="card-revenue" id="ordersDone">
-              {{ number_format($todayRevenue, 0, ',', '.') }}₫
+            <div class="card-value">
+              <label class="dash_icon icon-revenue">
+                <i class="fa fa-usd"></i>
+              </label>
+              <span class="card-revenue" id="ordersDone">
+                {{ number_format($todayRevenue, 0, ',', '.') }}₫
+              </span>
             </div>
           </div>
 
@@ -28,8 +33,13 @@
               <div class="card-title">Đã Hoàn Thành</div>
               <div class="card-sub">Đơn</div>
             </div>
-            <div class="card-order" id="ordersServ">
-              {{ $completedOrders }}
+            <div class="card-value">
+              <label class="dash_icon icon-completed">
+                <i class="fa fa-star"></i>
+              </label>
+              <span class="card-order" id="ordersServ">
+                {{ $completedOrders }}
+              </span>
             </div>
           </div>
 
@@ -38,8 +48,13 @@
               <div class="card-title">Đang Phục Vụ</div>
               <div class="card-sub">Bàn</div>
             </div>
-            <div class="card-serving" id="servicing">
-              {{ $servicingTables }}
+            <div class="card-value">
+              <label class="dash_icon icon-serving">
+                <i class="fa fa-cutlery"></i>
+              </label>
+              <span class="card-serving" id="servicing">
+                {{ $servicingTables }}
+              </span>
             </div>
           </div>
         </section>

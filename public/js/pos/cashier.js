@@ -321,7 +321,7 @@ payMethodRadios.forEach(radio => {
 
             // Kiểm tra xem bàn hiện tại có món không (để tránh đổi bàn trống vô nghĩa)
             if (Object.keys(orderItems).length === 0) {
-                showToast('Bàn chưa có món, bạn chỉ cần chọn bàn khác trực tiếp bên trái.', 'warning');
+                showToast('Bàn chưa có món, bạn phải chọn bàn có món để đổi bàn.', 'warning');
                 return;
             }
 

@@ -66,6 +66,36 @@
   color:#999;
 }
 
+.card-value{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.dash_icon{
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 50%;
+  color:#fff;
+  font-size:16px;
+  box-shadow: var(--shadow);
+}
+
+.icon-revenue{
+  background:#0094da;
+}
+
+.icon-completed{
+  background:#4bac4d;
+}
+
+.icon-serving{
+  background:#18c0c2;
+}
+
 .card-revenue{ 
   font-size:28px; 
   font-weight:500; 
