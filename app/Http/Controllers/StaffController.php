@@ -83,7 +83,11 @@ class StaffController extends Controller
 
     public function updateAccount(Request $request)
     {
+        /** @var Staff|null $user */
         $user = Auth::guard('staff')->user();
+        if (!$user) {
+            return response()->json(['errors' => ['auth' => ['Chưa đăng nhập.']]], 401);
+        }
 
         $validator = Validator::make($request->all(), [
             'name' => 'required',

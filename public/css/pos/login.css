@@ -66,6 +66,25 @@ body {
     font-size: 15px;
 }
 
+.login-error {
+    margin: -6px 0 14px;
+    color: #bd0f21;
+    background: rgba(239, 60, 77, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(239, 60, 77, 0.2) !important;
+    padding: 8px 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+}
+
+.login-error::before {
+    content: "!";
+    margin-right: 8px;
+    font-size: 16px;
+    color: #ef3c4d;
+}
+
 .forgot {
     text-align: right;
     margin-top: -8px;

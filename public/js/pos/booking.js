@@ -41,10 +41,9 @@ let lastSearchKeyword = '';
 let currentBookingId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- KHAI BÁO BIẾN ---
     const btnTime = document.getElementById('timeBtn');
     const menuTime = document.getElementById('timeMenu');
-    const inputSearch = document.querySelectorAll('.sidebar .input-text'); // Lấy các ô search
+    const inputSearch = document.querySelectorAll('.sidebar .input-text');
     const rows = document.querySelectorAll('.booking-info');
     const btnTable = document.getElementById('tableBtn');
     const tableSearch = document.getElementById('tableSearch');
@@ -52,18 +51,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1;
     const rowsPerPage = 15;
 
-    // Object lưu trữ trạng thái filter
     window.filters = {
         code: '',
         name: '',
         phone: '',
-        from: null, // Unix timestamp
-        to: null,   // Unix timestamp
+        from: null,
+        to: null,
         tableId: 'all',
         status: ['waiting', 'assigned', 'received']
     };
 
-    // --- 1. XỬ LÝ DROPDOWN THỜI GIAN ---
     btnTime.addEventListener('click', (e) => {
         e.stopPropagation();
         btnTime.parentElement.classList.toggle('open');
@@ -71,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnTable.addEventListener('click', (e) => {
         e.stopPropagation();
-        // Đóng menu thời gian nếu đang mở
         document.getElementById('timeBtn').parentElement.classList.remove('open');
         btnTable.parentElement.classList.toggle('open');
     });
@@ -100,32 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
             btnTime.innerHTML = `${item.innerText} <i class="fa fa-chevron-down"></i>`;
             applyPreset(preset);
             btnTime.parentElement.classList.remove('open');
-            // Reset ô DateRangePicker nếu chọn preset nhanh
             $('#dateRange').val('');
         });
     });
 
     document.querySelectorAll('.table-item').forEach(item => {
         item.addEventListener('click', function() {
-            // Xử lý UI
             document.querySelectorAll('.table-item').forEach(i => i.classList.remove('active'));
             this.classList.add('active');
-            
             btnTable.innerHTML = `${this.innerText} <i class="fa fa-chevron-down"></i>`;
             btnTable.parentElement.classList.remove('open');
 
-            // Cập nhật logic filter
             window.filters.tableId = this.dataset.id;
             applyBookingFilters();
         });
     });
-
-    // --- 2. LOGIC TÍNH TOÁN THỜI GIAN ---
     function applyPreset(preset) {
         const now = new Date();
         let from = null, to = null;
 
-        // Helper: Tạo bản sao date để không làm thay đổi biến gốc
         const startOfDay = d => {
             const date = new Date(d);
             date.setHours(0, 0, 0, 0);
@@ -149,11 +138,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 to = endOfDay(yesterday);
                 break;
             case 'this_week':
-                // Tính Thứ 2 tuần này
                 const first = now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1);
                 const monday = new Date(now.setDate(first));
                 from = startOfDay(monday);
-                to = endOfDay(new Date()); // Đến hiện tại
+                to = endOfDay(new Date());
                 break;
             case 'last_week':
                 const lastMon = new Date();
@@ -171,53 +159,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 from = null;
                 to = null;
                 break;
-            // ... các case khác tương tự
         }
-
-        // Chuyển sang giây (Unix Timestamp) để so khớp với data-time đã sửa ở Blade
         window.filters.from = from ? Math.floor(from.getTime() / 1000) : null;
         window.filters.to   = to   ? Math.floor(to.getTime() / 1000) : null;
 
         applyBookingFilters();
     }
-    // --- 3. BỘ LỌC CHÍNH ---
     function applyBookingFilters() {
         rows.forEach(row => {
             let match = true;
-
-            // Filter Mã (Input 1)
             if (window.filters.code) {
                 const codeTxt = (row.dataset.code || '').toLowerCase();
                 if (!codeTxt.includes(window.filters.code)) match = false;
             }
-
-            // Filter Tên (Input 2)
             if (match && window.filters.name) {
                 const nameTxt = (row.dataset.name || '').toLowerCase();
                 if (!nameTxt.includes(window.filters.name)) match = false;
             }
-
-            // Filter SĐT (Input 3)
             if (match && window.filters.phone) {
                 const phoneTxt = (row.dataset.phone || '').toLowerCase();
                 if (!phoneTxt.includes(window.filters.phone)) match = false;
             }
-
-            // Filter Thời gian (Unix timestamp)
             if (match && window.filters.from && window.filters.to) {
                 const rowTime = Number(row.dataset.time);
                 if (rowTime < window.filters.from || rowTime > window.filters.to) match = false;
             }
-
-            // Filter Phòng/Bàn
             if (match && window.filters.tableId !== 'all') {
-                // Đảm bảo ở thẻ <tr> bạn đã thêm data-table-id="{{ $booking->table_id }}"
                 if (row.dataset.tableId !== window.filters.tableId) {
                     match = false;
                 }
             }
-
-            // Filter Trạng thái (Đa chọn)
             if (match) {
                 const rowStatus = row.dataset.status;
                 if (window.filters.status && window.filters.status.length > 0) {
@@ -233,34 +204,24 @@ document.addEventListener('DOMContentLoaded', () => {
         renderPagination();
     }
 
-    // --- 4. PHÂN TRANG ---
     function renderPagination() {
         const filteredRows = Array.from(rows).filter(r => r.dataset.filtered !== '0');
         const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
-
-        // Ẩn tất cả trước
         rows.forEach(r => {
             r.style.display = 'none';
             const detail = document.getElementById(`detail-${r.dataset.id}`);
             if (detail) detail.style.display = 'none';
         });
 
-        // Hiển thị theo trang
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
-
         filteredRows.slice(start, end).forEach(r => r.style.display = '');
-
-        // Cập nhật UI Info
         const pageInfo = document.getElementById('pageInfo');
         if (pageInfo) pageInfo.innerText = `Trang ${currentPage} / ${totalPages}`;
-        
-        // Disabled nút nếu cần
         const prevBtn = document.getElementById('prevPage');
         const nextBtn = document.getElementById('nextPage');
         if(prevBtn) prevBtn.disabled = (currentPage === 1);
         if(nextBtn) nextBtn.disabled = (currentPage === totalPages);
-
         const paginationContainer = document.getElementById('pagination');
         if (totalPages <= 1) {
             paginationContainer.classList.add('d-none');
@@ -269,9 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- 5. SỰ KIỆN LẮNG NGHE ---
-
-    // Gán sự kiện cho 3 ô input search theo thứ tự
     const searchInputs = document.querySelectorAll('.filter-box .input-text');
     if (searchInputs.length >= 3) {
         searchInputs[0].addEventListener('input', e => { window.filters.code = e.target.value.toLowerCase(); applyBookingFilters(); });

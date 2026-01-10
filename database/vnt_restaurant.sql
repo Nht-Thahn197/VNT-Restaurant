@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th1 08, 2026 lúc 05:54 PM
+-- Thời gian đã tạo: Th1 10, 2026 lúc 07:51 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -1349,19 +1349,19 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id`, `name`, `permission`) VALUES
-(1, 'admin', NULL),
-(2, 'Bếp Trưởng', NULL),
-(3, 'Nhân Viên Bàn', NULL),
-(4, 'Nhân Viên Phục Vụ', NULL),
-(5, 'Tạp Vụ', NULL),
-(6, 'Quản Lý', NULL),
-(7, 'Bảo Vệ', NULL),
-(8, 'Bếp Phó', NULL),
-(9, 'Chảo', NULL),
-(10, 'Thớt', NULL),
-(11, 'Chảo Non', NULL),
-(12, 'Kế Toán', NULL),
-(13, 'Phụ Bếp', NULL);
+(1, 'admin', '[\"view_dashboard\",\"view_product\",\"create_product\",\"update_product\",\"delete_product\",\"view_ingredient\",\"create_ingredient\",\"update_ingredient\",\"delete_ingredient\",\"view_category_product\",\"create_category_product\",\"update_category_product\",\"delete_category_product\",\"view_category_ingredient\",\"create_category_ingredient\",\"update_category_ingredient\",\"delete_category_ingredient\",\"view_table\",\"create_table\",\"update_table\",\"delete_table\",\"view_invoice\",\"cancel_invoice\",\"view_promotion\",\"view_import\",\"view_export\",\"view_customer\",\"update_customer\",\"view_staff\",\"view_report\",\"view_analysis\",\"view_contact\"]'),
+(2, 'Bếp Trưởng', '[\"view_dashboard\",\"view_product\",\"view_ingredient\",\"view_table\",\"view_invoice\",\"cancel_invoice\",\"view_import\",\"view_export\"]'),
+(3, 'Nhân Viên Bàn', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]'),
+(4, 'Nhân Viên Phục Vụ', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]'),
+(5, 'Tạp Vụ', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]'),
+(6, 'Quản Lý', '[\"view_dashboard\",\"view_product\",\"create_product\",\"update_product\",\"delete_product\",\"view_ingredient\",\"create_ingredient\",\"update_ingredient\",\"delete_ingredient\",\"view_category_product\",\"create_category_product\",\"update_category_product\",\"delete_category_product\",\"view_category_ingredient\",\"create_category_ingredient\",\"update_category_ingredient\",\"delete_category_ingredient\",\"view_table\",\"create_table\",\"update_table\",\"delete_table\",\"view_invoice\",\"cancel_invoice\",\"view_promotion\",\"view_import\",\"view_export\",\"update_customer\",\"view_staff\",\"view_report\",\"view_analysis\",\"view_contact\"]'),
+(7, 'Bảo Vệ', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]'),
+(8, 'Bếp Phó', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\",\"view_import\",\"view_export\"]'),
+(9, 'Chảo', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]'),
+(10, 'Thớt', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]'),
+(11, 'Chảo Non', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]'),
+(12, 'Kế Toán', '[\"view_dashboard\",\"view_product\",\"view_ingredient\",\"view_table\",\"view_invoice\",\"cancel_invoice\",\"view_promotion\",\"view_import\",\"view_export\",\"view_customer\",\"view_staff\",\"view_report\",\"view_analysis\",\"view_contact\"]'),
+(13, 'Phụ Bếp', '[\"view_dashboard\",\"view_table\",\"view_invoice\",\"cancel_invoice\"]');
 
 -- --------------------------------------------------------
 
@@ -1393,38 +1393,38 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `code`, `location_code`, `img`, `name`, `phone`, `cccd`, `email`, `password`, `dob`, `gender`, `role_id`, `start_date`, `status`, `created_at`) VALUES
 (1, 'NV000001', 'tbqdonghia', '1766831587_z6964562040461_7cb24844432153850934d2efa2ae1f88.jpg', 'Nguyễn Phúc Nhật Thành', '0961581328', '001203032553', 'nhatthanh197203@gmail.com', '$2y$10$34ZZSWfpltyooeUS1fvonOZvyRpuoLmJAP6WvCJ8E04YYHKV19iKq', '2003-07-19', 'nam', 1, '2023-12-24', 'Active', '2025-11-25 19:29:14'),
-(2, 'NV000002', NULL, '1767891181_ma.jpg', 'Nguyễn Tuấn Anh', '0988398455', '001077004246', 'Tamanager@gmail.com', '$2y$12$1vEHQrRTev8SbM7VUQnVmel2N.M/u1CheqZBy90FJH8ihSy9kbc1y', '1977-01-03', 'nam', 6, '2023-12-23', 'Active', '2025-12-10 13:45:07'),
-(3, 'NV000003', NULL, '1767891077_KT.jpg', 'Nguyễn Mai Anh', '0989115689', '001176048275', 'manhkt@gmail.com', '$2y$12$J.4qEGpmppsyCaAiVVSeeu/3IyF4c6k4/LTptHTO7UjA9P9z1npZa', '2000-10-09', 'nữ', 12, '2023-12-23', 'Active', '2025-12-10 13:47:40'),
-(4, 'NV000004', NULL, NULL, 'Nguyễn Phúc Đức', '0981678163', NULL, 'duc@gmail.com', '$2y$12$j4AYq0p448SsjU0KGSKaHOO0pxDdkGB/cyDH9NUgbQZ6wfWjwcoU.', '2003-09-17', 'nam', 3, '2025-01-10', 'Active', '2025-12-10 13:57:34'),
-(5, 'NV000005', NULL, '1765375295_quynh.jpg', 'Nguyễn Thị Như Quỳnh', '0769069166', '001304038035', 'quynhquam031204@gmail.com', '$2y$12$VabJJMh9XsbhLPedPIWllu8wF28jGEjSba5IKof0GIfrTaRtA9b/K', '2004-12-03', 'nữ', 1, '2024-01-01', 'Active', '2025-12-10 14:01:35'),
-(6, 'NV000006', NULL, NULL, 'Nguyễn Thu Phương', '0862888754', NULL, 'thuphuong@gmail.com', '$2y$12$zAU2Vx2MWKCl3Pjh6DDO6OUXDUn.s5YWMTIK2UtdxMFsU4AEWFJyC', '2005-05-14', 'nữ', 4, '2023-12-23', 'Active', '2025-12-10 14:08:33'),
-(7, 'NV000007', NULL, NULL, 'Nguyễn Xuân Phúc', '0395861854', '042206009656', 'xphuc@gmail.com', '$2y$12$qEfZJoADWzRQcrMPG85qk.UTFNak.kQYbJ/RGUHiGJMi5AaDyQu.q', '2006-02-22', 'nam', 3, '2024-12-06', 'Active', '2025-12-10 14:10:26'),
-(8, 'NV000008', NULL, NULL, 'Đỗ Hữu Hải', '0343548072', '001205003445', 'HH@gmail.com', '$2y$12$4iy6oBDs8l/xp3O2uWzaoOOJnqiTbnmLUS4LzO1EG.auZRHjTmi/e', '2005-06-03', 'nam', 3, '2025-03-20', 'Active', '2025-12-10 14:13:26'),
-(9, 'NV000009', NULL, NULL, 'Nguyễn Phúc Ân', '0869428901', '001210048153', 'PAn@gmail.com', '$2y$12$56esbm0k3b52.7AO6p/cvuo62PJer3jlPL1YBFmBdL9j5VsEwVaXy', '2010-03-16', 'nam', 3, '2025-06-16', 'Active', '2025-12-10 14:14:44'),
-(10, 'NV000010', NULL, '1767890974_ram.jpg', 'Nguyễn Tiến Đạt', '0984646172', NULL, 'tiendat@gmail.com', '$2y$12$GyfTXlqPVykpnoe6XedJ9.CeCDlgVrTN9QOT1umPxkeLo7nddhhNK', '1992-09-12', 'nam', 2, '2023-12-30', 'Active', '2025-12-10 14:18:35'),
-(11, 'NV000011', NULL, '1767890997_bv.jpg', 'Đỗ Hữu Thanh', '0352031947', '001079002398', NULL, '$2y$12$AvRFPU3zb3sR6YPuo6NewuT04BzUdJDi4gSelQmrDWZLhHU23aNUq', '1979-09-26', 'nam', 7, '2025-02-04', 'Active', '2025-12-10 14:19:50'),
-(12, 'NV000012', NULL, '1767891050_cn1.jpg', 'Nguyễn Văn Cao', '0983366488', NULL, NULL, '$2y$12$GhpoV10Aj9kVykamwa5Jxep7gf.hj5zKEULmhQF07pAVh3vniZ7.a', '2003-11-05', 'nam', 11, '2024-07-01', 'Active', '2025-12-10 14:26:51'),
-(13, 'NV000013', NULL, '1767891030_C0.jpg', 'Điền Hải Phong', '0817676151', '00130223153', NULL, '$2y$12$69en3YBDHe8jow1Rtc1nUu/UxgUOUNlxwGogElG5xdlx2oz/wKjHC', '2000-12-10', 'nam', 9, '2024-01-11', 'Active', '2025-12-10 14:28:30'),
-(14, 'NV000014', NULL, '1767891009_Bp.jpg', 'Nguyễn Văn Thuấn', '0865135155', NULL, NULL, '$2y$12$3JyIt.z64IWGOYbtl2QMseZQGfoY95XXbN.JFAsxbNpVmfdvqU6iC', '1993-03-12', 'nam', 8, '2023-12-23', 'Active', '2025-12-10 14:29:39'),
-(15, 'NV000015', NULL, NULL, 'Hoàng Thị Đào', '0948096154', '008179000601', NULL, '$2y$12$33fehEGr4l.FDL1VdJfxIuCYuYL1ZGmWb6I8o0Vudfai4Ous.Tw6.', '1979-08-25', 'nữ', 13, '2024-12-31', 'Active', '2025-12-10 14:32:26'),
-(16, 'NV000016', NULL, NULL, 'Nguyễn Minh Huệ', '0987125120', '001207695314', NULL, '$2y$12$nO1Kaxo1BiESQ18kOmIYUOxPc0OT6FBc5XPNlQxJZyiyTFOBUl/P.', '2005-04-06', 'nữ', 4, '2024-04-12', 'Active', '2025-12-10 14:34:13'),
-(17, 'NV000017', NULL, NULL, 'Nguyễn Ngọc Huyền', '0900617117', '001177004246', NULL, '$2y$12$uxz73qBEud./n5I7uQek4Omf9K.uCioZVb36dIo1mhO53tZQq0hA6', '1966-02-15', 'nữ', 5, '2023-12-23', 'Active', '2025-12-10 14:37:58'),
-(18, 'NV000018', NULL, NULL, 'Hoàng Đức Mạnh', '0769046385', '001212132553', NULL, '$2y$12$95GCp3T93u.8Pv7ztCyez.f5yKZ4iASKTazsB8lPkSq5oQAUsryc6', '2005-12-16', 'nam', 3, '2024-08-18', 'Active', '2025-12-10 16:07:41'),
-(19, 'NV000019', NULL, NULL, 'Nguyễn Đắc Thắng', '0987962125', '001216348153', NULL, '$2y$12$BIluHkkafd4LveXFj338eeiFEWfJtWbAmKlH.idb/zGquPPf1mcBS', '1999-03-19', 'nam', 10, '2024-08-18', 'Active', '2025-12-10 16:09:00'),
-(20, 'NV000020', NULL, NULL, 'Nguyễn Thế Đức', '0969172190', '001276748621', NULL, '$2y$12$v3gm01mi10HjzvMOP9.zF.pD3U9xB8gRBJuX5fU6cOLJNtjKGl0d2', '1997-08-08', 'nam', 10, '2024-09-18', 'Active', '2025-12-10 16:10:14'),
-(21, 'NV000021', NULL, NULL, 'Đỗ Bảo Minh', '0917625152', '001082946357', NULL, '$2y$12$G7fRb/MEG9.VZ9U7LWvuDO8/LKaat9ANiMaSQdeUpZdnGB9CBzGMO', '1995-04-18', 'nam', 13, '2024-08-19', 'Active', '2025-12-10 16:12:46'),
-(22, 'NV000022', NULL, NULL, 'Nguyễn Vân Khánh', '0782413116', '001306022614', 'thanh197203@gmail.com', '$2y$12$AsRkuaGb9pI54rYHRF//d.Ss/Smc8ZQMEfYSyju5m2J4SYTxUP6I.', '2006-04-14', 'nữ', 4, '2024-08-05', 'Active', '2025-12-10 16:14:17'),
-(23, 'NV000023', NULL, NULL, 'Phạm Thị Thúy Ngọc', '0984215763', '012345678912', 'thanh197203@gmail.com', '$2y$12$rUe00azchjHW.UgWSftfBOgQ/Ajemyyd5iO1ue4lmvLEzGbGrwieK', '1999-02-25', 'nữ', 4, '2025-09-08', 'Active', '2025-12-10 16:17:53'),
-(24, 'NV000024', NULL, NULL, 'Trần Thu Hà', '0912673804', '001362813547', NULL, '$2y$12$TEXnxovqH1T2Eehf0v2q0enQZaKO3JCSXxbP5WHVjuV5ToGH80OYu', '2000-10-22', 'nữ', 4, '2024-09-12', 'Active', '2025-12-10 16:19:59'),
-(25, 'NV000025', NULL, NULL, 'Nguyễn Ngọc Trang', '0976582140', '001328451620', NULL, '$2y$12$wabQ3cJaZquI1z3zTb3Uu.K7DLApsukhwEDzg96kTt0ZWkd.OS9zO', '2005-11-25', 'nữ', 4, '2025-03-04', 'Active', '2025-12-10 16:22:07'),
-(26, 'NV000026', NULL, '1767891023_C.jpg', 'Vũ Đức Huấn', '0935720465', '001114237508', NULL, '$2y$12$Wt4p.BQsTAjHg/qfQH8g2O.UTrnKriEPFzgedhsn27.VE6Xg3WKkO', '1994-06-01', 'nam', 9, '2025-02-26', 'Active', '2025-12-10 16:23:18'),
-(27, 'NV000027', NULL, '1767891041_cn.jpg', 'Nguyễn Văn Nghĩa', '0889134507', '001239284610', NULL, '$2y$12$GKCr67vM8yR6Ni/yItYm6eQaYyXdXX1HvuR3aqlRgvhbNmWdSeZ1a', '2000-05-05', 'nam', 11, '2025-01-01', 'Active', '2025-12-10 16:24:27'),
-(28, 'NV000028', NULL, NULL, 'Nguyễn Mai Hoa', '0857903621', '001321975430', NULL, '$2y$12$ySi.uxtNAS0/ptXiB6JApuwiL.3BlNmNasKyq6eY13Cn4SiysxSgm', '2008-06-15', 'nữ', 4, '2025-02-02', 'Active', '2025-12-10 16:26:41'),
-(29, 'NV000029', NULL, NULL, 'Nguyễn Huyền Nhung', '0963748210', '001384726510', NULL, '$2y$12$JQ5OrC5Yizp1Rbz7Iar6g.SurvpuLKRagvGeP8Ps70hlPi0XKsAHS', '2006-12-10', 'nữ', 4, '2024-11-04', 'Active', '2025-12-10 16:29:22'),
-(30, 'NV000030', NULL, '1767891127_NV1.jpg', 'Trần Khánh Linh', '0908452379', '001318349602', NULL, '$2y$12$gXvoCRyaOj3XYVeKGNWlSu3LgrMFz3/HYwf6Zri4xHgp/.FVXaNC.', '2005-07-24', 'nữ', 4, '2024-10-13', 'Active', '2025-12-10 16:30:56'),
-(31, 'NV000031', NULL, NULL, 'Nguyễn Ngọc Trâm', '0946820517', '001147281504', 'thanh197203@gmail.com', '$2y$12$VeWNXhe47QCBwzyDb86ZW.GOPseugX2PNIR5emQm6KI1Q0AqVxuhq', '1982-07-09', 'nữ', 5, '2024-05-23', 'Active', '2025-12-10 16:33:24'),
-(32, 'NV000032', NULL, '1767891117_NV.jpg', 'Trần Thị Hồng Nhung', '0896375204', '001226739410', NULL, '$2y$12$TEjM9hHqEQHhRDeu.HaTuOcjDON4gZu5BJW.mGKWxwaqjHZuTY9fi', '2003-05-11', 'nữ', 4, '2024-08-26', 'Active', '2025-12-10 16:35:08'),
-(33, 'NV000033', NULL, '1767891143_db.jpg', 'Lê Đức Hùng', '0352217255', '001246884575', NULL, '$2y$10$/NFaxz4g4T3x7AiWX7/k2Opn2rMAsijviGApBLXhFUAXRFueNgl/G', NULL, NULL, 13, NULL, 'Active', '2025-12-31 09:23:49');
+(2, 'NV000002', 'tbqdonghia', '1767891181_ma.jpg', 'Nguyễn Tuấn Anh', '0988398455', '001077004246', 'Tamanager@gmail.com', '$2y$12$1vEHQrRTev8SbM7VUQnVmel2N.M/u1CheqZBy90FJH8ihSy9kbc1y', '1977-01-03', 'nam', 6, '2023-12-23', 'Active', '2025-12-10 13:45:07'),
+(3, 'NV000003', 'tbqdonghia', '1767891077_KT.jpg', 'Nguyễn Mai Anh', '0989115689', '001176048275', 'manhkt@gmail.com', '$2y$10$Al26qOHH4hLl1u6wbzk9W.enGtBvaLXDt89ybFzAuHMGbVthO9NXi', '2000-10-09', 'nữ', 12, '2023-12-23', 'Active', '2025-12-10 13:47:40'),
+(4, 'NV000004', 'tbqdonghia', NULL, 'Nguyễn Phúc Đức', '0981678163', NULL, 'duc@gmail.com', '$2y$12$j4AYq0p448SsjU0KGSKaHOO0pxDdkGB/cyDH9NUgbQZ6wfWjwcoU.', '2003-09-17', 'nam', 3, '2025-01-10', 'Active', '2025-12-10 13:57:34'),
+(5, 'NV000005', 'tbqdonghia', '1765375295_quynh.jpg', 'Nguyễn Thị Như Quỳnh', '0769069166', '001304038035', 'quynhquam031204@gmail.com', '$2y$10$O/bVqTQmIgzUbP.UFzSm7OoYq2..qt0ypQ5Qpl7cYzwHezy25aLRS', '2004-12-03', 'nữ', 1, '2024-01-01', 'Active', '2025-12-10 14:01:35'),
+(6, 'NV000006', 'tbqdonghia', NULL, 'Nguyễn Thu Phương', '0862888754', NULL, 'thuphuong@gmail.com', '$2y$12$zAU2Vx2MWKCl3Pjh6DDO6OUXDUn.s5YWMTIK2UtdxMFsU4AEWFJyC', '2005-05-14', 'nữ', 4, '2023-12-23', 'Active', '2025-12-10 14:08:33'),
+(7, 'NV000007', 'tbqdonghia', NULL, 'Nguyễn Xuân Phúc', '0395861854', '042206009656', 'xphuc@gmail.com', '$2y$12$qEfZJoADWzRQcrMPG85qk.UTFNak.kQYbJ/RGUHiGJMi5AaDyQu.q', '2006-02-22', 'nam', 3, '2024-12-06', 'Active', '2025-12-10 14:10:26'),
+(8, 'NV000008', 'tbqdonghia', NULL, 'Đỗ Hữu Hải', '0343548072', '001205003445', 'HH@gmail.com', '$2y$12$4iy6oBDs8l/xp3O2uWzaoOOJnqiTbnmLUS4LzO1EG.auZRHjTmi/e', '2005-06-03', 'nam', 3, '2025-03-20', 'Active', '2025-12-10 14:13:26'),
+(9, 'NV000009', 'tbqdonghia', NULL, 'Nguyễn Phúc Ân', '0869428901', '001210048153', 'PAn@gmail.com', '$2y$12$56esbm0k3b52.7AO6p/cvuo62PJer3jlPL1YBFmBdL9j5VsEwVaXy', '2010-03-16', 'nam', 3, '2025-06-16', 'Active', '2025-12-10 14:14:44'),
+(10, 'NV000010', 'tbqdonghia', '1767890974_ram.jpg', 'Nguyễn Tiến Đạt', '0984646172', NULL, 'tiendat@gmail.com', '$2y$12$GyfTXlqPVykpnoe6XedJ9.CeCDlgVrTN9QOT1umPxkeLo7nddhhNK', '1992-09-12', 'nam', 2, '2023-12-30', 'Active', '2025-12-10 14:18:35'),
+(11, 'NV000011', 'tbqdonghia', '1767890997_bv.jpg', 'Đỗ Hữu Thanh', '0352031947', '001079002398', NULL, '$2y$12$AvRFPU3zb3sR6YPuo6NewuT04BzUdJDi4gSelQmrDWZLhHU23aNUq', '1979-09-26', 'nam', 7, '2025-02-04', 'Active', '2025-12-10 14:19:50'),
+(12, 'NV000012', 'tbqdonghia', '1767891050_cn1.jpg', 'Nguyễn Văn Cao', '0983366488', NULL, NULL, '$2y$12$GhpoV10Aj9kVykamwa5Jxep7gf.hj5zKEULmhQF07pAVh3vniZ7.a', '2003-11-05', 'nam', 11, '2024-07-01', 'Active', '2025-12-10 14:26:51'),
+(13, 'NV000013', 'tbqdonghia', '1767891030_C0.jpg', 'Điền Hải Phong', '0817676151', '00130223153', NULL, '$2y$12$69en3YBDHe8jow1Rtc1nUu/UxgUOUNlxwGogElG5xdlx2oz/wKjHC', '2000-12-10', 'nam', 9, '2024-01-11', 'Active', '2025-12-10 14:28:30'),
+(14, 'NV000014', 'tbqdonghia', '1767891009_Bp.jpg', 'Nguyễn Văn Thuấn', '0865135155', NULL, NULL, '$2y$12$3JyIt.z64IWGOYbtl2QMseZQGfoY95XXbN.JFAsxbNpVmfdvqU6iC', '1993-03-12', 'nam', 8, '2023-12-23', 'Active', '2025-12-10 14:29:39'),
+(15, 'NV000015', 'tbqdonghia', NULL, 'Hoàng Thị Đào', '0948096154', '008179000601', NULL, '$2y$12$33fehEGr4l.FDL1VdJfxIuCYuYL1ZGmWb6I8o0Vudfai4Ous.Tw6.', '1979-08-25', 'nữ', 13, '2024-12-31', 'Active', '2025-12-10 14:32:26'),
+(16, 'NV000016', 'tbqdonghia', NULL, 'Nguyễn Minh Huệ', '0987125120', '001207695314', NULL, '$2y$12$nO1Kaxo1BiESQ18kOmIYUOxPc0OT6FBc5XPNlQxJZyiyTFOBUl/P.', '2005-04-06', 'nữ', 4, '2024-04-12', 'Active', '2025-12-10 14:34:13'),
+(17, 'NV000017', 'tbqdonghia', NULL, 'Nguyễn Ngọc Huyền', '0900617117', '001177004246', NULL, '$2y$12$uxz73qBEud./n5I7uQek4Omf9K.uCioZVb36dIo1mhO53tZQq0hA6', '1966-02-15', 'nữ', 5, '2023-12-23', 'Active', '2025-12-10 14:37:58'),
+(18, 'NV000018', 'tbqdonghia', NULL, 'Hoàng Đức Mạnh', '0769046385', '001212132553', NULL, '$2y$12$95GCp3T93u.8Pv7ztCyez.f5yKZ4iASKTazsB8lPkSq5oQAUsryc6', '2005-12-16', 'nam', 3, '2024-08-18', 'Active', '2025-12-10 16:07:41'),
+(19, 'NV000019', 'tbqdonghia', NULL, 'Nguyễn Đắc Thắng', '0987962125', '001216348153', NULL, '$2y$12$BIluHkkafd4LveXFj338eeiFEWfJtWbAmKlH.idb/zGquPPf1mcBS', '1999-03-19', 'nam', 10, '2024-08-18', 'Active', '2025-12-10 16:09:00'),
+(20, 'NV000020', 'tbqdonghia', NULL, 'Nguyễn Thế Đức', '0969172190', '001276748621', NULL, '$2y$12$v3gm01mi10HjzvMOP9.zF.pD3U9xB8gRBJuX5fU6cOLJNtjKGl0d2', '1997-08-08', 'nam', 10, '2024-09-18', 'Active', '2025-12-10 16:10:14'),
+(21, 'NV000021', 'tbqdonghia', NULL, 'Đỗ Bảo Minh', '0917625152', '001082946357', NULL, '$2y$12$G7fRb/MEG9.VZ9U7LWvuDO8/LKaat9ANiMaSQdeUpZdnGB9CBzGMO', '1995-04-18', 'nam', 13, '2024-08-19', 'Active', '2025-12-10 16:12:46'),
+(22, 'NV000022', 'tbqdonghia', NULL, 'Nguyễn Vân Khánh', '0782413116', '001306022614', 'thanh197203@gmail.com', '$2y$12$AsRkuaGb9pI54rYHRF//d.Ss/Smc8ZQMEfYSyju5m2J4SYTxUP6I.', '2006-04-14', 'nữ', 4, '2024-08-05', 'Active', '2025-12-10 16:14:17'),
+(23, 'NV000023', 'tbqdonghia', NULL, 'Phạm Thị Thúy Ngọc', '0984215763', '012345678912', 'thanh197203@gmail.com', '$2y$12$rUe00azchjHW.UgWSftfBOgQ/Ajemyyd5iO1ue4lmvLEzGbGrwieK', '1999-02-25', 'nữ', 4, '2025-09-08', 'Active', '2025-12-10 16:17:53'),
+(24, 'NV000024', 'tbqdonghia', NULL, 'Trần Thu Hà', '0912673804', '001362813547', '', '$2y$12$TEXnxovqH1T2Eehf0v2q0enQZaKO3JCSXxbP5WHVjuV5ToGH80OYu', '2000-10-22', 'nữ', 4, '2024-09-12', 'Active', '2025-12-10 16:19:59'),
+(25, 'NV000025', 'tbqdonghia', NULL, 'Nguyễn Ngọc Trang', '0976582140', '001328451620', NULL, '$2y$12$wabQ3cJaZquI1z3zTb3Uu.K7DLApsukhwEDzg96kTt0ZWkd.OS9zO', '2005-11-25', 'nữ', 4, '2025-03-04', 'Active', '2025-12-10 16:22:07'),
+(26, 'NV000026', 'tbqdonghia', '1767891023_C.jpg', 'Vũ Đức Huấn', '0935720465', '001114237508', NULL, '$2y$12$Wt4p.BQsTAjHg/qfQH8g2O.UTrnKriEPFzgedhsn27.VE6Xg3WKkO', '1994-06-01', 'nam', 9, '2025-02-26', 'Active', '2025-12-10 16:23:18'),
+(27, 'NV000027', 'tbqdonghia', '1767891041_cn.jpg', 'Nguyễn Văn Nghĩa', '0889134507', '001239284610', NULL, '$2y$12$GKCr67vM8yR6Ni/yItYm6eQaYyXdXX1HvuR3aqlRgvhbNmWdSeZ1a', '2000-05-05', 'nam', 11, '2025-01-01', 'Active', '2025-12-10 16:24:27'),
+(28, 'NV000028', 'tbqdonghia', NULL, 'Nguyễn Mai Hoa', '0857903621', '001321975430', NULL, '$2y$12$ySi.uxtNAS0/ptXiB6JApuwiL.3BlNmNasKyq6eY13Cn4SiysxSgm', '2008-06-15', 'nữ', 4, '2025-02-02', 'Active', '2025-12-10 16:26:41'),
+(29, 'NV000029', 'tbqdonghia', NULL, 'Nguyễn Huyền Nhung', '0963748210', '001384726510', NULL, '$2y$12$JQ5OrC5Yizp1Rbz7Iar6g.SurvpuLKRagvGeP8Ps70hlPi0XKsAHS', '2006-12-10', 'nữ', 4, '2024-11-04', 'Active', '2025-12-10 16:29:22'),
+(30, 'NV000030', 'tbqdonghia', '1767891127_NV1.jpg', 'Trần Khánh Linh', '0908452379', '001318349602', NULL, '$2y$12$gXvoCRyaOj3XYVeKGNWlSu3LgrMFz3/HYwf6Zri4xHgp/.FVXaNC.', '2005-07-24', 'nữ', 4, '2024-10-13', 'Active', '2025-12-10 16:30:56'),
+(31, 'NV000031', 'tbqdonghia', NULL, 'Nguyễn Ngọc Trâm', '0946820517', '001147281504', 'thanh197203@gmail.com', '$2y$12$VeWNXhe47QCBwzyDb86ZW.GOPseugX2PNIR5emQm6KI1Q0AqVxuhq', '1982-07-09', 'nữ', 5, '2024-05-23', 'Active', '2025-12-10 16:33:24'),
+(32, 'NV000032', 'tbqdonghia', '1767891117_NV.jpg', 'Trần Thị Hồng Nhung', '0896375204', '001226739410', NULL, '$2y$12$TEjM9hHqEQHhRDeu.HaTuOcjDON4gZu5BJW.mGKWxwaqjHZuTY9fi', '2003-05-11', 'nữ', 4, '2024-08-26', 'Active', '2025-12-10 16:35:08'),
+(33, 'NV000033', 'tbqdonghia', '1767891143_db.jpg', 'Lê Đức Hùng', '0352217255', '001246884575', NULL, '$2y$10$dX/.IcD7lNwwemisN/MdM.ne.PvOiVnbSStlmT5Tigv7E4NGP8X92', NULL, NULL, 13, NULL, 'Active', '2025-12-31 09:23:49');
 
 --
 -- Bẫy `users`
@@ -1776,7 +1776,7 @@ ALTER TABLE `recipe`
 -- AUTO_INCREMENT cho bảng `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT cho bảng `users`
