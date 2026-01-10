@@ -38,7 +38,9 @@
           <div class="group-header">
             <span>Nhóm hàng</span>
             <div class="group-actions">
+              @can('create_category_product')
               <button type="button" class="add-group">＋</button>
+              @endcan
               <span class="group-arrow"></span>
             </div>
           </div>
@@ -54,7 +56,9 @@
               @foreach($categories as $category)
                 <li class="category-item" data-category="{{ $category->id }}">
                   <span class="cat-name">{{ $category->name }}</span>
+                  @can('update_category_product')
                   <i class="fa-regular fa-pen-to-square edit-icon"></i>
+                  @endcan
                 </li>
               @endforeach
             </ul>
@@ -67,7 +71,9 @@
     <div class="main-content">
       <div class="top-bar">
         <h2>Hàng Hóa</h2>
+          @can('create_product')
           <button id="btnOpenForm" class="btn-add"><i class="far fa-plus"></i> Thêm Hàng Hóa</button>
+          @endcan
       </div>
 
       <table class="product-table">
@@ -133,8 +139,12 @@
                   </div>
                   <!-- Nút -->
                   <div class="detail-actions">
+                    @can('update_product')
                     <a href="#" class="btn prd-update"><i class="fa fa-check-square"></i> Cập nhật</a>
+                    @endcan
+                    @can('delete_product')
                     <a href="#" class="btn prd-delete"><i class="far fa-trash-alt"></i> Xoá</a>
+                    @endcan
                   </div>
               </td>
             </tr>
@@ -158,9 +168,13 @@
     <label>Tên nhóm</label>
     <input type="text" id="group-name" placeholder="Nhập tên nhóm...">
     <div class="popup-actions">
+      @canany(['create_category_product', 'update_category_product'])
       <button id="cat-save" class="btn-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+      @endcanany
       <button id="cat-cancel" class="btn-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
+      @can('delete_category_product')
       <button id="cat-delete" class="btn-delete" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
+      @endcan
     </div>
   </div>
   <!-- FORM Add & Edit & Delete CATEGORY END -->
@@ -234,7 +248,9 @@
           </div>
 
           <div class="form-actions">
+            @canany(['create_product', 'update_product'])
             <button id="save-popup" class="prd-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+            @endcanany
             <button id="cancelBtn" class="prd-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
           </div>
         </form>
@@ -265,7 +281,9 @@
         </table>
 
         <div class="form-actions">
+          @canany(['create_product', 'update_product'])
           <button id="save-popup" class="prd-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+          @endcanany
           <button id="cancel-popup" class="prd-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
         </div>
       </div>

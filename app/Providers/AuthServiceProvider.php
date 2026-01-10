@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Providers;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -21,10 +23,119 @@ class AuthServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->registerPolicies();
+        Gate::before(function ($user, $ability) {
+            return null;
+        });
+        $permissions = [
+            'view_dashboard' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bảo Vệ', 'Bếp Trưởng', 'Bếp Phó', 'Nhân Viên Bàn', 'Nhân viên Phục Vụ', 'Tạp Vụ', 'Chảo', 'Thớt', 'Chảo Non', 'Phụ Bếp'],
 
-        //
+            'view_product' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng'],
+            'create_product' => ['Admin', 'Quản Lý'],
+            'update_product' => ['Admin', 'Quản Lý'],
+            'delete_product' => ['Admin', 'Quản Lý'],
+            'view_ingredient' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng'],
+            'create_ingredient' => ['Admin', 'Quản Lý'],
+            'update_ingredient' => ['Admin', 'Quản Lý'],
+            'delete_ingredient' => ['Admin', 'Quản Lý'],
+            'view_category_product' => ['Admin', 'Quản Lý'],
+            'create_category_product' => ['Admin', 'Quản Lý'],
+            'update_category_product' => ['Admin', 'Quản Lý'],
+            'delete_category_product' => ['Admin', 'Quản Lý'],
+            'view_category_ingredient' => ['Admin', 'Quản Lý'],
+            'create_category_ingredient' => ['Admin', 'Quản Lý'],
+            'update_category_ingredient' => ['Admin', 'Quản Lý'],
+            'delete_category_ingredient' => ['Admin', 'Quản Lý'],
+
+            'view_table' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng', 'Bếp Phó', 'Bảo Vệ', 'Nhân Viên Bàn', 'Nhân viên Phục Vụ', 'Tạp Vụ', 'Chảo', 'Thớt', 'Chảo Non', 'Phụ Bếp'],
+            'create_table' => ['Admin', 'Quản Lý'],
+            'update_table' => ['Admin', 'Quản Lý'],
+            'delete_table' => ['Admin', 'Quản Lý'],
+
+            'view_invoice' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng', 'Bếp Phó', 'Bảo Vệ', 'Nhân Viên Bàn', 'Nhân viên Phục Vụ', 'Tạp Vụ', 'Chảo', 'Thớt', 'Chảo Non', 'Phụ Bếp'],
+            'cancel_invoice' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng', 'Bếp Phó', 'Bảo Vệ', 'Nhân Viên Bàn', 'Nhân viên Phục Vụ', 'Tạp Vụ', 'Chảo', 'Thớt', 'Chảo Non', 'Phụ Bếp'],
+
+            'view_promotion' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_import' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng', 'Bếp Phó'],
+            'view_export' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng', 'Bếp Phó'],
+
+            'view_customer' => ['Admin', 'Nhân viên', 'Kế Toán'],
+            'update_customer' => ['Admin', 'Quản Lý'],
+
+            'view_staff' => ['Admin', 'Quản Lý', 'Kế Toán'],
+
+            'view_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_analysis' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_contact' => ['Admin', 'Quản Lý', 'Kế Toán'],
+        ];
+
+        foreach ($permissions as $permission => $roles) {
+            Gate::define($permission, function () use ($roles) {
+                $user = Auth::guard('staff')->user();
+
+                if (!$user || !$user->role) {
+                    return false;
+                }
+
+                return in_array(
+                    strtolower($user->role->name),
+                    array_map('strtolower', $roles)
+                );
+            });
+        }
     }
+
+    protected $adminPermissions = [
+        'view_dashboard',
+
+        'view_product',
+        'create_product',
+        'update_product',
+        'delete_product',
+        'view_ingredient',
+        'create_ingredient',
+        'update_ingredient',
+        'delete_ingredient',
+        'view_category_product',
+        'create_category_product',
+        'update_category_product',
+        'delete_category_product',
+        'view_category_ingredient',
+        'create_category_ingredient',
+        'update_category_ingredient',
+        'delete_category_ingredient',
+
+        'view_table',
+        'create_table',
+        'update_table',
+        'delete_table',
+
+        'view_invoice',
+        'cancel_invoice',
+
+        'view_promotion',
+        'view_import',
+        'view_export',
+
+        'view_customer',
+        'update_customer',
+
+        'view_staff',
+
+        'view_report',
+        'view_analysis',
+        'view_contact',
+    ];
+
+    protected $staffPermissions = [
+        'view_dashboard',
+
+        'view_table',
+
+        'view_invoice',
+        'cancel_invoice',
+
+        'view_customer',
+    ];
 }

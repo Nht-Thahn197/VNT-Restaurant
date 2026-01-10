@@ -501,19 +501,22 @@ document.addEventListener("DOMContentLoaded", function () {
   const showAllBtn = document.getElementById("showAll");
   const storeCategoryUrl = document.querySelector('meta[name="csrf-token"]').dataset.storeUrl;
   let editId = null;
-  addBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    openPopup("add");
-  });
+  if (addBtn) {
+    addBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      openPopup("add");
+    });
+  }
+
 
   function openPopup(mode, id = null, name = "") {
     if (mode === "add") {
       popup.querySelector("h2").innerText = "Thêm Nhóm Hàng";
-      deleteBtn.style.display = "none";
+      if (deleteBtn) deleteBtn.style.display = "none";
       editId = null;
     } else {
       popup.querySelector("h2").innerText = "Sửa Nhóm Hàng";
-      deleteBtn.style.display = "inline-block";
+      if (deleteBtn) deleteBtn.style.display = "inline-block";
       editId = id;
     }
     nameInput.value = name || "";
@@ -529,8 +532,8 @@ document.addEventListener("DOMContentLoaded", function () {
     popup.removeAttribute("data-edit-id");
   }
 
-  cancelBtn.addEventListener("click", closePopup);
-  overlay.addEventListener("click", closePopup);
+  if (cancelBtn) cancelBtn.addEventListener("click", closePopup);
+  if (overlay) overlay.addEventListener("click", closePopup);
 
   document.addEventListener("click", function (e) {
     if (e.target.closest && e.target.closest(".edit-icon")) {
@@ -574,7 +577,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  saveBtn.addEventListener("click", function () {
+  if (saveBtn) saveBtn.addEventListener("click", function () {
     const name = nameInput.value.trim();
     if (!name) {
       showToast("Vui lòng nhập tên nhóm!", "warning");
@@ -632,7 +635,7 @@ document.addEventListener("DOMContentLoaded", function () {
       showToast("Lỗi server!", "error");
     });
   });
-  deleteBtn.addEventListener("click", function () {
+  if (deleteBtn) deleteBtn.addEventListener("click", function () {
     if (!editId) {
       showToast("Không có nhóm để xóa", "warning");
       return;

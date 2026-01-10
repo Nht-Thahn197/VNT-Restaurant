@@ -88,52 +88,86 @@
 
 <nav class="header-nav">
     <ul class="nav-list">
-        <li><a href="{{ url('/pos/kiot') }}">Tổng quan</a></li>
+        @can('view_dashboard')
+            <li><a href="{{ url('/pos/kiot') }}">Tổng quan</a></li>
+        @endcan
 
-        <li class="dropdown">
-            <a href="#">Hàng hóa</a>
-            <ul class="dropdown-menu">
-                <li><a href="{{ url('/pos/product') }}">Hàng Hóa</a></li>
-                <li><a href="{{ url('/pos/ingredient') }}">Nguyên liệu</a></li>
-                <li><a href="#">Thiết lập giá</a></li>
-            </ul>
-        </li>
+        @canany(['view_product', 'view_ingredient'])
+            <li class="dropdown">
+                <a href="#">Hàng hóa</a>
+                <ul class="dropdown-menu">
+                    @can('view_product')
+                        <li><a href="{{ url('/pos/product') }}">Hàng hóa</a></li>
+                    @endcan
+                    @can('view_ingredient')
+                        <li><a href="{{ url('/pos/ingredient') }}">Nguyên liệu</a></li>
+                    @endcan
+                </ul>
+            </li>
+        @endcanany
 
-        <li><a href="{{ url('/pos/table') }}">Phòng/Bàn</a></li>
+        @can('view_table')
+            <li><a href="{{ url('/pos/table') }}">Phòng/Bàn</a></li>
+        @endcan
 
-        <li class="dropdown">
-            <a href="#">Giao dịch</a>
-            <ul class="dropdown-menu">
-                <li><a href="{{ url('/pos/invoice') }}">Hóa đơn</a></li>
-                <li><a href="{{ url('/pos/promotion') }}">Khuyến mãi</a></li>
-                <li><a href="{{ url('/pos/import') }}">Nhập hàng</a></li>
-                <li><a href="{{ url('/pos/export') }}">Xuất hủy</a></li>
-            </ul>
-        </li>
+        @canany(['view_invoice', 'view_promotion', 'view_import', 'view_export'])
+            <li class="dropdown">
+                <a href="#">Giao dịch</a>
+                <ul class="dropdown-menu">
 
-        <li><a href="{{ url('/pos/customer') }}">Khách hàng</a></li>
+                    @can('view_invoice')
+                        <li><a href="{{ url('/pos/invoice') }}">Hóa đơn</a></li>
+                    @endcan
 
-        <li class="dropdown">
-            <a href="#">Nhân viên</a>
-            <ul class="dropdown-menu">
-                <li><a href="{{ url('/pos/staff') }}">Danh sách nhân viên</a></li>
-                <li><a href="#">Lịch làm việc</a></li>
-                <li><a href="#">Bảng chấm công</a></li>
-            </ul>
-        </li>
+                    @can('view_promotion')
+                        <li><a href="{{ url('/pos/promotion') }}">Khuyến mãi</a></li>
+                    @endcan
 
-        <li class="dropdown">
-            <a href="#">Báo cáo</a>
-            <ul class="dropdown-menu">
-                <li><a href="#">Cuối ngày</a></li>
-                <li><a href="#">Bán hàng</a></li>
-                <li><a href="#">Hàng hóa</a></li>
-            </ul>
-        </li>
+                    @can('view_import')
+                        <li><a href="{{ url('/pos/import') }}">Nhập hàng</a></li>
+                    @endcan
 
-        <li><a href="#">Phân tích</a></li>
+                    @can('view_export')
+                        <li><a href="{{ url('/pos/export') }}">Xuất hủy</a></li>
+                    @endcan
 
-        <li><a href="{{ url('/pos/contact') }}">Liên hệ</a></li>
+                </ul>
+            </li>
+        @endcanany
+
+        @can('view_customer')
+            <li><a href="{{ url('/pos/customer') }}">Khách hàng</a></li>
+        @endcan
+        
+        @can('view_staff')
+            <li class="dropdown">
+                <a href="#">Nhân viên</a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{ url('/pos/staff') }}">Danh sách nhân viên</a></li>
+                    <li><a href="#">Lịch làm việc</a></li>
+                    <li><a href="#">Bảng chấm công</a></li>
+                </ul>
+            </li>
+        @endcan
+
+        @can('view_report')
+            <li class="dropdown">
+                <a href="#">Báo cáo</a>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Cuối ngày</a></li>
+                    <li><a href="#">Bán hàng</a></li>
+                    <li><a href="#">Hàng hóa</a></li>
+                </ul>
+            </li>
+        @endcan
+
+        @can('view_analysis')
+            <li><a href="#">Phân tích</a></li>
+        @endcan
+
+        @can('view_contact')
+            <li><a href="{{ url('/pos/contact') }}">Liên hệ</a></li>
+        @endcan
     </ul>
     <ul class="nav-right">
         <li><a href="{{ url('/pos/booking') }}"><i class="fas fa-calendar-check" style="margin-right: 6px;"></i>Lễ Tân</a></li>

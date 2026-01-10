@@ -7,6 +7,7 @@
   @endpush
 
 @section('content')
+
   <main class="dashboard-wrapper">
     <div class="dashboard-container">
       <!-- LEFT COLUMN -->

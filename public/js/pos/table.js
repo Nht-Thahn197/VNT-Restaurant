@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
     status: 'all'
     };
 
-    display.addEventListener('click', () => {
+    if (display) display.addEventListener('click', () => {
         dropdown.classList.toggle('active');
     });
 
@@ -49,18 +49,18 @@ document.addEventListener("DOMContentLoaded", function () {
             if (value !== "") {
                 // ĐÂY LÀ CHỖ THÊM CLASS ĐỂ CSS THU NHỎ 85%
                 dropdown.classList.add('area-has-value');
-                editBtn.classList.remove('d-none');
+                if (editBtn) editBtn.classList.remove('d-none');
             } else {
                 // Nếu chọn "Tất cả" thì quay lại 100%
                 dropdown.classList.remove('area-has-value');
-                editBtn.classList.add('d-none');
+                if (editBtn) editBtn.classList.add('d-none');
             }
             filters.area = value; 
             applyTableFilters();
         });
     });
 
-    window.addEventListener('click', (e) => {
+    if (dropdown) window.addEventListener('click', (e) => {
         if (!dropdown.contains(e.target)) dropdown.classList.remove('active');
     });
 
@@ -134,12 +134,12 @@ document.addEventListener("DOMContentLoaded", function () {
     renderTablePagination();
 
     // EVENTS
-    searchInput.addEventListener('input', e => {
+    if (searchInput) searchInput.addEventListener('input', e => {
         filters.keyword = e.target.value.trim().toLowerCase();
         applyTableFilters();
     });
 
-    areaSelect.addEventListener('change', e => {
+    if (areaSelect) areaSelect.addEventListener('change', e => {
         filters.area = e.target.value;
         applyTableFilters();
     });
@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===========================
     // OPEN/CLOSE POPUP
     // ===========================
-    addBtn.addEventListener("click", function (e) {
+    if (addBtn) addBtn.addEventListener("click", function (e) {
         e.stopPropagation();
         openPopup("add");
     });
@@ -174,11 +174,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function openPopup(mode, id = null, name = "") {
         if (mode === "add") {
             popup.querySelector("h2").innerText = "Thêm Khu Vực";
-            deleteBtn.style.display = "none";
+            if (deleteBtn) deleteBtn.style.display = "none";
             editId = null;
         } else {
             popup.querySelector("h2").innerText = "Sửa Khu Vực";
-            deleteBtn.style.display = "inline-block";
+            if (deleteBtn) deleteBtn.style.display = "inline-block";
             editId = id;
         }
         nameInput.value = name || "";
@@ -211,8 +211,8 @@ document.addEventListener("DOMContentLoaded", function () {
         editId = null;
     }
 
-    cancelBtn.addEventListener("click", closePopup);
-    overlay.addEventListener("click", closePopup);
+    if (cancelBtn) cancelBtn.addEventListener("click", closePopup);
+    if (overlay) overlay.addEventListener("click", closePopup);
 
     // =========================== EDIT AREA =========================== //
     document.addEventListener("click", function (e) {
@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // =========================== SAVE AREA (ADD/UPDATE)  =========================== //
-    saveBtn.addEventListener("click", function () {
+    if (saveBtn) saveBtn.addEventListener("click", function () {
         const name = nameInput.value.trim();
         if (!name) {
             showToast("Vui lòng nhập tên khu vực!", "warning");
@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===========================
     // DELETE AREA
     // ===========================
-    deleteBtn.addEventListener("click", function () {
+    if (deleteBtn) deleteBtn.addEventListener("click", function () {
         if (!editId) {
         showToast("Không có khu vực để xóa", "warning");
         return;
@@ -365,11 +365,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const nameInput = document.getElementById("table_name");
     const areaSelect = document.getElementById("area_id");
     let currentDetailOpen = null;
-    btnCreate.addEventListener("click", function () {
+    if (btnCreate) btnCreate.addEventListener("click", function () {
         openForm();
     });
-    btnCloseHeader.addEventListener("click", closeForm);
-    cancelBtn.addEventListener("click", closeForm);
+    if (btnCloseHeader) btnCloseHeader.addEventListener("click", closeForm);
+    if (cancelBtn) cancelBtn.addEventListener("click", closeForm);
     function openForm(isEdit = false) {
         document.getElementById("formTitle").innerText = isEdit ? "Cập nhật phòng/bàn" : "Thêm phòng/bàn";
         if (!isEdit) {
@@ -407,13 +407,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const btnUpdate = detailRow.querySelector(".tb-update");
         const btnDelete = detailRow.querySelector(".tb-delete");
         const btnStatus = detailRow.querySelector(".tb-status");
-        const currentStatus = btnStatus.dataset.status; 
-        updateStatusButtonUI(btnStatus, currentStatus);
-        btnUpdate.addEventListener("click", async function (e) {
+        if (btnStatus) {
+            const currentStatus = btnStatus.dataset.status;
+            updateStatusButtonUI(btnStatus, currentStatus);
+        }
+        if (btnUpdate) btnUpdate.addEventListener("click", async function (e) {
             e.preventDefault();
             await loadTableInfo(id);
         });
-        btnDelete.addEventListener("click", async function (e) {
+        if (btnDelete) btnDelete.addEventListener("click", async function (e) {
             e.preventDefault();
             if (!confirm("Bạn có chắc muốn xoá phòng/bàn này?")) return;
             try {
@@ -428,7 +430,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     showToast("Không thể xoá phòng/bàn!", "error");
                 }
         });
-        btnStatus.addEventListener("click", async function (e) {
+        if (btnStatus) btnStatus.addEventListener("click", async function (e) {
             e.preventDefault();
 
             const res = await fetch(`${BASE_URL}/pos/table/${id}/toggle-status`, {
@@ -443,7 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
             location.reload();
             }
         });
-        updateStatusButtonStyle(btnStatus);
+        if (btnStatus) updateStatusButtonStyle(btnStatus);
     }
     function updateStatusButtonUI(btn, status) {
     if (status === "active") {
@@ -472,7 +474,7 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Lỗi load table:", err);
         }
     }
-    saveBtn.addEventListener("click", async function () {
+    if (saveBtn) saveBtn.addEventListener("click", async function () {
         const id = tableIdInput.value;
         const name = nameInput.value.trim();
         const area_id = areaSelect.value;

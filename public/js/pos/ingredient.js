@@ -153,19 +153,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let editId = null;
 
-  addBtn.addEventListener("click", function (e) {
-    e.stopPropagation();
-    openPopup("add");
-  });
+  if (addBtn) {
+    addBtn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      openPopup("add");
+    });
+  }
+
 
   function openPopup(mode, id = null, name = "") {
     if (mode === "add") {
       popup.querySelector("h2").innerText = "Thêm Nhóm Hàng";
-      deleteBtn.style.display = "none";
+      if (deleteBtn) deleteBtn.style.display = "none";
       editId = null;
     } else {
       popup.querySelector("h2").innerText = "Sửa Nhóm Hàng";
-      deleteBtn.style.display = "inline-block";
+      if (deleteBtn) deleteBtn.style.display = "inline-block";
       editId = id;
     }
     nameInput.value = name || "";
@@ -181,8 +184,8 @@ document.addEventListener("DOMContentLoaded", function () {
     popup.removeAttribute("data-edit-id");
   }
 
-  cancelBtn.addEventListener("click", closePopup);
-  overlay.addEventListener("click", closePopup);
+  if (cancelBtn) cancelBtn.addEventListener("click", closePopup);
+  if (overlay) overlay.addEventListener("click", closePopup);
 
   // JS LIST & ADD EDIT DELETE CATEGORY
   document.addEventListener("click", function (e) {
@@ -225,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
   
-  saveBtn.addEventListener("click", function () {
+  if (saveBtn) saveBtn.addEventListener("click", function () {
     const storeCategoryUrl = window.routes.storeCategory;
     const name = nameInput.value.trim();
     if (!name) {
@@ -282,7 +285,7 @@ document.addEventListener("DOMContentLoaded", function () {
       showToast("Lỗi server!", "error");
     });
   });
-  deleteBtn.addEventListener("click", function () {
+  if (deleteBtn) deleteBtn.addEventListener("click", function () {
     if (!editId) {
       showToast("Không có nhóm để xóa", "warning");
       return;
@@ -342,7 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const DELETE_URL = "/VNT-Restaurant/public/pos/ingredient/";
 
     // ====== OPEN FORM ADD ======
-    btnOpenForm.addEventListener("click", () => {
+    if (btnOpenForm) btnOpenForm.addEventListener("click", () => {
         resetForm();
         formTitle.textContent = "Thêm Nguyên liệu";
         ingredientFormOverlay.style.display = "flex";
@@ -352,7 +355,8 @@ document.addEventListener("DOMContentLoaded", function () {
     function closeForm() {
         ingredientFormOverlay.style.display = "none";
     }
-    btnCloseHeader.onclick = cancelBtn.onclick = closeForm;
+    if (btnCloseHeader) btnCloseHeader.onclick = closeForm;
+    if (cancelBtn) cancelBtn.onclick = closeForm;
 
     // ====== RESET FORM ======
     function resetForm() {
@@ -421,7 +425,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ====== SAVE (ADD + UPDATE) ======
-    ingsaveBtn.addEventListener("click", async () => {
+    if (ingsaveBtn) ingsaveBtn.addEventListener("click", async () => {
 
         const id = idInput.value;
         const isEdit = id !== "";

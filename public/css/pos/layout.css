@@ -431,7 +431,8 @@ body {
   align-items: center;
   gap: 10px;
   margin: 0;
-  padding: 0;
+  padding: 0 60px 0 0;
+  margin-left: auto;
 }
 
 .nav-right a {

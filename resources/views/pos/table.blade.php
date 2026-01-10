@@ -16,7 +16,9 @@
                     <div class="box">
                         <div class="box-title">
                             <span>Khu vực</span>
+                            @can('create_table')
                             <button type="button" class="add-area-btn">+</button>
+                            @endcan
                         </div>
 
                         <div class="custom-dropdown" id="areaDropdown">
@@ -33,7 +35,9 @@
                             </ul>
                             
                             <input type="hidden" name="area_id" id="areaSelect">
+                            @can('update_table')
                             <i class="fa-regular fa-pen-to-square edit-icon d-none" id="editAreaBtn"></i>
+                            @endcan
                         </div>
                     </div>
                     
@@ -77,7 +81,9 @@
             <div class="main-content">
                 <div class="header-row">
                     <h2>Phòng/Bàn</h2>
+                    @can('create_table')
                     <button class="btn-create"><i class="far fa-plus"></i> Thêm Phòng/Bàn </button>
+                    @endcan
                 </div>
                 <table class="data-table">
                     <thead>
@@ -111,9 +117,15 @@
                                     </div>
                                     <!-- Nút -->
                                     <div class="detail-actions">
+                                        @can('update_table')
                                         <a href="#" class="btn tb-update"><i class="fa fa-check-square"></i> Cập nhật</a>
+                                        @endcan
+                                        @can('update_table')
                                         <a href="#" class="btn tb-status" data-status="{{ $tb->status }}"><i class="fa fa-lock"></i> Ngừng hoạt động</a>
+                                        @endcan
+                                        @can('delete_table')
                                         <a href="#" class="btn tb-delete"><i class="far fa-trash-alt"></i> Xoá</a>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -144,9 +156,13 @@
         <label>Tên khu vực</label>
         <input type="text" id="area-name" placeholder="Nhập tên khu vực...">
         <div class="popup-actions">
+            @canany(['create_table', 'update_table'])
             <button id="save-popup" class="btn-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+            @endcanany
             <button id="cancel-popup" class="btn-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
+            @can('delete_table')
             <button id="delete-popup" class="btn-delete" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
+            @endcan
         </div>
     </div>
     <!-- FORM ADD EDIT DELETE AREA END -->
@@ -177,7 +193,9 @@
                 </div>
 
                 <div class="form-actions">
+                    @canany(['create_table', 'update_table'])
                     <button id="table-save" class="table-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+                    @endcanany
                     <button id="cancelBtn" class="table-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
                 </div>
             </form>
