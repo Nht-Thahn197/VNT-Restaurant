@@ -13,8 +13,17 @@
 
     <div class="header-right">
         <button class="icon-notify" id="notifyBtn" title="Thông báo">🔔</button>
-        <button class="icon" id="settingsBtn" title="Cài đặt">Thiết lập <i class="hide-mobile fas fa-cog"></i></button>
-
+        <div class="setting">
+            <button class="icon" id="settingsBtn" title="Cài đặt">Thiết lập <i class="hide-mobile fas fa-cog"></i></button>
+            <div class="setting-dropdown" id="settingDropdown">
+                @can('manage_role')
+                    <a href="{{ url('/pos/role') }}">Quản lý quyền truy cập</a>
+                @endcan
+                @can('view_promotion')
+                    <a href="{{ url('/pos/promotion') }}">Quản lý khuyến mãi</a>
+                @endcan
+            </div>
+        </div>
         <div class="user-menu">
             <button class="icon" id="btnAccount" title="Tài khoản">Người Dùng <i class="fas fa-user-circle fa-fw"></i></button>
             <div class="user-dropdown" id="userDropdown">
@@ -110,17 +119,13 @@
             <li><a href="{{ url('/pos/table') }}">Phòng/Bàn</a></li>
         @endcan
 
-        @canany(['view_invoice', 'view_promotion', 'view_import', 'view_export'])
+        @canany(['view_invoice', 'view_import', 'view_export'])
             <li class="dropdown">
                 <a href="#">Giao dịch</a>
                 <ul class="dropdown-menu">
 
                     @can('view_invoice')
                         <li><a href="{{ url('/pos/invoice') }}">Hóa đơn</a></li>
-                    @endcan
-
-                    @can('view_promotion')
-                        <li><a href="{{ url('/pos/promotion') }}">Khuyến mãi</a></li>
                     @endcan
 
                     @can('view_import')
@@ -154,7 +159,7 @@
             <li class="dropdown">
                 <a href="#">Báo cáo</a>
                 <ul class="dropdown-menu">
-                    <li><a href="#">Cuối ngày</a></li>
+                    <li><a href="{{ url('/pos/daily-report') }}">Cuối ngày</a></li>
                     <li><a href="#">Bán hàng</a></li>
                     <li><a href="#">Hàng hóa</a></li>
                 </ul>

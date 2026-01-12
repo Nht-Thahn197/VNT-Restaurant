@@ -26,7 +26,7 @@
           <span>Nhóm nguyên liệu</span>
           <div class="group-actions">
             @can('create_category_ingredient')
-            <button type="button" class="add-group">＋</button>
+              <button type="button" class="add-group">＋</button>
             @endcan
             <span class="group-arrow"></span>
           </div>
@@ -59,7 +59,7 @@
       <div class="top-bar">
         <h2>Nguyên Liệu</h2>
         @can('create_ingredient')
-        <button id="btnOpenForm" class="btn-add"><i class="far fa-plus"></i> Thêm Nguyên Liệu</button>
+          <button id="btnOpenForm" class="btn-add"><i class="far fa-plus"></i> Thêm Nguyên Liệu</button>
         @endcan
       </div>
 
@@ -109,10 +109,10 @@
                   <!-- Nút -->
                   <div class="detail-actions">
                     @can('update_ingredient')
-                    <a href="#" class="btn ing-update"><i class="fa fa-check-square"></i> Cập nhật</a>
+                      <a href="#" class="btn ing-update"><i class="fa fa-check-square"></i> Cập nhật</a>
                     @endcan
                     @can('delete_ingredient')
-                    <a href="#" class="btn ing-delete"><i class="far fa-trash-alt"></i> Xoá</a>
+                      <a href="#" class="btn ing-delete"><i class="far fa-trash-alt"></i> Xoá</a>
                     @endcan
                   </div>
               </td>
@@ -144,11 +144,11 @@
     <input type="text" id="group-name" placeholder="Nhập tên nhóm...">
     <div class="popup-actions">
       @canany(['create_category_ingredient', 'update_category_ingredient'])
-      <button id="save-popup" class="btn-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+        <button id="save-popup" class="btn-save" type="button"><i class="fas fa-save"></i> Lưu</button>
       @endcanany
       <button id="cancel-popup" class="btn-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
       @can('delete_category_ingredient')
-      <button id="delete-popup" class="btn-delete" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
+        <button id="delete-popup" class="btn-delete" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
       @endcan
     </div>
   </div>
@@ -196,9 +196,9 @@
 
           <div class="form-actions">
             @canany(['create_ingredient', 'update_ingredient'])
-            <button id="ing-save" class="ing-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+              <button id="ing-save" class="ing-save" type="button"><i class="fas fa-save"></i> Lưu</button>
             @endcanany
-            <button id="cancelBtn" class="ing-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
+              <button id="cancelBtn" class="ing-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
           </div>
         </form>
     </div>

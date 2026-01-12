@@ -25,7 +25,9 @@
             <div class="main-content"> 
                 <div class="header-row"> 
                     <h2>Khách hàng</h2> 
-                    <button class="btn-create"><i class="far fa-plus"></i> Thêm khách hàng</button>
+                    @can('create_customer')
+                        <button class="btn-create"><i class="far fa-plus"></i> Thêm khách hàng</button>
+                    @endcan
                 </div> 
                 <table class="data-table"> 
                     <thead> 
@@ -89,7 +91,9 @@
                                     </div>
                                     <!-- Nút -->
                                     <div class="detail-actions">
-                                        <a href="#" class="btn btn-update"><i class="fa fa-check-square"></i> Cập nhật</a>
+                                        @can('update_customer')
+                                            <a href="#" class="btn btn-update"><i class="fa fa-check-square"></i> Cập nhật</a>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

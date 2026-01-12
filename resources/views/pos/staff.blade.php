@@ -47,7 +47,9 @@
                     <div class="box"> 
                         <div class="box-title"> 
                             <span>Chức vụ</span> 
-                            <button type="button" class="add-role-btn">+</button> 
+                            @can('create_role')
+                                <button type="button" class="add-role-btn">+</button> 
+                            @endcan
                         </div> 
 
                         <div class="role-select-wrapper" id="roleWrapper">
@@ -73,7 +75,9 @@
             <div class="main-content"> 
                 <div class="header-row"> 
                     <h2>Danh sách nhân viên</h2> 
-                    <button class="btn-create"><i class="far fa-plus"></i> Thêm Nhân Viên</button>
+                        @can('create_staff')
+                            <button class="btn-create"><i class="far fa-plus"></i> Thêm Nhân Viên</button>
+                        @endcan
                 </div> 
                 <table class="data-table"> 
                     <thead> 
@@ -172,9 +176,15 @@
                                     </div>
                                     <!-- Nút -->
                                     <div class="detail-actions">
-                                        <a href="#" class="btn btn-update"><i class="fa fa-check-square"></i> Cập nhật</a>
-                                        <a href="#" class="btn btn-status"><i class="fa fa-user-slash"></i> Ngừng làm việc</a>
-                                        <a href="#" class="btn btn-delete"><i class="far fa-trash-alt"></i> Xoá nhân viên</a>
+                                        @can('update_staff')
+                                            <a href="#" class="btn btn-update"><i class="fa fa-check-square"></i> Cập nhật</a>
+                                        @endcan
+                                        @can('update_status_staff')
+                                            <a href="#" class="btn btn-status"><i class="fa fa-user-slash"></i> Ngừng làm việc</a>
+                                        @endcan
+                                        @can('delete_staff')
+                                            <a href="#" class="btn btn-delete"><i class="far fa-trash-alt"></i> Xoá nhân viên</a>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>
@@ -199,9 +209,13 @@
             <label>Tên chức vụ</label>
             <input type="text" id="role-name" placeholder="Nhập tên khu vực...">
             <div class="popup-actions">
-                <button id="save-popup" class="btn-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+                @can('create_role')
+                    <button id="save-popup" class="btn-save" type="button"><i class="fas fa-save"></i> Lưu</button>
+                @endcan
                 <button id="cancel-popup" class="btn-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
-                <button id="delete-popup" class="btn-delete" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
+                @can('delete_role')
+                    <button id="delete-popup" class="btn-delete" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
+                @endcan
             </div>
         </div>
     <!-- FORM ADD NEW CATEGORY END -->

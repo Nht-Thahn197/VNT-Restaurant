@@ -24,6 +24,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PromotionTypeController;
+use App\Http\Controllers\DailyReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -57,6 +58,15 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
 
     // ACCOUNT
     Route::post('/user/update', [StaffController::class, 'updateAccount'])->name('pos.user.update');
+
+    Route::prefix('roles')->group(function () {
+
+        Route::get('{role}/permissions', [RoleController::class, 'editPermissions'])
+            ->name('pos.roles.permissions.edit');
+
+        Route::post('{role}/permissions', [RoleController::class, 'updatePermissions'])
+            ->name('pos.roles.permissions.update');
+    });
 
     // DASHBOARD
     Route::get('/kiot', [KiotController::class, 'index'])->name('pos.kiot');
@@ -203,6 +213,7 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('staff.destroy')->middleware('can:view_staff');
 
     //ROLE
+    Route::get('/role', [RoleController::class, 'page'])->name('pos.role')->middleware('can:view_role');
     Route::post('/role/store', [RoleController::class, 'store'])->middleware('can:view_staff')
         ->name('role.store');
     Route::post('/role/update/{id}', [RoleController::class, 'update'])->middleware('can:view_staff')
@@ -213,6 +224,10 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     // CONTACT
     Route::get('/contact', [ContactController::class, 'index'])->name('pos.contact')->middleware('can:view_contact');
     Route::post('/contact/update-status/{id}', [ContactController::class, 'updateStatus'])->name('contact.update')->middleware('can:view_contact');
+
+    // DAILY REPORT
+    Route::get('/daily-report', [DailyReportController::class, 'index'])->name('pos.daily-report')->middleware('can:view_report');
+    Route::post('/daily-report/close', [DailyReportController::class, 'closeDay'])->name('pos.daily-report.close');
 
     // PROMOTION
     Route::get('/promotion', [PromotionController::class, 'index'])->name('pos.promotion')->middleware('can:view_promotion');
@@ -226,6 +241,5 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::post('/promotion-type', [PromotionTypeController::class, 'store'])->name('promotion_type.store')->middleware('can:view_promotion');
     Route::put('/promotion-type/{id}', [PromotionTypeController::class, 'update'])->name('promotion_type.update')->middleware('can:view_promotion');
     Route::delete('/promotion-type/{id}', [PromotionTypeController::class, 'destroy'])->name('promotion_type.destroy')->middleware('can:view_promotion');
-
 
 });

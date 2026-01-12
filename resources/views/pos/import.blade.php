@@ -107,9 +107,11 @@
         <div class="content">
             <div class="content-header">
                 <h2>Phiếu nhập hàng</h2>
-                <a href="{{ route('import.detail') }}" class="btn-add">
-                    <i class="far fa-plus"></i> Nhập hàng
-                </a>
+                @can('create_import')
+                    <a href="{{ route('import.detail') }}" class="btn-add">
+                        <i class="far fa-plus"></i> Nhập hàng
+                    </a>
+                @endcan
             </div>
 
             <table class="import-table">
@@ -188,7 +190,9 @@
                                     <form method="POST" action="{{ route('import.cancel', $import->id) }}"
                                         onsubmit="return confirm('Hủy phiếu nhập này?')">
                                         @csrf
-                                        <button class="btn btn-danger"><i class="fas fa-close"></i> Hủy phiếu</button>
+                                        @can('delete_import')
+                                            <button class="btn btn-danger"><i class="fas fa-close"></i> Hủy phiếu</button>
+                                        @endcan
                                     </form>
                                 @endif
                             </div>

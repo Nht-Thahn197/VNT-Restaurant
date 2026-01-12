@@ -128,6 +128,62 @@ body {
   background: rgba(255,255,255,0.1);
 }
 
+.setting {
+  position: relative;
+  cursor: pointer;
+}
+
+.setting::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 6px;
+}
+
+.setting-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #fff;
+  color: #111111;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.12);
+  overflow: hidden;
+  min-width: 200px;
+  padding: 5px 0;
+  z-index: 1000;
+  pointer-events: auto
+}
+
+.setting-dropdown a:hover { 
+  background: #f3f4f6; 
+}
+
+.setting-dropdown.show { 
+  display: block; 
+  animation: fadeIn 0.2s ease;
+}
+
+.setting-dropdown a {
+  display: block;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #333;
+  font-size: 14px;
+}
+
+.setting:hover .setting-dropdown {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .user-menu {
   position: relative;
   cursor: pointer;

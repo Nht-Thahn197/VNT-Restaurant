@@ -202,15 +202,30 @@ document.getElementById('clearCart').addEventListener('click', () => {
 // Lưu ảnh thực đơn
 document.getElementById('saveImg').addEventListener('click', function() {
     const area = document.getElementById('captureArea');
-    // Ẩn nút X và nút lưu để ảnh đẹp hơn
-    document.querySelector('.header-right').style.display = 'none';
-    
-    html2canvas(area).then(canvas => {
+    const scale = Math.max(3, window.devicePixelRatio || 1);
+    const rect = area.getBoundingClientRect();
+
+    html2canvas(area, {
+        scale,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        width: Math.ceil(rect.width),
+        height: Math.ceil(rect.height),
+        onclone: (doc) => {
+            const cloneArea = doc.getElementById('captureArea');
+            if (cloneArea) {
+                cloneArea.style.transform = 'none';
+                cloneArea.style.animation = 'none';
+                cloneArea.style.boxShadow = 'none';
+            }
+            const cloneHeaderRight = doc.querySelector('.header-right');
+            if (cloneHeaderRight) cloneHeaderRight.style.display = 'none';
+        }
+    }).then(canvas => {
         const link = document.createElement('a');
         link.download = 'thuc-don-tam-tinh.png';
-        link.href = canvas.toDataURL();
+        link.href = canvas.toDataURL('image/png');
         link.click();
-        document.querySelector('.header-right').style.display = 'flex';
     });
 });
 

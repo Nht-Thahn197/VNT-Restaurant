@@ -107,9 +107,11 @@
         <div class="content">
             <div class="content-header">
                 <h2>Phiếu xuất hàng</h2>
-                <a href="{{ route('export.detail') }}" class="btn-add">
-                    <i class="far fa-plus"></i> Xuất hàng
-                </a>
+                @can('create_export')
+                    <a href="{{ route('export.detail') }}" class="btn-add">
+                        <i class="far fa-plus"></i> Xuất hàng
+                    </a>
+                @endcan
             </div>
 
             <table class="export-table">
@@ -171,7 +173,9 @@
                                         <form method="POST" action="{{ route('export.cancel', $export->id) }}"
                                             onsubmit="return confirm('Hủy phiếu xuất này?')">
                                             @csrf
-                                            <button class="btn btn-danger"><i class="fas fa-close"></i> Hủy phiếu</button>
+                                            @can('delete_export')
+                                                <button class="btn btn-danger"><i class="fas fa-close"></i> Hủy phiếu</button>
+                                            @endcan
                                         </form>
                                     @endif
                                 </div>

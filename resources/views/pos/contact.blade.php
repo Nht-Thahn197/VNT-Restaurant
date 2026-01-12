@@ -176,7 +176,9 @@
             <div class="message-box" id="detail-message"></div>
         </div>
         <div class="modal-footer">
-            <button class="btn-done">Đánh dấu đã xử lý</button>
+            @can('update_contact')
+                <button class="btn-done">Đánh dấu đã xử lý</button>
+            @endcan
         </div>
     </div>
 </div>

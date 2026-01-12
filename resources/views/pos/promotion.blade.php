@@ -44,7 +44,9 @@
             <div class="box"> 
                 <div class="box-title"> 
                     <span>Loại chương trình</span> 
-                    <button type="button" class="add-type-btn">+</button> 
+                    @can('create_promotion_type')
+                        <button type="button" class="add-type-btn">+</button> 
+                    @endcan
                 </div> 
                 <div class="type-select-wrapper" id="typeWrapper">
                     <div class="custom-dropdown" id="typeDropdown">
@@ -71,7 +73,9 @@
         <div class="content">
             <div class="content-header">
                 <h2>Danh sách chương trình</h2>
-                <button class="btn-create"><i class="far fa-plus"></i> Tạo chương trình</button>
+                @can('create_promotion')
+                    <button class="btn-create"><i class="far fa-plus"></i> Tạo chương trình</button>
+                @endcan
             </div>
 
             <table class="promotion-table">
@@ -170,10 +174,13 @@
                         <label for="end_date">Ngày kết thúc</label>
                         <input type="date" id="end_date" name="end_date" class="form-control">
                     </div>
-
-                    <button type="submit" class="btn-submit promotion-submit-btn"><i class="fas fa-save"></i> Lưu </button>
+                    @can('update_promotion')
+                        <button type="submit" class="btn-submit promotion-submit-btn"><i class="fas fa-save"></i> Lưu </button>
+                    @endcan
                     <button id="cancelBtn" class="promotion-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
-                    <button id="deletePromotionBtn" class="btn-delete" type="button" style="display:none;"> <i class="far fa-trash-alt"></i> Xóa </button>
+                    @can('delete_promotion')
+                        <button id="deletePromotionBtn" class="btn-delete" type="button" style="display:none;"> <i class="far fa-trash-alt"></i> Xóa </button>
+                    @endcan
                 </form>
             </div>
         </div>
@@ -203,9 +210,13 @@
                         <label for="description">Mô tả</label>
                         <textarea id="description" name="description" class="form-control"></textarea>
                     </div>
-                    <button type="submit" class="btn-submit type-submit-btn"> <i class="fas fa-save"></i> Lưu</button>
+                    @can('create_promotion_type')
+                        <button type="submit" class="btn-submit type-submit-btn"> <i class="fas fa-save"></i> Lưu</button>
+                    @endcan
                     <button id="cancel-popup" class="btn-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
-                    <button id="delete-popup" class="btn-delete" type="button" style="display: none;"><i class="far fa-trash-alt"></i> Xóa</button>
+                    @can('delete_promotion_type')
+                        <button id="delete-popup" class="btn-delete" type="button" style="display: none;"><i class="far fa-trash-alt"></i> Xóa</button>
+                    @endcan
                 </form>
             </div>
         </div>

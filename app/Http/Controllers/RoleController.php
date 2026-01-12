@@ -8,6 +8,15 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
+    public function page()
+    {
+        $roles = Role::withCount(['tables as staff_count'])
+            ->orderBy('name')
+            ->get();
+
+        return view('pos.role', compact('roles'));
+    }
+
     public function index()
     {
         return Role::orderBy('name')->get();
@@ -59,5 +68,22 @@ class RoleController extends Controller
         $role->delete();
 
         return response()->json(['success' => true, 'message' => 'Xóa thành công']);
+    }
+
+    public function editPermissions(Role $role)
+    {
+        return view('pos.permissions', [
+            'role' => $role,
+            'permissions' => config('permissions'),
+        ]);
+    }
+
+    public function updatePermissions(Request $request, Role $role)
+    {
+        $role->update([
+            'permission' => $request->permissions ?? []
+        ]);
+
+        return back()->with('success', 'Cập nhật quyền thành công');
     }
 }

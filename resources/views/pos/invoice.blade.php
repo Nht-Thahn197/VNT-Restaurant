@@ -255,7 +255,9 @@
                                     </table>
 
                                     <div class="detail-actions">
-                                        <button class="btn-cancel" data-id="{{ $invoice->id }}"><i class="fas fa-close"></i> Hủy hóa đơn</button>
+                                        @can('cancel_invoice')
+                                            <button class="btn-cancel" data-id="{{ $invoice->id }}"><i class="fas fa-close"></i> Hủy hóa đơn</button>
+                                        @endcan
                                     </div>
                                 </div>
                             </td>
