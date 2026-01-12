@@ -52,9 +52,11 @@
                 <td>{{ count($role->permission ?? []) }}</td>
                 <td>
                   @can('manage_role')
-                    <a class="btn-permission" href="{{ route('pos.roles.permissions.edit', $role) }}">
-                      <i class="fa fa-shield"></i> Phân quyền
-                    </a>
+                    @if (strtolower($role->name ?? '') !== 'admin')
+                      <a class="btn-permission" href="{{ route('pos.roles.permissions.edit', $role) }}">
+                        <i class="fa fa-shield"></i> Phân quyền
+                      </a>
+                    @endif
                   @endcan
                 </td>
               </tr>
@@ -86,9 +88,11 @@
                       </a>
                     @endcan
                     @can('manage_role')
-                      <a class="btn-permission" href="{{ route('pos.roles.permissions.edit', $role) }}">
-                        <i class="fa fa-shield"></i> Phân quyền
-                      </a>
+                      @if (strtolower($role->name ?? '') !== 'admin')
+                        <a class="btn-permission" href="{{ route('pos.roles.permissions.edit', $role) }}">
+                          <i class="fa fa-shield"></i> Phân quyền
+                        </a>
+                      @endif
                     @endcan
                   </div>
                 </td>

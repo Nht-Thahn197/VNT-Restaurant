@@ -9,12 +9,16 @@ class DailyReportController extends Controller
 {
     public function index()
     {
-        $startTime = Carbon::today()->startOfDay();
-        $endTime = Carbon::now();
+        [$startTime, $endTime, $dateLabel, $dateRangeValue, $fromDate, $toDate] = $this->resolveDateRange();
 
         $reportData = $this->buildReport($startTime, $endTime);
 
-        return view('pos.daily-report', $reportData);
+        return view('pos.daily-report', $reportData + [
+            'dateLabel' => $dateLabel,
+            'dateRangeValue' => $dateRangeValue,
+            'fromDate' => $fromDate,
+            'toDate' => $toDate,
+        ]);
     }
 
     public function closeDay()
@@ -31,6 +35,48 @@ class DailyReportController extends Controller
             'start_time' => $startTime,
             'end_time' => $endTime,
         ]);
+    }
+
+    private function resolveDateRange(): array
+    {
+        $fromInput = request('fromDate');
+        $toInput = request('toDate');
+
+        if ($fromInput || $toInput) {
+            try {
+                $fromDate = $fromInput ? Carbon::parse($fromInput) : Carbon::parse($toInput);
+                $toDate = $toInput ? Carbon::parse($toInput) : Carbon::parse($fromInput);
+
+                $startTime = $fromDate->copy()->startOfDay();
+                $endTime = $toDate->copy()->endOfDay();
+
+                if ($startTime->greaterThan($endTime)) {
+                    [$startTime, $endTime] = [$endTime, $startTime];
+                }
+
+                $label = $startTime->isSameDay($endTime)
+                    ? 'Ngày ' . $startTime->format('d/m/Y')
+                    : 'Từ ' . $startTime->format('d/m/Y') . ' - ' . $endTime->format('d/m/Y');
+
+                $dateRangeValue = $startTime->format('d/m/Y') . ' - ' . $endTime->format('d/m/Y');
+
+                return [
+                    $startTime,
+                    $endTime,
+                    $label,
+                    $dateRangeValue,
+                    $startTime->format('Y-m-d'),
+                    $endTime->format('Y-m-d'),
+                ];
+            } catch (\Exception $e) {
+                // Fall back to default range.
+            }
+        }
+
+        $startTime = Carbon::today()->startOfDay();
+        $endTime = Carbon::now();
+
+        return [$startTime, $endTime, 'Hôm nay', '', '', ''];
     }
 
     private function buildReport(Carbon $startTime, Carbon $endTime): array

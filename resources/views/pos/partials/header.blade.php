@@ -161,7 +161,8 @@
                 <ul class="dropdown-menu">
                     <li><a href="{{ url('/pos/daily-report') }}">Cuối ngày</a></li>
                     <li><a href="#">Bán hàng</a></li>
-                    <li><a href="#">Hàng hóa</a></li>
+                    <li><a href="{{ url('/pos/product-report') }}">Hàng hóa</a></li>
+                    <li><a href="#">Nhân Viên</a></li>
                 </ul>
             </li>
         @endcan

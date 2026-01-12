@@ -25,6 +25,7 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PromotionTypeController;
 use App\Http\Controllers\DailyReportController;
+use App\Http\Controllers\ProductReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -228,6 +229,9 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     // DAILY REPORT
     Route::get('/daily-report', [DailyReportController::class, 'index'])->name('pos.daily-report')->middleware('can:view_report');
     Route::post('/daily-report/close', [DailyReportController::class, 'closeDay'])->name('pos.daily-report.close');
+
+    // PRODUCT REPORT
+    Route::get('/product-report', [ProductReportController::class, 'index'])->name('pos.product-report')->middleware('can:view_report');
 
     // PROMOTION
     Route::get('/promotion', [PromotionController::class, 'index'])->name('pos.promotion')->middleware('can:view_promotion');

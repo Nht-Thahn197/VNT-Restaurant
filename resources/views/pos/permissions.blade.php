@@ -30,6 +30,7 @@
                   name="permissions[]"
                   value="{{ $key }}"
                   {{ in_array($key, $role->permission ?? []) ? 'checked' : '' }}
+                  {{ $isAdminRole ? 'disabled' : '' }}
                 >
                 <span>{{ $label }}</span>
               </label>
@@ -39,9 +40,13 @@
       @endforeach
 
       <div class="permissions-actions">
-        <button type="submit" class="btn-save">
-          <i class="fas fa-save"></i> Lưu quyền
-        </button>
+        @if (!$isAdminRole)
+          <button type="submit" class="btn-save">
+            <i class="fas fa-save"></i> Lưu quyền
+          </button>
+        @else
+          <div class="note">Admin role is locked.</div>
+        @endif
       </div>
     </form>
   </div>

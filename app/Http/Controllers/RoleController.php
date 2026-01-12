@@ -8,6 +8,22 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
+    private function isAdminRole(Role $role): bool
+    {
+        return strtolower($role->name ?? '') === 'admin';
+    }
+
+    private function allPermissionKeys(): array
+    {
+        $permissions = config('permissions', []);
+        $keys = [];
+
+        foreach ($permissions as $items) {
+            $keys = array_merge($keys, array_keys($items));
+        }
+
+        return $keys;
+    }
     public function page()
     {
         $roles = Role::withCount(['tables as staff_count'])
@@ -72,14 +88,30 @@ class RoleController extends Controller
 
     public function editPermissions(Role $role)
     {
+        $isAdminRole = $this->isAdminRole($role);
+        $allPermissionKeys = $this->allPermissionKeys();
+
+        if ($isAdminRole) {
+            $role->permission = $allPermissionKeys;
+        }
+
         return view('pos.permissions', [
             'role' => $role,
             'permissions' => config('permissions'),
+            'isAdminRole' => $isAdminRole,
         ]);
     }
 
     public function updatePermissions(Request $request, Role $role)
     {
+        if ($this->isAdminRole($role)) {
+            $role->update([
+                'permission' => $this->allPermissionKeys(),
+            ]);
+
+            return back()->with('success', 'Cập nhật quyền thành công');
+        }
+
         $role->update([
             'permission' => $request->permissions ?? []
         ]);

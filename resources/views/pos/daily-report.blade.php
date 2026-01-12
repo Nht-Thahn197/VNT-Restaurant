@@ -5,21 +5,39 @@
 @section('content')
   @push('css')
     <link rel="stylesheet" href="{{ asset('css/pos/daily-report.css') }}">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   @endpush
 
   <div class="daily-report-page">
     <div class="report-header">
       <div class="title-wrap">
         <div class="title-label">Báo cáo cuối ngày</div>
-        <h2>Hôm nay</h2>
+        <h2>{{ $dateLabel }}</h2>
+        <div class="title-actions">
+          <div class="time-custom">
+            <input
+              type="text"
+              id="dateRange"
+              class="input-text{{ $dateRangeValue ? ' has-value' : '' }}"
+              placeholder="Lựa chọn khác"
+              value="{{ $dateRangeValue }}"
+              data-from="{{ $fromDate }}"
+              data-to="{{ $toDate }}"
+              readonly
+            >
+            <input type="hidden" id="fromDate" value="{{ $fromDate }}">
+            <input type="hidden" id="toDate" value="{{ $toDate }}">
+          </div>
+          <div class="report-actions">
+            <button type="button" class="btn-print" id="btnPrintReport">
+              <i class="fas fa-print"></i> In báo cáo
+            </button>
+          </div>
+        </div>
       </div>
       <div class="subtitle">
         Từ {{ $startTime->format('d/m/Y 00:00') }} đến {{ $endTime->format('d/m/Y H:i') }}
-      </div>
-      <div class="report-actions">
-        <button type="button" class="btn-print" id="btnPrintReport">
-          <i class="fas fa-print"></i> In báo cáo
-        </button>
       </div>
     </div>
 
@@ -111,11 +129,11 @@
     </div>
   </div>
 
-  @push('js')
-    <script>
-      document.getElementById('btnPrintReport')?.addEventListener('click', () => {
-        window.print();
-      });
-    </script>
+    @push('js')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="{{ asset('js/pos/report.js') }}"></script>
   @endpush
+
 @endsection
