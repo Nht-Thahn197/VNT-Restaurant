@@ -52,9 +52,15 @@
                 value="{{ auth()->user()->id }}">
 
             <label>Thời gian</label>
-            <input type="datetime-local"
+            <input type="hidden"
                 name="import_time"
-                value="{{ now()->format('Y-m-d\TH:i') }}">
+                id="import_time"
+                value="{{ now()->format('Y-m-d H:i') }}">
+            <input type="text"
+                id="import_time_display"
+                class="datetime-input"
+                value="{{ now()->format('d/m/Y H:i') }}"
+                autocomplete="off">
 
             <label>Tổng tiền</label>
             <input type="text" id="totalAmount" name="total_amount" value="0" readonly>

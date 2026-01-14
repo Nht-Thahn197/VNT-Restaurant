@@ -100,7 +100,13 @@ class AuthServiceProvider extends ServiceProvider
             'update_status_staff' => ['Admin', 'Quản Lý'],
             'delete_staff' => ['Admin', 'Quản Lý'],
 
+            'manage_shift' => ['Admin', 'Quản Lý'],
             'view_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
+
+            'view_daily_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_sales_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_product_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_staff_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
 
             'view_analysis' => ['Admin', 'Quản Lý', 'Kế Toán'],
 
@@ -193,8 +199,14 @@ class AuthServiceProvider extends ServiceProvider
         'update_staff',
         'update_status_staff',
         'delete_staff',
+        'manage_shift',
 
         'view_report',
+
+        'view_daily_report',
+        'view_sales_report',
+        'view_product_report',
+        'view_staff_report',
 
         'view_analysis',
 

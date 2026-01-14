@@ -5,6 +5,7 @@
 @section('content')
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/pos/customer.css') }}">
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     @endpush
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
@@ -39,7 +40,7 @@
                     </thead> 
                     <tbody> 
                         <!-- Ví dụ --> 
-                        @foreach($customer as $cus)
+                                    @foreach($customer as $cus)
                             <tr class="customer-info" data-id="{{ $cus->id }}" data-code="{{ strtolower($cus->code) }}" 
                                 data-name="{{ strtolower($cus->name) }}" data-phone="{{ $cus->phone }}">
                                 <td class="customer-code">{{ $cus->code }}</td>
@@ -97,7 +98,7 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                                    @endforeach
                     </tbody> 
                 </table> 
             <div class="customer-pagination" id="pagination">
@@ -146,17 +147,25 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Giới tính</label>
-                            <select name="gender" id="gender">
-                                <option value="">Chọn giới tính</option>
-                                <option value="nam">Nam</option>
-                                <option value="nữ">Nữ</option>
-                                <option value="khác">Khác</option>
-                            </select>
+                            <div class="customer-select" data-customer-select>
+                                <button type="button" class="customer-select-trigger" id="genderDisplay" aria-expanded="false" aria-controls="genderMenu">
+                                    <span class="customer-select-value is-placeholder" id="genderText"></span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div class="customer-select-menu" id="genderMenu" aria-hidden="true"></div>
+                                <select name="gender" id="gender">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="nam">Nam</option>
+                                    <option value="nữ">Nữ</option>
+                                    <option value="khác">Khác</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">
                             <label>Ngày sinh</label>
-                            <input type="date" name="dob" id="dob">
+                            <input type="hidden" name="dob" id="dob">
+                            <input type="text" id="dob_display" class="datetime-input" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -175,5 +184,8 @@
     <script>
         const CUSTOMER_STORE_URL = "{{ route('customer.store') }}";
     </script>
-    <script src="{{ asset('js/pos/customer.js') }}"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="{{ asset('js/pos/customer.js') }}"></script>
 @endpush

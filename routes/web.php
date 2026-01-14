@@ -26,6 +26,12 @@ use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PromotionTypeController;
 use App\Http\Controllers\DailyReportController;
 use App\Http\Controllers\ProductReportController;
+use App\Http\Controllers\StaffReportController;
+use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\WorkScheduleController;
+use App\Http\Controllers\WorkShiftController;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\PayrollController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -212,6 +218,23 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::post('/staff/{id}/update', [StaffController::class, 'update'])->name('staff.update')->middleware('can:view_staff');
     Route::post('/staff/{id}/status', [StaffController::class, 'updateStatus'])->name('staff.status')->middleware('can:view_staff');
     Route::delete('/staff/{id}', [StaffController::class, 'destroy'])->name('staff.destroy')->middleware('can:view_staff');
+    Route::get('/work-schedule', [WorkScheduleController::class, 'index'])->name('pos.work-schedule')->middleware('can:view_staff');
+    Route::get('/work-schedule/data', [WorkScheduleController::class, 'data'])->name('pos.work-schedule.data')->middleware('can:view_staff');
+    Route::post('/work-schedule/store', [WorkScheduleController::class, 'store'])->name('pos.work-schedule.store')->middleware('can:view_staff');
+    Route::delete('/work-schedule/delete', [WorkScheduleController::class, 'destroy'])->name('pos.work-schedule.destroy')->middleware('can:view_staff');
+    Route::get('/work-shifts', [WorkShiftController::class, 'index'])->name('pos.work-shifts')->middleware('can:view_staff');
+    Route::get('/work-shifts/list', [WorkShiftController::class, 'list'])->name('pos.work-shifts.list')->middleware('can:view_staff');
+    Route::post('/work-shifts', [WorkShiftController::class, 'store'])->name('pos.work-shifts.store')->middleware('can:view_staff');
+    Route::post('/work-shifts/{id}', [WorkShiftController::class, 'update'])->name('pos.work-shifts.update')->middleware('can:view_staff');
+    Route::delete('/work-shifts/{id}', [WorkShiftController::class, 'destroy'])->name('pos.work-shifts.destroy')->middleware('can:view_staff');
+    Route::get('/attendance', [AttendanceController::class, 'index'])->name('pos.attendance');
+    Route::get('/attendance/data', [AttendanceController::class, 'data'])->name('pos.attendance.data');
+    Route::post('/attendance/update', [AttendanceController::class, 'update'])->name('pos.attendance.update');
+    Route::post('/attendance/clock', [AttendanceController::class, 'clock'])->name('pos.attendance.clock');
+    Route::post('/payroll/generate', [PayrollController::class, 'generate'])->name('pos.payroll.generate')->middleware('can:view_staff');
+    Route::post('/payroll/{id}/update', [PayrollController::class, 'update'])->name('pos.payroll.update')->middleware('can:view_staff');
+    Route::post('/payroll/{id}/pay', [PayrollController::class, 'pay'])->name('pos.payroll.pay')->middleware('can:view_staff');
+    Route::get('/payroll', [PayrollController::class, 'index'])->name('pos.payroll')->middleware('can:view_staff');
 
     //ROLE
     Route::get('/role', [RoleController::class, 'page'])->name('pos.role')->middleware('can:view_role');
@@ -227,11 +250,13 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::post('/contact/update-status/{id}', [ContactController::class, 'updateStatus'])->name('contact.update')->middleware('can:view_contact');
 
     // DAILY REPORT
-    Route::get('/daily-report', [DailyReportController::class, 'index'])->name('pos.daily-report')->middleware('can:view_report');
-    Route::post('/daily-report/close', [DailyReportController::class, 'closeDay'])->name('pos.daily-report.close');
+    Route::get('/daily-report', [DailyReportController::class, 'index'])->name('pos.daily-report')->middleware('can:view_daily_report');
+    Route::post('/daily-report/close', [DailyReportController::class, 'closeDay'])->name('pos.daily-report.close')->middleware('can:view_daily_report');
 
     // PRODUCT REPORT
-    Route::get('/product-report', [ProductReportController::class, 'index'])->name('pos.product-report')->middleware('can:view_report');
+    Route::get('/product-report', [ProductReportController::class, 'index'])->name('pos.product-report')->middleware('can:view_product_report');
+    Route::get('/staff-report', [StaffReportController::class, 'index'])->name('pos.staff-report')->middleware('can:view_staff_report');
+    Route::get('/sales-report', [SalesReportController::class, 'index'])->name('pos.sales-report')->middleware('can:view_sales_report');
 
     // PROMOTION
     Route::get('/promotion', [PromotionController::class, 'index'])->name('pos.promotion')->middleware('can:view_promotion');

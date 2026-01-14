@@ -7,6 +7,126 @@ const filters = {
   category: ''
 };
 
+
+document.documentElement.classList.add('js');
+
+var productSelectControls = [];
+
+var closeProductSelectMenus = function () {
+  productSelectControls.forEach(function (control) {
+    control.close();
+  });
+};
+
+var syncProductSelects = function () {
+  productSelectControls.forEach(function (control) {
+    control.buildMenu();
+    control.updateDisplay();
+  });
+};
+
+var initProductSelect = function (wrapper) {
+  if (!wrapper) {
+    return;
+  }
+  var select = wrapper.querySelector('select');
+  var trigger = wrapper.querySelector('.product-select-trigger');
+  var valueText = wrapper.querySelector('.product-select-value');
+  var menu = wrapper.querySelector('.product-select-menu');
+
+  if (!select || !trigger || !valueText || !menu) {
+    return;
+  }
+
+  var buildMenu = function () {
+    menu.innerHTML = '';
+    Array.prototype.slice.call(select.options).forEach(function (option) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'product-select-item';
+      button.textContent = option.text;
+      button.dataset.value = option.value;
+      if (option.selected) {
+        button.classList.add('is-selected');
+      }
+      button.addEventListener('click', function () {
+        select.value = option.value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        closeProductSelectMenus();
+      });
+      menu.appendChild(button);
+    });
+  };
+
+  var updateDisplay = function () {
+    var selectedOption = select.options[select.selectedIndex];
+    valueText.textContent = selectedOption ? selectedOption.text : '';
+    if (selectedOption && selectedOption.value === '') {
+      valueText.classList.add('is-placeholder');
+    } else {
+      valueText.classList.remove('is-placeholder');
+    }
+    Array.prototype.slice.call(menu.children).forEach(function (child) {
+      if (child.dataset.value === select.value) {
+        child.classList.add('is-selected');
+      } else {
+        child.classList.remove('is-selected');
+      }
+    });
+  };
+
+  var closeMenu = function () {
+    menu.classList.remove('open');
+    menu.setAttribute('aria-hidden', 'true');
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+
+  var openMenu = function () {
+    buildMenu();
+    menu.classList.add('open');
+    menu.setAttribute('aria-hidden', 'false');
+    trigger.setAttribute('aria-expanded', 'true');
+  };
+
+  trigger.addEventListener('click', function (event) {
+    event.stopPropagation();
+    var isOpen = menu.classList.contains('open');
+    closeProductSelectMenus();
+    if (!isOpen) {
+      openMenu();
+    }
+  });
+
+  menu.addEventListener('click', function (event) {
+    event.stopPropagation();
+  });
+
+  select.addEventListener('change', updateDisplay);
+
+  productSelectControls.push({
+    buildMenu: buildMenu,
+    updateDisplay: updateDisplay,
+    close: closeMenu
+  });
+
+  buildMenu();
+  updateDisplay();
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-product-select]').forEach(function (wrapper) {
+    initProductSelect(wrapper);
+  });
+  syncProductSelects();
+});
+
+document.addEventListener('click', closeProductSelectMenus);
+document.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape') {
+    closeProductSelectMenus();
+  }
+});
+
 // ===================== Apply Filter =====================
 function applyFilters() {
   const allRows = document.querySelectorAll('.product-item');
@@ -229,6 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     editingProductId = null;
     activateTab("info");
     resetImageBox();
+    syncProductSelects();
   }
 
   function resetImageBox() {
@@ -417,6 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.getElementById('type_menu').value = p.type_menu;
           document.getElementById('price').value = formatMoney(p.price);
           document.getElementById('unit').value = p.unit;
+          syncProductSelects();
 
           selectedIngredients = data.ingredients.map(ing => ({
             id: ing.id,

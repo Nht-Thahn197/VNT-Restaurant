@@ -123,13 +123,13 @@
       <div class="ing-pagination" id="pagination">
           <button id="prevPage" class="page-btn">
               <i class="fas fa-chevron-left"></i>
-          </button>
+              </button>
 
           <span id="pageInfo"></span>
 
           <button id="nextPage" class="page-btn">
               <i class="fas fa-chevron-right"></i>
-          </button>
+              </button>
       </div>
     </div>
   </div>
@@ -176,12 +176,19 @@
 
           <div class="form-group">
             <label>Nhóm hàng</label>
-            <select class="choose" name="category_id" id="category_id">
+            <div class="ingredient-select" data-ingredient-select>
+              <button type="button" class="ingredient-select-trigger" id="ingredientCategoryDisplay" aria-expanded="false" aria-controls="ingredientCategoryMenu">
+                <span class="ingredient-select-value is-placeholder" id="ingredientCategoryText"></span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="ingredient-select-menu" id="ingredientCategoryMenu" aria-hidden="true"></div>
+              <select class="choose" name="category_id" id="category_id">
               <option value="">-- Lựa chọn --</option>
               @foreach($categories as $category) 
               <option value="{{ $category->id }}">{{ $category->name }}</option>
             @endforeach
-            </select>
+              </select>
+            </div>
           </div>
 
           <div class="form-group">

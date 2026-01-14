@@ -6,6 +6,126 @@ const filters = {
   category: ''
 };
 
+
+document.documentElement.classList.add('js');
+
+var ingredientSelectControls = [];
+
+var closeIngredientSelectMenus = function () {
+  ingredientSelectControls.forEach(function (control) {
+    control.close();
+  });
+};
+
+var syncIngredientSelects = function () {
+  ingredientSelectControls.forEach(function (control) {
+    control.buildMenu();
+    control.updateDisplay();
+  });
+};
+
+var initIngredientSelect = function (wrapper) {
+  if (!wrapper) {
+    return;
+  }
+  var select = wrapper.querySelector('select');
+  var trigger = wrapper.querySelector('.ingredient-select-trigger');
+  var valueText = wrapper.querySelector('.ingredient-select-value');
+  var menu = wrapper.querySelector('.ingredient-select-menu');
+
+  if (!select || !trigger || !valueText || !menu) {
+    return;
+  }
+
+  var buildMenu = function () {
+    menu.innerHTML = '';
+    Array.prototype.slice.call(select.options).forEach(function (option) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'ingredient-select-item';
+      button.textContent = option.text;
+      button.dataset.value = option.value;
+      if (option.selected) {
+        button.classList.add('is-selected');
+      }
+      button.addEventListener('click', function () {
+        select.value = option.value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        closeIngredientSelectMenus();
+      });
+      menu.appendChild(button);
+    });
+  };
+
+  var updateDisplay = function () {
+    var selectedOption = select.options[select.selectedIndex];
+    valueText.textContent = selectedOption ? selectedOption.text : '';
+    if (selectedOption && selectedOption.value === '') {
+      valueText.classList.add('is-placeholder');
+    } else {
+      valueText.classList.remove('is-placeholder');
+    }
+    Array.prototype.slice.call(menu.children).forEach(function (child) {
+      if (child.dataset.value === select.value) {
+        child.classList.add('is-selected');
+      } else {
+        child.classList.remove('is-selected');
+      }
+    });
+  };
+
+  var closeMenu = function () {
+    menu.classList.remove('open');
+    menu.setAttribute('aria-hidden', 'true');
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+
+  var openMenu = function () {
+    buildMenu();
+    menu.classList.add('open');
+    menu.setAttribute('aria-hidden', 'false');
+    trigger.setAttribute('aria-expanded', 'true');
+  };
+
+  trigger.addEventListener('click', function (event) {
+    event.stopPropagation();
+    var isOpen = menu.classList.contains('open');
+    closeIngredientSelectMenus();
+    if (!isOpen) {
+      openMenu();
+    }
+  });
+
+  menu.addEventListener('click', function (event) {
+    event.stopPropagation();
+  });
+
+  select.addEventListener('change', updateDisplay);
+
+  ingredientSelectControls.push({
+    buildMenu: buildMenu,
+    updateDisplay: updateDisplay,
+    close: closeMenu
+  });
+
+  buildMenu();
+  updateDisplay();
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-ingredient-select]').forEach(function (wrapper) {
+    initIngredientSelect(wrapper);
+  });
+  syncIngredientSelects();
+});
+
+document.addEventListener('click', closeIngredientSelectMenus);
+document.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape') {
+    closeIngredientSelectMenus();
+  }
+});
+
 // ===================== Filter & Render =====================
 function applyIngredientFilters() {
     const allRows = document.querySelectorAll('.ingredient-item');
@@ -365,6 +485,7 @@ document.addEventListener("DOMContentLoaded", function () {
         categorySelect.value = "";
         priceInput.value = "";
         unitInput.value = "";
+        syncIngredientSelects();
     }
 
     // ====== TOGGLE DETAIL ROW ======
@@ -404,6 +525,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 idInput.value = ing.id;
                 nameInput.value = ing.name;
                 categorySelect.value = ing.category_id;
+                syncIngredientSelects();
 
                 // ✔ FORMAT PRICE
                 priceInput.value = formatMoney(ing.price);

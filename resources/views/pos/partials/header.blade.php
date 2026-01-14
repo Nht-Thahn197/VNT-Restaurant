@@ -19,6 +19,9 @@
                 @can('manage_role')
                     <a href="{{ url('/pos/role') }}">Quản lý quyền truy cập</a>
                 @endcan
+                @can('manage_shift')
+                    <a href="{{ url('/pos/work-shifts') }}">Thiết lập ca làm việc</a>
+                @endcan
                 @can('view_promotion')
                     <a href="{{ url('/pos/promotion') }}">Quản lý khuyến mãi</a>
                 @endcan
@@ -35,7 +38,7 @@
             </div>
         </div>
         <div id="overlay"></div>
-        <div id="accountForm" class="account-form" style="display: {{ ($errors->any() || session('success')) ? 'block' : 'none' }}">
+        <div id="accountForm" class="account-form" style="display: {{ $errors->hasAny(['name', 'phone', 'email', 'current_password', 'new_password', 'new_password_confirmation']) ? 'block' : 'none' }}">
             <div class="modal-account">
                 <h3>Thông tin người dùng</h3>
                 <button id="btnCloseUpdate" class="close-update">×</button>
@@ -143,29 +146,53 @@
         @can('view_customer')
             <li><a href="{{ url('/pos/customer') }}">Khách hàng</a></li>
         @endcan
-        
-        @can('view_staff')
+
+        @canany(['view_staff','manage_shift'])
             <li class="dropdown">
                 <a href="#">Nhân viên</a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ url('/pos/staff') }}">Danh sách nhân viên</a></li>
-                    <li><a href="#">Lịch làm việc</a></li>
-                    <li><a href="#">Bảng chấm công</a></li>
+                    @can('view_staff')
+                        <li><a href="{{ url('/pos/staff') }}">Danh sách nhân viên</a></li>
+                    @endcan
+                    @can('manage_shift')
+                        <li><a href="{{ url('/pos/work-schedule') }}">Lịch làm việc</a></li>
+                    @endcan
+                    <li><a href="{{ url('/pos/attendance') }}">Bảng chấm công</a></li>
+                    @can('view_staff')
+                        <li><a href="{{ url('/pos/payroll') }}">Bảng lương</a></li>
+                    @endcan
                 </ul>
             </li>
-        @endcan
+        @else
+            <li class="dropdown">
+                <a href="#">Nhân viên</a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{ url('/pos/attendance') }}">Bảng chấm công</a></li>
+                </ul>
+            </li>
+        @endcanany
 
-        @can('view_report')
+
+
+        @canany(['view_daily_report','view_sales_report','view_product_report','view_staff_report'])
             <li class="dropdown">
                 <a href="#">Báo cáo</a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ url('/pos/daily-report') }}">Cuối ngày</a></li>
-                    <li><a href="#">Bán hàng</a></li>
-                    <li><a href="{{ url('/pos/product-report') }}">Hàng hóa</a></li>
-                    <li><a href="#">Nhân Viên</a></li>
+                    @can('view_daily_report')
+                        <li><a href="{{ url('/pos/daily-report') }}">Cuối ngày</a></li>
+                    @endcan
+                    @can('view_sales_report')
+                        <li><a href="{{ url('/pos/sales-report') }}">Bán hàng</a></li>
+                    @endcan
+                    @can('view_product_report')
+                        <li><a href="{{ url('/pos/product-report') }}">Hàng hóa</a></li>
+                    @endcan
+                    @can('view_staff_report')
+                        <li><a href="{{ url('/pos/staff-report') }}">Nhân viên</a></li>
+                    @endcan
                 </ul>
             </li>
-        @endcan
+        @endcanany
 
         @can('view_analysis')
             <li><a href="#">Phân tích</a></li>
@@ -180,3 +207,5 @@
         <li><a href="{{ url('/pos/cashier') }}"><i class="fas fa-file-edit" style="margin-right: 6px;"></i>Thu Ngân</a></li>
     </ul>
 </nav>
+
+

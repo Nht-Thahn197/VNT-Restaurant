@@ -135,13 +135,13 @@ body {
 }
 
 .time-custom input[type="text"]:hover {
-    border-color: #409eff;
+    border-color: #357ebd;
 }
 
 .time-custom input[type="text"]:focus,
 .time-custom .flatpickr-input:focus {
-    border-color: #409eff;
-    box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.15);
+    border-color: #357ebd;
+    box-shadow: 0 0 0 2px rgba(53, 126, 189, 0.18);
     outline: none;
 }
 
@@ -175,12 +175,17 @@ body {
 .flatpickr-day.selected,
 .flatpickr-day.startRange,
 .flatpickr-day.endRange {
-    background: #409eff;
-    border-color: #409eff;
+    background: #357ebd;
+    border-color: #357ebd;
 }
 
 .flatpickr-day.inRange {
-    background: rgba(64, 158, 255, 0.15);
+    background: #f0f6ff;
+}
+
+.flatpickr-day:hover {
+    background: #f0f6ff;
+    color: #1f2937;
 }
 
 .time-dropdown {
@@ -219,7 +224,7 @@ body {
 }
 
 .input-select:hover {
-    border-color: #409eff;
+    border-color: #357ebd;
 }
 
 .time-col-title {
@@ -236,7 +241,7 @@ body {
 
 .time-item:hover {
     background: #f0f6ff;
-    color: #0070f4;
+    color: #357ebd;
 }
 
 .table-dropdown {
@@ -553,7 +558,7 @@ body {
     background: #fff;
     width: 900px;
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .modal-header {
@@ -769,6 +774,490 @@ input[type=number] {
 
 .d-none {
     display: none !important;
+}
+
+/* Booking form custom dropdown */
+.booking-select {
+    position: relative;
+}
+
+.booking-select .booking-select-trigger,
+.booking-select .booking-select-menu {
+    display: none;
+}
+
+.js .booking-select select {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.js .booking-select .booking-select-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    margin-top: 6px;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.js .booking-select .booking-select-trigger:hover {
+    border-color: #bdbdbd;
+}
+
+.js .booking-select .booking-select-trigger:focus-visible {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.booking-select-value {
+    font-weight: 500;
+    color: #333;
+}
+
+.booking-select-value.is-placeholder {
+    color: #9ca3af;
+}
+
+.booking-select-trigger i {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.js .booking-select .booking-select-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    padding: 6px;
+    max-height: 360px;
+    overflow-y: auto;
+    z-index: 30;
+    display: none;
+}
+
+.js .booking-select .booking-select-menu.open {
+    display: block;
+}
+
+.booking-select-item {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: transparent;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1f2937;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.booking-select-item:hover {
+    background: #f0f6ff;
+}
+
+.booking-select-item.is-selected {
+    background: #357ebd;
+    color: #fff;
+}
+
+.daterangepicker {
+    z-index: 10050 !important;
+}
+
+#bookingModal .daterangepicker {
+    border-radius: 14px;
+    border: 1px solid #e1e7ef;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+    background: #ffffff;
+    overflow: hidden;
+    top: 10px !important;
+}
+
+#bookingModal .daterangepicker .drp-calendar {
+    padding: 12px 16px;
+    background: #ffffff;
+}
+
+#bookingModal .daterangepicker .calendar-table {
+    background: transparent;
+    width: 100%;
+}
+
+#bookingModal .daterangepicker .calendar-table table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+#bookingModal .daterangepicker .calendar-table th {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+#bookingModal .daterangepicker .calendar-table th.month {
+    font-weight: 700;
+    color: #357ebd;
+    letter-spacing: 0.3px;
+}
+
+#bookingModal .daterangepicker .calendar-table th.prev,
+#bookingModal .daterangepicker .calendar-table th.next {
+    display: none;
+}
+
+#bookingModal .daterangepicker .calendar-table td {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+#bookingModal .daterangepicker .calendar-time {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 8px 10px;
+    margin: 6px 0 2px;
+    border-radius: 14px;
+    border: 1px solid #e1ece5;
+    background: linear-gradient(135deg, #f2f8f4 0%, #edf6f1 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+#bookingModal .daterangepicker .calendar-time span {
+    justify-self: center;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.4px;
+}
+
+#bookingModal .daterangepicker .calendar-time .vnt-native-time {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#bookingModal .daterangepicker .vnt-month-year {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr) 32px;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+#bookingModal .daterangepicker .vnt-nav {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 1px solid #d9e2dc;
+    background: #ffffff;
+    color: #1f2937;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+#bookingModal .daterangepicker .vnt-nav:hover {
+    background: #f0f6ff;
+    border-color: #c7d6ce;
+    transform: translateY(-1px);
+}
+
+#bookingModal .daterangepicker .vnt-field {
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid #d9e2dc;
+    background: #ffffff;
+    color: #1f2937;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    text-align: center;
+}
+
+#bookingModal .daterangepicker .vnt-field:hover,
+#bookingModal .daterangepicker .vnt-field:focus {
+    border-color: #357ebd;
+    box-shadow: 0 0 0 2px rgba(53, 126, 189, 0.16);
+    outline: none;
+}
+
+#bookingModal .daterangepicker .vnt-dropdown {
+    position: absolute;
+    top: 40px;
+    min-width: 140px;
+    max-height: 220px;
+    padding: 6px;
+    background: #ffffff;
+    border: 1px solid #d9e2dc;
+    border-radius: 12px;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    z-index: 12;
+}
+
+#bookingModal .daterangepicker .vnt-dropdown.open {
+    display: flex;
+}
+
+#bookingModal .daterangepicker .vnt-month-menu {
+    left: 0;
+}
+
+#bookingModal .daterangepicker .vnt-year-menu {
+    right: 0;
+}
+
+#bookingModal .daterangepicker .vnt-option {
+    border: none;
+    background: transparent;
+    text-align: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: #1f2937;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+#bookingModal .daterangepicker .vnt-option:hover {
+    background: #f0f6ff;
+    color: #357ebd;
+}
+
+#bookingModal .daterangepicker .vnt-time-select {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+#bookingModal .daterangepicker .vnt-time-trigger {
+    width: 100%;
+    height: 36px;
+    border-radius: 12px;
+    border: 1px solid #d6e3dc;
+    background: #ffffff;
+    color: #1f2937;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+#bookingModal .daterangepicker .vnt-time-trigger:hover {
+    border-color: #c7d7cf;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+#bookingModal .daterangepicker .vnt-time-select.open .vnt-time-trigger {
+    border-color: #357ebd;
+    box-shadow: 0 0 0 3px rgba(53, 126, 189, 0.16);
+}
+
+#bookingModal .daterangepicker .vnt-time-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 240px;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid #d9e2dc;
+    background: #ffffff;
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    z-index: 12;
+}
+
+#bookingModal .daterangepicker .vnt-time-select.open .vnt-time-menu {
+    display: flex;
+}
+
+#bookingModal .daterangepicker .vnt-time-select.open {
+    z-index: 20;
+}
+
+#bookingModal .daterangepicker .vnt-time-option {
+    border: none;
+    background: transparent;
+    text-align: center;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: #1f2937;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+#bookingModal .daterangepicker .vnt-time-option:hover {
+    background: #f0f6ff;
+    color: #357ebd;
+}
+
+#bookingModal .daterangepicker .vnt-time-option.is-selected {
+    background: #357ebd;
+    color: #ffffff;
+}
+
+#bookingModal .daterangepicker .drp-buttons {
+    border-top: 1px solid #d9e2dc;
+    background: #f7faf8;
+    padding: 10px 14px;
+}
+
+#bookingModal .daterangepicker .vnt-month-year {
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
+}
+
+#bookingModal .daterangepicker .vnt-title {
+    width: 100%;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #d9e2dc;
+    background: #ffffff;
+    color: #1f2937;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    text-align: center;
+}
+
+#bookingModal .daterangepicker .vnt-title:hover {
+    background: #f1f1f1;
+}
+
+#bookingModal .daterangepicker .vnt-panel {
+    display: none;
+    padding: 8px 10px 12px;
+}
+
+#bookingModal .daterangepicker .vnt-month-grid,
+#bookingModal .daterangepicker .vnt-year-list {
+    display: none;
+}
+
+#bookingModal .daterangepicker.vnt-view-month .vnt-panel,
+#bookingModal .daterangepicker.vnt-view-year .vnt-panel {
+    display: block;
+}
+
+#bookingModal .daterangepicker.vnt-view-month .vnt-month-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+#bookingModal .daterangepicker.vnt-view-year .vnt-year-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+#bookingModal .daterangepicker.vnt-view-month .calendar-table tbody,
+#bookingModal .daterangepicker.vnt-view-month .calendar-table thead tr:nth-child(2),
+#bookingModal .daterangepicker.vnt-view-year .calendar-table tbody,
+#bookingModal .daterangepicker.vnt-view-year .calendar-table thead tr:nth-child(2) {
+    display: none;
+}
+
+#bookingModal .daterangepicker.vnt-view-month .calendar-time,
+#bookingModal .daterangepicker.vnt-view-year .calendar-time,
+#bookingModal .daterangepicker.vnt-view-month .drp-buttons,
+#bookingModal .daterangepicker.vnt-view-year .drp-buttons {
+    display: none;
+}
+
+#bookingModal .daterangepicker .vnt-month-item,
+#bookingModal .daterangepicker .vnt-year-item {
+    border: 1px solid transparent;
+    background: #ffffff;
+    padding: 10px 0;
+    border-radius: 12px;
+    font-weight: 600;
+    color: #1f2937;
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    text-align: center;
+}
+
+#bookingModal .daterangepicker .vnt-month-item:hover,
+#bookingModal .daterangepicker .vnt-year-item:hover {
+    background: #f0f6ff;
+    color: #357ebd;
+}
+
+#bookingModal .daterangepicker .vnt-month-item.is-selected {
+    border-color: #d6d6d6;
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+#bookingModal .daterangepicker .vnt-year-item.is-selected {
+    background: #357ebd;
+    color: #ffffff;
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker td.available:focus {
+    background: #f0f6ff;
+    color: #1f2937;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+    background: #357ebd;
+    color: #fff;
+}
+
+.daterangepicker td.in-range {
+    background: #f0f6ff;
+    color: #1f2937;
+}
+
+.daterangepicker .drp-buttons .btn.applyBtn {
+    background: #357ebd;
+    border-color: #357ebd;
 }
 
 .booking-pagination {

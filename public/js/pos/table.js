@@ -1,3 +1,123 @@
+
+
+document.documentElement.classList.add('js');
+
+var tableSelectControls = [];
+
+var closeTableSelectMenus = function () {
+  tableSelectControls.forEach(function (control) {
+    control.close();
+  });
+};
+
+var syncTableSelects = function () {
+  tableSelectControls.forEach(function (control) {
+    control.buildMenu();
+    control.updateDisplay();
+  });
+};
+
+var initTableSelect = function (wrapper) {
+  if (!wrapper) {
+    return;
+  }
+  var select = wrapper.querySelector('select');
+  var trigger = wrapper.querySelector('.table-select-trigger');
+  var valueText = wrapper.querySelector('.table-select-value');
+  var menu = wrapper.querySelector('.table-select-menu');
+
+  if (!select || !trigger || !valueText || !menu) {
+    return;
+  }
+
+  var buildMenu = function () {
+    menu.innerHTML = '';
+    Array.prototype.slice.call(select.options).forEach(function (option) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'table-select-item';
+      button.textContent = option.text;
+      button.dataset.value = option.value;
+      if (option.selected) {
+        button.classList.add('is-selected');
+      }
+      button.addEventListener('click', function () {
+        select.value = option.value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        closeTableSelectMenus();
+      });
+      menu.appendChild(button);
+    });
+  };
+
+  var updateDisplay = function () {
+    var selectedOption = select.options[select.selectedIndex];
+    valueText.textContent = selectedOption ? selectedOption.text : '';
+    if (selectedOption && selectedOption.value === '') {
+      valueText.classList.add('is-placeholder');
+    } else {
+      valueText.classList.remove('is-placeholder');
+    }
+    Array.prototype.slice.call(menu.children).forEach(function (child) {
+      if (child.dataset.value === select.value) {
+        child.classList.add('is-selected');
+      } else {
+        child.classList.remove('is-selected');
+      }
+    });
+  };
+
+  var closeMenu = function () {
+    menu.classList.remove('open');
+    menu.setAttribute('aria-hidden', 'true');
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+
+  var openMenu = function () {
+    buildMenu();
+    menu.classList.add('open');
+    menu.setAttribute('aria-hidden', 'false');
+    trigger.setAttribute('aria-expanded', 'true');
+  };
+
+  trigger.addEventListener('click', function (event) {
+    event.stopPropagation();
+    var isOpen = menu.classList.contains('open');
+    closeTableSelectMenus();
+    if (!isOpen) {
+      openMenu();
+    }
+  });
+
+  menu.addEventListener('click', function (event) {
+    event.stopPropagation();
+  });
+
+  select.addEventListener('change', updateDisplay);
+
+  tableSelectControls.push({
+    buildMenu: buildMenu,
+    updateDisplay: updateDisplay,
+    close: closeMenu
+  });
+
+  buildMenu();
+  updateDisplay();
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-table-select]').forEach(function (wrapper) {
+    initTableSelect(wrapper);
+  });
+  syncTableSelects();
+});
+
+document.addEventListener('click', closeTableSelectMenus);
+document.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape') {
+    closeTableSelectMenus();
+  }
+});
 document.addEventListener("DOMContentLoaded", function () {
     
     const storeAreaUrl = window.routes.area.store;
@@ -378,6 +498,7 @@ document.addEventListener("DOMContentLoaded", function () {
             areaSelect.value = "";
         }
         tableFormOverlay.style.display = "flex";
+        if (typeof syncTableSelects === 'function') { syncTableSelects(); }
     }
     function closeForm() {
         tableFormOverlay.style.display = "none";
@@ -468,6 +589,7 @@ document.addEventListener("DOMContentLoaded", function () {
             tableIdInput.value = t.id;
             nameInput.value = t.name;
             areaSelect.value = t.area_id;
+            if (typeof syncTableSelects === 'function') { syncTableSelects(); }
 
             openForm(true);
         } catch (err) {

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return [
 
@@ -101,10 +101,15 @@ return [
         'update_staff' => 'Sửa nhân viên',
         'update_status_staff' => 'Cập nhật trạng thái nhân viên',
         'delete_staff' => 'Xóa nhân viên',
+        'manage_shift' => 'Thiết lập ca làm việc',
     ],
 
     'Báo cáo' => [
         'view_report'   => 'Xem báo cáo',
+        'view_daily_report' => 'Xem báo cáo cuối ngày',
+        'view_sales_report' => 'Xem báo cáo bán hàng',
+        'view_product_report' => 'Xem báo cáo hàng hóa',
+        'view_staff_report' => 'Xem báo cáo nhân viên',
     ],
 
     'Phân tích' => [

@@ -248,7 +248,7 @@
   border-radius: 12px; 
   width: 650px; 
   max-height: 100vh;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 8px 25px rgba(0,0,0,0.2);
   animation: popup 0.25s ease;
 }
@@ -266,6 +266,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 12px;
 }
 
 .modal-header h3 {
@@ -599,4 +600,107 @@ form#tableInfoForm {
   color: #fff;
   border-radius: 6px;
   cursor: pointer;
+}
+
+
+/* Custom dropdowns */
+.table-select {
+  position: relative;
+}
+
+.table-select .table-select-trigger,
+.table-select .table-select-menu {
+  display: none;
+}
+
+.js .table-select select {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.js .table-select .table-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.js .table-select .table-select-trigger:hover {
+  border-color: #bdbdbd;
+}
+
+.js .table-select .table-select-trigger:focus-visible {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.table-select-value {
+  font-weight: 500;
+  color: #333;
+}
+
+.table-select-value.is-placeholder {
+  color: #9ca3af;
+}
+
+.table-select-trigger i {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.js .table-select .table-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 30;
+  display: none;
+}
+
+.js .table-select .table-select-menu.open {
+  display: block;
+}
+
+.table-select-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.table-select-item:hover {
+  background: #f0f6ff;
+}
+
+.table-select-item.is-selected {
+  background: #007bff;
+  color: #fff;
 }

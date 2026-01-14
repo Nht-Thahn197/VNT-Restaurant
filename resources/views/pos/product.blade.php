@@ -207,22 +207,36 @@
 
           <div class="form-group">
             <label>Loại thực đơn</label>
-            <select class="choose" name="type_menu_id" id="type_menu">
+            <div class="product-select" data-product-select>
+              <button type="button" class="product-select-trigger" id="typeMenuDisplay" aria-expanded="false" aria-controls="typeMenuMenu">
+                <span class="product-select-value is-placeholder" id="typeMenuText"></span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="product-select-menu" id="typeMenuMenu" aria-hidden="true"></div>
+              <select class="choose" name="type_menu_id" id="type_menu">
               <option value="">-- Chọn loại --</option>
               <option value="Food"> Đồ ăn </option>
               <option value="Drink"> Đồ uống </option>
               <option value="Other"> Khác </option>
-            </select>
+              </select>
+            </div>
           </div>
 
           <div class="form-group">
             <label>Nhóm hàng</label>
-            <select class="choose" name="category_id" id="category_id">
+            <div class="product-select" data-product-select>
+              <button type="button" class="product-select-trigger" id="categoryDisplay" aria-expanded="false" aria-controls="categoryMenu">
+                <span class="product-select-value is-placeholder" id="categoryText"></span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="product-select-menu" id="categoryMenu" aria-hidden="true"></div>
+              <select class="choose" name="category_id" id="category_id">
               <option value="">-- Lựa chọn --</option>
               @foreach($categories as $category) 
               <option value="{{ $category->id }}">{{ $category->name }}</option>
             @endforeach
-            </select>
+              </select>
+            </div>
           </div>
 
           <div class="form-group">

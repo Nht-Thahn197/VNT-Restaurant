@@ -121,9 +121,258 @@
   width: 900px;
   background: #fff;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 8px 30px rgba(0,0,0,0.12);
   animation: fadeIn .2s ease-out;
+}
+
+.daterangepicker {
+  z-index: 10050 !important;
+}
+
+.daterangepicker {
+  border-radius: 12px;
+  border: 1px solid #e1e7ef;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);
+  overflow: hidden;
+}
+
+.daterangepicker .calendar-table {
+  background: transparent;
+}
+
+.daterangepicker .calendar-table th {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.daterangepicker .calendar-table th.month {
+  color: #357ebd;
+  letter-spacing: 0.3px;
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker td.available:focus {
+  background: #f0f6ff;
+  color: #1f2937;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background: #357ebd;
+  color: #fff;
+}
+
+.daterangepicker td.in-range {
+  background: #f0f6ff;
+  color: #1f2937;
+}
+
+.daterangepicker .drp-buttons .btn.applyBtn {
+  background: #357ebd;
+  border-color: #357ebd;
+}
+
+#customerFormOverlay .daterangepicker .calendar-table th.prev,
+#customerFormOverlay .daterangepicker .calendar-table th.next {
+  display: none;
+}
+
+#customerFormOverlay .daterangepicker .calendar-table th.month {
+  position: relative;
+  padding: 4px 0 12px;
+  text-align: center;
+}
+
+#customerFormOverlay .daterangepicker .vnt-month-year {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr) 32px;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+#customerFormOverlay .daterangepicker .vnt-nav {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #d9e2dc;
+  background: #fff;
+  color: #1f2937;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+#customerFormOverlay .daterangepicker .vnt-nav:hover {
+  background: #f0f6ff;
+  border-color: #c7d6ce;
+  transform: translateY(-1px);
+}
+
+#customerFormOverlay .daterangepicker .vnt-field {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid #d9e2dc;
+  background: #fff;
+  color: #1f2937;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  text-align: center;
+}
+
+#customerFormOverlay .daterangepicker .vnt-field:hover,
+#customerFormOverlay .daterangepicker .vnt-field:focus {
+  border-color: #357ebd;
+  box-shadow: 0 0 0 2px rgba(53, 126, 189, 0.16);
+  outline: none;
+}
+
+#customerFormOverlay .daterangepicker .vnt-dropdown {
+  position: absolute;
+  top: 40px;
+  min-width: 140px;
+  max-height: 220px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid #d9e2dc;
+  border-radius: 12px;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  z-index: 12;
+}
+
+#customerFormOverlay .daterangepicker .vnt-dropdown.open {
+  display: flex;
+}
+
+#customerFormOverlay .daterangepicker .vnt-month-menu {
+  left: 0;
+}
+
+#customerFormOverlay .daterangepicker .vnt-year-menu {
+  right: 0;
+}
+
+#customerFormOverlay .daterangepicker .vnt-option {
+  border: none;
+  background: transparent;
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #1f2937;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+#customerFormOverlay .daterangepicker .vnt-option:hover {
+  background: #f0f6ff;
+  color: #357ebd;
+}
+
+#customerFormOverlay .daterangepicker .vnt-month-year {
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+}
+
+#customerFormOverlay .daterangepicker .vnt-title {
+  width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #d9e2dc;
+  background: #ffffff;
+  color: #1f2937;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  text-align: center;
+}
+
+#customerFormOverlay .daterangepicker .vnt-title:hover {
+  background: #f1f1f1;
+}
+
+#customerFormOverlay .daterangepicker .vnt-panel {
+  display: none;
+  padding: 8px 10px 12px;
+}
+
+#customerFormOverlay .daterangepicker .vnt-month-grid,
+#customerFormOverlay .daterangepicker .vnt-year-list {
+  display: none;
+}
+
+#customerFormOverlay .daterangepicker.vnt-view-month .vnt-panel,
+#customerFormOverlay .daterangepicker.vnt-view-year .vnt-panel {
+  display: block;
+}
+
+#customerFormOverlay .daterangepicker.vnt-view-month .vnt-month-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#customerFormOverlay .daterangepicker.vnt-view-year .vnt-year-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+#customerFormOverlay .daterangepicker.vnt-view-month .calendar-table tbody,
+#customerFormOverlay .daterangepicker.vnt-view-month .calendar-table thead tr:nth-child(2),
+#customerFormOverlay .daterangepicker.vnt-view-year .calendar-table tbody,
+#customerFormOverlay .daterangepicker.vnt-view-year .calendar-table thead tr:nth-child(2) {
+  display: none;
+}
+
+#customerFormOverlay .daterangepicker.vnt-view-month .drp-buttons,
+#customerFormOverlay .daterangepicker.vnt-view-year .drp-buttons {
+  display: none;
+}
+
+#customerFormOverlay .daterangepicker .vnt-month-item,
+#customerFormOverlay .daterangepicker .vnt-year-item {
+  border: 1px solid transparent;
+  background: #ffffff;
+  padding: 10px 0;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  text-align: center;
+}
+
+#customerFormOverlay .daterangepicker .vnt-month-item:hover,
+#customerFormOverlay .daterangepicker .vnt-year-item:hover {
+  background: #f0f6ff;
+  color: #357ebd;
+}
+
+#customerFormOverlay .daterangepicker .vnt-month-item.is-selected {
+  border-color: #d6d6d6;
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+#customerFormOverlay .daterangepicker .vnt-year-item.is-selected {
+  background: #357ebd;
+  color: #ffffff;
 }
 
 @keyframes fadeIn {
@@ -488,4 +737,105 @@ form#customerInfoForm {
   color: #fff;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* Custom dropdowns */
+.customer-select {
+  position: relative;
+}
+
+.customer-select .customer-select-trigger,
+.customer-select .customer-select-menu {
+  display: none;
+}
+
+.js .customer-select select {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.js .customer-select .customer-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.js .customer-select .customer-select-trigger:hover {
+  border-color: #bdbdbd;
+}
+
+.js .customer-select .customer-select-trigger:focus-visible {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+}
+
+.customer-select-value {
+  font-weight: 500;
+  color: #333;
+}
+
+.customer-select-value.is-placeholder {
+  color: #9ca3af;
+}
+
+.customer-select-trigger i {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.js .customer-select .customer-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  z-index: 30;
+  display: none;
+}
+
+.js .customer-select .customer-select-menu.open {
+  display: block;
+}
+
+.customer-select-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.customer-select-item:hover {
+  background: #f0f6ff;
+}
+
+.customer-select-item.is-selected {
+  background: #007bff;
+  color: #fff;
 }

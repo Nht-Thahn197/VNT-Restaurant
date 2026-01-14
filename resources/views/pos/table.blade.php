@@ -135,13 +135,13 @@
                 <div class="table-pagination" id="pagination">
                     <button id="prevPage" class="page-btn">
                         <i class="fas fa-chevron-left"></i>
-                    </button>
+                        </button>
 
                     <span id="pageInfo"></span>
 
                     <button id="nextPage" class="page-btn">
                         <i class="fas fa-chevron-right"></i>
-                    </button>
+                        </button>
                 </div>
             </div>
         </div>
@@ -184,12 +184,19 @@
 
                 <div class="form-group">
                     <label>Khu vực</label>
-                    <select class="choose" name="area_id" id="area_id">
-                    <option value="">-- Lựa chọn --</option>
-                    @foreach($areas as $area) 
-                    <option value="{{ $area->id }}">{{ $area->name }}</option>
-                    @endforeach
-                    </select>
+                    <div class="table-select" data-table-select>
+                        <button type="button" class="table-select-trigger" id="tableAreaDisplay" aria-expanded="false" aria-controls="tableAreaMenu">
+                            <span class="table-select-value is-placeholder" id="tableAreaText"></span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="table-select-menu" id="tableAreaMenu" aria-hidden="true"></div>
+                        <select class="choose" name="area_id" id="area_id">
+                        <option value="">-- Lựa chọn --</option>
+                        @foreach($areas as $area) 
+                        <option value="{{ $area->id }}">{{ $area->name }}</option>
+                        @endforeach
+                        </select>
+                    </div>
                 </div>
 
                 <div class="form-actions">

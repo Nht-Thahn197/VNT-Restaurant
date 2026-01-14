@@ -5,6 +5,7 @@
 @section('content')
     @push('css')
         <link rel="stylesheet" href="{{ asset('css/pos/staff.css') }}">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
     @endpush
 
     <meta name="csrf-token" content="{{ csrf_token() }}" data-store-url="{{ route('role.store') }}" >
@@ -288,12 +289,19 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Chức vụ</label>
-                                    <select name="role_id" id="role_id">
+                                    <div class="staff-select" data-staff-select>
+                                        <button type="button" class="staff-select-trigger" id="staffRoleDisplay" aria-expanded="false" aria-controls="staffRoleMenu">
+                                            <span class="staff-select-value is-placeholder" id="staffRoleText"></span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="staff-select-menu" id="staffRoleMenu" aria-hidden="true"></div>
+                                        <select name="role_id" id="role_id">
                                         <option value="">Chọn chức vụ</option>
                                         @foreach($roles as $role)
                                             <option value="{{ $role->id }}">{{ $role->name }}</option>
                                         @endforeach
                                     </select>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -317,24 +325,33 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Giới tính</label>
-                                    <select name="gender" id="gender">
+                                    <div class="staff-select" data-staff-select>
+                                        <button type="button" class="staff-select-trigger" id="staffGenderDisplay" aria-expanded="false" aria-controls="staffGenderMenu">
+                                            <span class="staff-select-value is-placeholder" id="staffGenderText"></span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="staff-select-menu" id="staffGenderMenu" aria-hidden="true"></div>
+                                        <select name="gender" id="gender">
                                         <option value="">Chọn giới tính</option>
                                         <option value="nam">Nam</option>
                                         <option value="nữ">Nữ</option>
                                         <option value="khác">Khác</option>
                                     </select>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Ngày sinh</label>
-                                    <input type="date" name="dob" id="dob">
+                                    <input type="hidden" name="dob" id="dob">
+                                    <input type="text" name="dob_display" id="dob_display" autocomplete="off" placeholder="DD/MM/YYYY">
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Ngày bắt đầu làm việc</label>
-                                    <input type="date" name="start_date" id="start_date">
+                                    <input type="hidden" name="start_date" id="start_date">
+                                    <input type="text" name="start_date_display" id="start_date_display" autocomplete="off" placeholder="DD/MM/YYYY">
                                 </div>
 
                                 <div class="form-group">
@@ -361,26 +378,31 @@
             <!-- TAB 2: LƯƠNG -->
             <div class="tab-content" id="tab-salary">
                 <form id="staffSalaryForm">
+                    <input type="hidden" id="salary_staff_id">
 
-                    <div class="ingredient-search">
-                        <input type="text" placeholder="Tìm nguyên liệu..." id="ingredientSearch">
-                        <div id="ingredientSuggest" class="suggest-box"></div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Loại lương</label>
+                            <div class="custom-dropdown salary-dropdown" id="salaryTypeDropdown">
+                                <div class="selected-display">
+                                    <span id="currentSalaryTypeText">Chọn loại lương</span>
+                                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                                </div>
+                                <ul class="dropdown-list">
+                                    <li data-value="">Chọn loại lương</li>
+                                    <li data-value="hour">Theo giờ</li>
+                                    <li data-value="shift">Theo ca</li>
+                                    <li data-value="day">Theo ngày</li>
+                                    <li data-value="month">Theo tháng</li>
+                                </ul>
+                                <input type="hidden" name="salary_type" id="salary_type">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Mức lương (VNĐ)</label>
+                            <input type="text" name="salary_rate" id="salary_rate" inputmode="numeric" autocomplete="off" placeholder="Nhập mức lương" disabled>
+                        </div>
                     </div>
-
-                    <table class="ingredient-table">
-                        <thead>
-                        <tr>
-                            <th>STT</th>
-                            <th>Mã</th>
-                            <th>Tên nguyên liệu</th>
-                            <th>Định lượng</th>
-                            <th>Giá vốn</th>
-                            <th>Thành tiền</th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                        <tbody id="ingredientList"></tbody>
-                    </table>
 
                     <div class="form-actions">
                         <button id="btnSaveSalary" class="staff-save" type="button">
@@ -390,7 +412,6 @@
                             <i class="fas fa-ban"></i> Hủy
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
@@ -414,5 +435,8 @@
             }
         };
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="{{ asset('js/pos/staff.js') }}"></script>
 @endpush

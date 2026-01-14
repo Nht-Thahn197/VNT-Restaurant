@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+﻿document.addEventListener("DOMContentLoaded", function () {
     // ELEMENTS
     const searchInput = document.querySelector(".input-text");
     const statusRadios = document.querySelectorAll("input[name='status']");
@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     setupRoleDropdown('roleDropdown', 'filter-role', 'currentRoleText', 'role');
+    setupSimpleDropdown('salaryTypeDropdown', 'salary_type', 'currentSalaryTypeText');
 
     function setupRoleDropdown(dropdownId, hiddenInputId, textSpanId, filterKey) {
         const dropdown = document.getElementById(dropdownId);
@@ -68,6 +69,38 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 // Gọi hàm lọc nhân viên
                 if (typeof applyStaffFilters === 'function') applyStaffFilters();
+            });
+        });
+    }
+
+    function setupSimpleDropdown(dropdownId, hiddenInputId, textSpanId) {
+        const dropdown = document.getElementById(dropdownId);
+        const hiddenInput = document.getElementById(hiddenInputId);
+        const textSpan = document.getElementById(textSpanId);
+
+        if (!dropdown || !hiddenInput || !textSpan) return;
+
+        const display = dropdown.querySelector('.selected-display');
+        const items = dropdown.querySelectorAll('.dropdown-list li');
+
+        display.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpening = !dropdown.classList.contains('active');
+            document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
+            if (isOpening) dropdown.classList.add('active');
+        });
+
+        items.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = item.getAttribute('data-value');
+                const txt = item.innerText;
+
+                textSpan.innerText = txt;
+                hiddenInput.value = val;
+                hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+                dropdown.classList.remove('active');
             });
         });
     }
@@ -367,6 +400,125 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+document.documentElement.classList.add('js');
+
+var staffSelectControls = [];
+
+var closeStaffSelectMenus = function () {
+    staffSelectControls.forEach(function (control) {
+        control.close();
+    });
+};
+
+var syncStaffSelects = function () {
+    staffSelectControls.forEach(function (control) {
+        control.buildMenu();
+        control.updateDisplay();
+    });
+};
+
+var initStaffSelect = function (wrapper) {
+    if (!wrapper) {
+        return;
+    }
+    var select = wrapper.querySelector('select');
+    var trigger = wrapper.querySelector('.staff-select-trigger');
+    var valueText = wrapper.querySelector('.staff-select-value');
+    var menu = wrapper.querySelector('.staff-select-menu');
+
+    if (!select || !trigger || !valueText || !menu) {
+        return;
+    }
+
+    var buildMenu = function () {
+        menu.innerHTML = '';
+        Array.prototype.slice.call(select.options).forEach(function (option) {
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'staff-select-item';
+            button.textContent = option.text;
+            button.dataset.value = option.value;
+            if (option.selected) {
+                button.classList.add('is-selected');
+            }
+            button.addEventListener('click', function () {
+                select.value = option.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                closeStaffSelectMenus();
+            });
+            menu.appendChild(button);
+        });
+    };
+
+    var updateDisplay = function () {
+        var selectedOption = select.options[select.selectedIndex];
+        valueText.textContent = selectedOption ? selectedOption.text : '';
+        if (selectedOption && selectedOption.value === '') {
+            valueText.classList.add('is-placeholder');
+        } else {
+            valueText.classList.remove('is-placeholder');
+        }
+        Array.prototype.slice.call(menu.children).forEach(function (child) {
+            if (child.dataset.value === select.value) {
+                child.classList.add('is-selected');
+            } else {
+                child.classList.remove('is-selected');
+            }
+        });
+    };
+
+    var closeMenu = function () {
+        menu.classList.remove('open');
+        menu.setAttribute('aria-hidden', 'true');
+        trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    var openMenu = function () {
+        buildMenu();
+        menu.classList.add('open');
+        menu.setAttribute('aria-hidden', 'false');
+        trigger.setAttribute('aria-expanded', 'true');
+    };
+
+    trigger.addEventListener('click', function (event) {
+        event.stopPropagation();
+        var isOpen = menu.classList.contains('open');
+        closeStaffSelectMenus();
+        if (!isOpen) {
+            openMenu();
+        }
+    });
+
+    menu.addEventListener('click', function (event) {
+        event.stopPropagation();
+    });
+
+    select.addEventListener('change', updateDisplay);
+
+    staffSelectControls.push({
+        buildMenu: buildMenu,
+        updateDisplay: updateDisplay,
+        close: closeMenu
+    });
+
+    buildMenu();
+    updateDisplay();
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-staff-select]').forEach(function (wrapper) {
+        initStaffSelect(wrapper);
+    });
+    syncStaffSelects();
+});
+
+document.addEventListener('click', closeStaffSelectMenus);
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+        closeStaffSelectMenus();
+    }
+});
+
 // JS STAFF
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById("btnChooseImage").addEventListener("click", () => {
@@ -390,8 +542,73 @@ document.addEventListener('DOMContentLoaded', () => {
     const removeImageBtn = document.getElementById("removeImageBtn");
     const addText = document.querySelector(".add-text");
     const deleteImageInput = document.getElementById('delete_image');
+    const salaryType = document.getElementById('salary_type');
+    const salaryRate = document.getElementById('salary_rate');
+    const salaryTypeDropdown = document.getElementById('salaryTypeDropdown');
+    const salaryTypeText = document.getElementById('currentSalaryTypeText');
+    const btnSaveSalary = document.getElementById('btnSaveSalary');
+    const roleSelect = document.getElementById('role_id');
+    const genderSelect = document.getElementById('gender');
+    const dobHiddenInput = document.getElementById('dob');
+    const dobDisplayInput = document.getElementById('dob_display');
+    const startDateHiddenInput = document.getElementById('start_date');
+    const startDateDisplayInput = document.getElementById('start_date_display');
 
     let editingStaffId = null;
+
+    const syncSalaryRateState = () => {
+        if (!salaryType || !salaryRate) return;
+        const enabled = Boolean(salaryType.value);
+        salaryRate.disabled = !enabled;
+        if (!enabled) {
+            salaryRate.value = '';
+        }
+    };
+
+    const parseSalaryValue = (value) => {
+        const raw = String(value || '').replace(/[^\d]/g, '');
+        return raw ? Number(raw) : 0;
+    };
+
+    const formatSalaryValue = (value) => {
+        const number = parseSalaryValue(value);
+        if (!number) return '';
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
+    const formatSalaryFromApi = (value) => {
+        if (value === null || value === undefined || value === '') return '';
+        if (typeof value === 'number') {
+            if (!Number.isFinite(value) || value <= 0) return '';
+            return Math.round(value).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        let raw = String(value).trim();
+        if (!raw) return '';
+
+        if (raw.includes(',') && raw.includes('.')) {
+            raw = raw.replace(/\./g, '').replace(',', '.');
+        } else if (raw.includes(',')) {
+            raw = raw.replace(',', '.');
+        }
+
+        const number = parseFloat(raw);
+        if (!Number.isFinite(number) || number <= 0) return '';
+        return Math.round(number).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    };
+
+    const syncSalaryDisplay = () => {
+        if (!salaryRate) return;
+        salaryRate.value = formatSalaryValue(salaryRate.value);
+    };
+
+    const setSalaryTypeValue = (value) => {
+        if (!salaryType || !salaryTypeText || !salaryTypeDropdown) return;
+        salaryType.value = value || '';
+        const item = salaryTypeDropdown.querySelector(`.dropdown-list li[data-value="${salaryType.value}"]`);
+        salaryTypeText.innerText = item ? item.innerText : 'Chon loai luong';
+        salaryType.dispatchEvent(new Event('change', { bubbles: true }));
+    };
     function formatDateForInput(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -401,9 +618,336 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${yyyy}-${mm}-${dd}`;
     }
 
+    const parseStaffDateValue = (dateString) => {
+        if (!dateString) return null;
+        if (window.moment) {
+            const parsed = moment(dateString, [moment.ISO_8601, 'YYYY-MM-DD', 'DD/MM/YYYY'], true);
+            if (parsed.isValid()) return parsed;
+        }
+        const date = new Date(dateString);
+        return isNaN(date.getTime()) ? null : date;
+    };
+
+    const formatStaffDateForHidden = (dateString) => {
+        const parsed = parseStaffDateValue(dateString);
+        if (!parsed) return '';
+        if (window.moment && parsed.format) {
+            return parsed.format('YYYY-MM-DD');
+        }
+        const yyyy = parsed.getFullYear();
+        const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+        const dd = String(parsed.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    };
+
+    const formatStaffDateForDisplay = (dateString) => {
+        const parsed = parseStaffDateValue(dateString);
+        if (!parsed) return '';
+        if (window.moment && parsed.format) {
+            return parsed.format('DD/MM/YYYY');
+        }
+        const dd = String(parsed.getDate()).padStart(2, '0');
+        const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+        const yyyy = parsed.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    };
+
+    const syncStaffDateDisplay = (hiddenInput, displayInput) => {
+        if (!hiddenInput || !displayInput) return;
+        if (!hiddenInput.value) {
+            displayInput.value = '';
+            return;
+        }
+        displayInput.value = formatStaffDateForDisplay(hiddenInput.value);
+        if (window.jQuery && window.moment) {
+            const picker = jQuery(displayInput).data('daterangepicker');
+            const parsed = moment(hiddenInput.value, 'YYYY-MM-DD', true);
+            if (picker && parsed.isValid()) {
+                picker.setStartDate(parsed);
+                picker.setEndDate(parsed);
+            }
+        }
+    };
+
+    const syncStaffDateDisplays = () => {
+        syncStaffDateDisplay(dobHiddenInput, dobDisplayInput);
+        syncStaffDateDisplay(startDateHiddenInput, startDateDisplayInput);
+    };
+
+    const initStaffDatePicker = (hiddenInput, displayInput, options) => {
+        if (!hiddenInput || !displayInput) return;
+        if (!window.jQuery || !jQuery.fn || !jQuery.fn.daterangepicker) return;
+
+        const config = options || {};
+        const $input = jQuery(displayInput);
+        const repositionPicker = (picker) => {
+            if (!picker || !picker.container || !picker.container.length) return;
+            if (typeof picker.move !== 'function') return;
+            const move = () => picker.move();
+            if (window.requestAnimationFrame) {
+                window.requestAnimationFrame(move);
+            } else {
+                setTimeout(move, 0);
+            }
+        };
+        const setupMonthYearControls = (picker) => {
+            if (!picker || !picker.container) return;
+            const calendar = picker.container.find('.drp-calendar').first();
+            const headerCell = picker.container.find('.calendar-table th.month');
+            if (!headerCell.length || !calendar.length) return;
+            headerCell.attr('colspan', 7);
+
+            if (!headerCell.find('.vnt-month-year').length) {
+                headerCell.empty().append(`
+                    <div class="vnt-month-year">
+                        <button type="button" class="vnt-nav vnt-prev" aria-label="Prev month">&#10094;</button>
+                        <button type="button" class="vnt-title" aria-haspopup="true" aria-expanded="false"></button>
+                        <button type="button" class="vnt-nav vnt-next" aria-label="Next month">&#10095;</button>
+                    </div>
+                `);
+            }
+
+            if (!calendar.find('.vnt-panel').length) {
+                calendar.append(`
+                    <div class="vnt-panel">
+                        <div class="vnt-month-grid"></div>
+                        <div class="vnt-year-list"></div>
+                    </div>
+                `);
+            }
+
+            const header = headerCell.find('.vnt-month-year');
+            const titleBtn = header.find('.vnt-title');
+            const monthGrid = calendar.find('.vnt-month-grid');
+            const yearList = calendar.find('.vnt-year-list');
+
+            const monthNames = [
+                'Tháng Giêng', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư',
+                'Tháng Năm', 'Tháng Sáu', 'Tháng Bảy', 'Tháng Tám',
+                'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai'
+            ];
+            const monthShorts = [
+                'Thg1', 'Thg2', 'Thg3', 'Thg4', 'Thg5', 'Thg6',
+                'Thg7', 'Thg8', 'Thg9', 'Thg10', 'Thg11', 'Thg12'
+            ];
+
+            const getView = () => picker.container.data('vnt-view') || 'day';
+
+            const buildMonthGrid = () => {
+                const current = picker.leftCalendar.month.clone();
+                monthGrid.html(monthShorts.map((label, index) => {
+                    const isSelected = index === current.month();
+                    return `<button type="button" class="vnt-month-item${isSelected ? ' is-selected' : ''}" data-month="${index}">${label}</button>`;
+                }).join(''));
+            };
+
+            const buildYearList = () => {
+                const current = picker.leftCalendar.month.clone();
+                const range = 12;
+                let startYear = Number(picker.container.data('vnt-year-start'));
+                if (!startYear || Number.isNaN(startYear)) {
+                    startYear = current.year() - Math.floor(range / 2);
+                }
+                const endYear = startYear + range - 1;
+                picker.container.data('vnt-year-start', startYear);
+                const items = [];
+                for (let year = startYear; year <= endYear; year++) {
+                    const isSelected = year === current.year();
+                    items.push(`<button type="button" class="vnt-year-item${isSelected ? ' is-selected' : ''}" data-year="${year}">${year}</button>`);
+                }
+                yearList.html(items.join(''));
+            };
+
+            const updateTitle = (view) => {
+                const current = picker.leftCalendar.month.clone();
+                if (view === 'day') {
+                    titleBtn.text(`${monthNames[current.month()]} ${current.year()}`);
+                } else {
+                    titleBtn.text(`${current.year()}`);
+                }
+                titleBtn.attr('aria-expanded', view !== 'day');
+            };
+
+            const applyView = (view) => {
+                picker.container
+                    .removeClass('vnt-view-day vnt-view-month vnt-view-year')
+                    .addClass(`vnt-view-${view}`)
+                    .data('vnt-view', view);
+                calendar
+                    .removeClass('vnt-view-day vnt-view-month vnt-view-year')
+                    .addClass(`vnt-view-${view}`);
+                if (view === 'month') {
+                    buildMonthGrid();
+                }
+                if (view === 'year') {
+                    buildYearList();
+                }
+                updateTitle(view);
+                repositionPicker(picker);
+            };
+
+            const setCurrentDate = (momentValue, viewAfter) => {
+                if (viewAfter) {
+                    picker.container.data('vnt-view', viewAfter);
+                }
+                picker.setStartDate(momentValue);
+                picker.setEndDate(momentValue);
+                picker.updateCalendars();
+                if (hiddenInput) {
+                    hiddenInput.value = momentValue.format('YYYY-MM-DD');
+                }
+                $input.val(momentValue.format('DD/MM/YYYY'));
+            };
+
+            applyView(getView());
+
+            header.off('click.vntMonthYear');
+            header.on('click.vntMonthYear', '.vnt-prev', (event) => {
+                event.preventDefault();
+                const view = getView();
+                if (view === 'year') {
+                    const range = 12;
+                    let startYear = Number(picker.container.data('vnt-year-start'));
+                    if (!startYear || Number.isNaN(startYear)) {
+                        startYear = picker.leftCalendar.month.year() - Math.floor(range / 2);
+                    }
+                    picker.container.data('vnt-year-start', startYear - range);
+                    applyView('year');
+                    return;
+                }
+                const unit = view === 'month' ? 'year' : 'month';
+                const current = picker.leftCalendar.month.clone().subtract(1, unit);
+                picker.leftCalendar.month = current;
+                picker.updateCalendars();
+                picker.container.data('vnt-view', view);
+            });
+            header.on('click.vntMonthYear', '.vnt-next', (event) => {
+                event.preventDefault();
+                const view = getView();
+                if (view === 'year') {
+                    const range = 12;
+                    let startYear = Number(picker.container.data('vnt-year-start'));
+                    if (!startYear || Number.isNaN(startYear)) {
+                        startYear = picker.leftCalendar.month.year() - Math.floor(range / 2);
+                    }
+                    picker.container.data('vnt-year-start', startYear + range);
+                    applyView('year');
+                    return;
+                }
+                const unit = view === 'month' ? 'year' : 'month';
+                const current = picker.leftCalendar.month.clone().add(1, unit);
+                picker.leftCalendar.month = current;
+                picker.updateCalendars();
+                picker.container.data('vnt-view', view);
+            });
+            header.on('click.vntMonthYear', '.vnt-title', (event) => {
+                event.preventDefault();
+                const view = getView();
+                if (view === 'day') {
+                    applyView('month');
+                    return;
+                }
+                if (view === 'month') {
+                    applyView('year');
+                    return;
+                }
+                applyView('month');
+            });
+
+            monthGrid.off('click.vntMonthGrid').on('click.vntMonthGrid', '.vnt-month-item', function (event) {
+                event.preventDefault();
+                const monthIndex = Number(jQuery(this).data('month'));
+                const base = picker.startDate ? picker.startDate.clone() : picker.leftCalendar.month.clone();
+                base.month(monthIndex);
+                setCurrentDate(base, 'day');
+            });
+
+            yearList.off('click.vntYearList').on('click.vntYearList', '.vnt-year-item', function (event) {
+                event.preventDefault();
+                const yearValue = Number(jQuery(this).data('year'));
+                const base = picker.startDate ? picker.startDate.clone() : picker.leftCalendar.month.clone();
+                base.year(yearValue);
+                setCurrentDate(base, 'month');
+            });
+        };
+
+        const patchPickerUpdate = (picker) => {
+            if (!picker || picker._vntPatched) return;
+            const originalUpdate = picker.updateCalendars;
+            picker.updateCalendars = function () {
+                originalUpdate.call(picker);
+                setupMonthYearControls(picker);
+                repositionPicker(picker);
+            };
+            picker._vntPatched = true;
+        };
+
+        $input.daterangepicker({
+            singleDatePicker: true,
+            autoUpdateInput: false,
+            showDropdowns: false,
+            autoApply: true,
+            parentEl: '#staffForm',
+            drops: config.drops || 'up',
+            opens: 'center',
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        }, function (start) {
+            $input.val(start.format('DD/MM/YYYY'));
+            hiddenInput.value = start.format('YYYY-MM-DD');
+        });
+
+        $input.off('click.daterangepicker');
+        $input.off('focus.daterangepicker');
+
+        $input.on('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const picker = jQuery(this).data('daterangepicker');
+            if (!picker) {
+                return;
+            }
+            if (picker.isShowing) {
+                picker.hide();
+            } else {
+                picker.show();
+            }
+        });
+
+        $input.on('show.daterangepicker', function (event, picker) {
+            patchPickerUpdate(picker);
+            setupMonthYearControls(picker);
+        });
+
+        $input.on('change', function () {
+            if (!window.moment) {
+                return;
+            }
+            const parsed = moment($input.val(), 'DD/MM/YYYY', true);
+            if (parsed.isValid()) {
+                hiddenInput.value = parsed.format('YYYY-MM-DD');
+            }
+        });
+
+        syncStaffDateDisplay(hiddenInput, displayInput);
+    };
+
+    initStaffDatePicker(dobHiddenInput, dobDisplayInput);
+    initStaffDatePicker(startDateHiddenInput, startDateDisplayInput, { drops: 'up' });
+
     // ====== MỞ / ĐÓNG FORM ======
     function openStaffForm() {
         overlay.style.display = "flex";
+        activateTab("info");
+        const formTitle = document.getElementById('formTitle');
+        if (formTitle) {
+            formTitle.innerText = editingStaffId ? 'Cập nhật nhân viên' : 'Thêm mới nhân viên';
+        }
+        if (typeof syncStaffSelects === 'function') {
+            syncStaffSelects();
+        }
+        syncStaffDateDisplays();
         setTimeout(() => { if (firstFocusable) firstFocusable.focus(); }, 120);
         document.addEventListener('keydown', escHandler);
     }
@@ -432,13 +976,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function activateTab(tabName) {
         tabs.forEach(t => t.classList.remove('active'));
         tabContents.forEach(c => c.classList.remove('active'));
-        document.querySelector(`.staff-tab#tab-${tabName}-btn`)?.classList.add('active');
+        document.querySelector(`.staff-tab[data-tab="${tabName}"]`)?.classList.add('active');
         document.getElementById(`tab-${tabName}`)?.classList.add('active');
     }
     // ====== TAB SWITCH ======
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            const target = tab.dataset.tab; // info hoặc salary
+            const target = tab.dataset.tab; // info ho?c salary
 
             // remove active
             tabs.forEach(t => t.classList.remove('active'));
@@ -450,10 +994,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // ====== RESET FORM ======
+    if (salaryType) {
+        salaryType.addEventListener('change', syncSalaryRateState);
+        syncSalaryRateState();
+    }
+
+    if (salaryRate) {
+        salaryRate.addEventListener('blur', syncSalaryDisplay);
+        salaryRate.addEventListener('focus', () => {
+            const raw = parseSalaryValue(salaryRate.value);
+            salaryRate.value = raw ? String(raw) : '';
+        });
+        salaryRate.addEventListener('input', () => {
+            const raw = parseSalaryValue(salaryRate.value);
+            salaryRate.value = raw ? String(raw) : '';
+        });
+    }
+// ====== RESET FORM ======
     function resetForm() {
         document.getElementById('staffInfoForm').reset();
+        const salaryForm = document.getElementById('staffSalaryForm');
+        if (salaryForm) salaryForm.reset();
+        setSalaryTypeValue('');
         editingStaffId = null;
+        if (dobHiddenInput) dobHiddenInput.value = '';
+        if (dobDisplayInput) dobDisplayInput.value = '';
+        if (startDateHiddenInput) startDateHiddenInput.value = '';
+        if (startDateDisplayInput) startDateDisplayInput.value = '';
+        if (typeof syncStaffSelects === 'function') {
+            syncStaffSelects();
+        }
+        syncStaffDateDisplays();
         activateTab("info");
         resetImageBox();
     }
@@ -526,6 +1097,64 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    if (btnSaveSalary) {
+        btnSaveSalary.addEventListener('click', async () => {
+            if (!editingStaffId) {
+                if (typeof showToast === 'function') {
+                    showToast('Vui lòng chọn nhân viên để thiết lập lương', 'error');
+                }
+                return;
+            }
+
+            const salaryTypeValue = salaryType ? salaryType.value : '';
+            const salaryRateValue = salaryRate ? parseSalaryValue(salaryRate.value) : '';
+
+            if (!salaryTypeValue) {
+                if (typeof showToast === 'function') {
+                    showToast('Vui lòng chọn loại lương', 'error');
+                }
+                return;
+            }
+
+            if (!salaryRateValue) {
+                if (typeof showToast === 'function') {
+                    showToast('Vui lòng nhập mức lương', 'error');
+                }
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+            formData.append('salary_type', salaryTypeValue);
+            formData.append('salary_rate', salaryRateValue);
+
+            try {
+                const res = await fetch(`${BASE_URL}/staff/${editingStaffId}/update`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (typeof showToast === 'function') {
+                        showToast('Lưu lương thành công', 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 800);
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast(data.message || 'Lưu lương thất bại', 'error');
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                if (typeof showToast === 'function') {
+                    showToast('Lỗi server', 'error');
+                }
+            }
+        });
+    }
+
     // ====== EDIT STAFF ======
     document.querySelectorAll('.btn-update').forEach(btn => {
         btn.addEventListener('click', async e => {
@@ -555,14 +1184,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         resetImageBox();
                     }
                     document.querySelector('#staffInfoForm [name="name"]').value = s.name;
-                    document.querySelector('#staffInfoForm [name="role_id"]').value = s.role_id;
+                    if (roleSelect) roleSelect.value = s.role_id || '';
                     document.querySelector('#staffInfoForm [name="cccd"]').value = s.cccd;
                     document.querySelector('#staffInfoForm [name="phone"]').value = s.phone;
                     document.querySelector('#staffInfoForm [name="email"]').value = s.email;
-                    document.querySelector('#staffInfoForm [name="gender"]').value = s.gender;
-                    document.getElementById('dob').value = formatDateForInput(s.dob);
-                    document.getElementById('start_date').value = formatDateForInput(s.start_date);
+                    if (genderSelect) genderSelect.value = s.gender || '';
+                    if (dobHiddenInput) dobHiddenInput.value = formatStaffDateForHidden(s.dob);
+                    if (startDateHiddenInput) startDateHiddenInput.value = formatStaffDateForHidden(s.start_date);
+                    syncStaffDateDisplays();
+                    if (typeof syncStaffSelects === 'function') {
+                        syncStaffSelects();
+                    }
                     document.querySelector('#staffInfoForm [name="password"]').value = '';
+                    const salary = data.salary || null;
+                    if (salary && salary.salary_type) {
+                        setSalaryTypeValue(salary.salary_type);
+                        if (salaryRate) {
+                            salaryRate.value = formatSalaryFromApi(salary.salary_rate ?? '');
+                        }
+                    } else {
+                        setSalaryTypeValue('');
+                        if (salaryRate) {
+                            salaryRate.value = '';
+                        }
+                    }
                     openStaffForm();
                 }
             } catch(err) { console.error(err); }
@@ -689,3 +1334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 });
+
+
+
+

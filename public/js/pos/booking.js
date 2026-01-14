@@ -1,3 +1,122 @@
+document.documentElement.classList.add('js');
+
+var bookingSelectControls = [];
+
+var closeBookingSelectMenus = function () {
+    bookingSelectControls.forEach(function (control) {
+        control.close();
+    });
+};
+
+var syncBookingSelects = function () {
+    bookingSelectControls.forEach(function (control) {
+        control.buildMenu();
+        control.updateDisplay();
+    });
+};
+
+var initBookingSelect = function (wrapper) {
+    if (!wrapper) {
+        return;
+    }
+    var select = wrapper.querySelector('select');
+    var trigger = wrapper.querySelector('.booking-select-trigger');
+    var valueText = wrapper.querySelector('.booking-select-value');
+    var menu = wrapper.querySelector('.booking-select-menu');
+
+    if (!select || !trigger || !valueText || !menu) {
+        return;
+    }
+
+    var buildMenu = function () {
+        menu.innerHTML = '';
+        Array.prototype.slice.call(select.options).forEach(function (option) {
+            var button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'booking-select-item';
+            button.textContent = option.text;
+            button.dataset.value = option.value;
+            if (option.selected) {
+                button.classList.add('is-selected');
+            }
+            button.addEventListener('click', function () {
+                select.value = option.value;
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+                closeBookingSelectMenus();
+            });
+            menu.appendChild(button);
+        });
+    };
+
+    var updateDisplay = function () {
+        var selectedOption = select.options[select.selectedIndex];
+        valueText.textContent = selectedOption ? selectedOption.text : '';
+        if (selectedOption && selectedOption.value === '') {
+            valueText.classList.add('is-placeholder');
+        } else {
+            valueText.classList.remove('is-placeholder');
+        }
+        Array.prototype.slice.call(menu.children).forEach(function (child) {
+            if (child.dataset.value === select.value) {
+                child.classList.add('is-selected');
+            } else {
+                child.classList.remove('is-selected');
+            }
+        });
+    };
+
+    var closeMenu = function () {
+        menu.classList.remove('open');
+        menu.setAttribute('aria-hidden', 'true');
+        trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    var openMenu = function () {
+        buildMenu();
+        menu.classList.add('open');
+        menu.setAttribute('aria-hidden', 'false');
+        trigger.setAttribute('aria-expanded', 'true');
+    };
+
+    trigger.addEventListener('click', function (event) {
+        event.stopPropagation();
+        var isOpen = menu.classList.contains('open');
+        closeBookingSelectMenus();
+        if (!isOpen) {
+            openMenu();
+        }
+    });
+
+    menu.addEventListener('click', function (event) {
+        event.stopPropagation();
+    });
+
+    select.addEventListener('change', updateDisplay);
+
+    bookingSelectControls.push({
+        buildMenu: buildMenu,
+        updateDisplay: updateDisplay,
+        close: closeMenu
+    });
+
+    buildMenu();
+    updateDisplay();
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('[data-booking-select]').forEach(function (wrapper) {
+        initBookingSelect(wrapper);
+    });
+    syncBookingSelects();
+});
+
+document.addEventListener('click', closeBookingSelectMenus);
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+        closeBookingSelectMenus();
+    }
+});
+
 // ===== CONFIG =====
 const BASE_URL = document
     .querySelector('meta[name="base-url"]')
@@ -32,6 +151,9 @@ const searchResultBox = document.getElementById('preorderSearchResult');
 const savePreorderBtn = document.getElementById('savePreorder');
 const cancelBookingBtn = document.getElementById('cancelBookingBtn');
 const statusCheckboxes = document.querySelectorAll('.status-checkbox');
+const arrivalTimeDisplay = document.getElementById('arrival_time_display');
+const arrivalTimeHidden = document.getElementById('arrival_time');
+const bookingTableSelect = document.getElementById('table_id');
 
 nameInput.disabled = true;
 let preorderItems = {};
@@ -40,6 +162,459 @@ let searchTimeout = null;
 let lastSearchKeyword = '';
 let currentBookingId = null;
 
+const parseBookingTime = (value) => {
+    if (!value) return null;
+    if (window.moment) {
+        const parsed = moment(value, [
+            moment.ISO_8601,
+            'YYYY-MM-DD HH:mm:ss',
+            'YYYY-MM-DD HH:mm',
+            'YYYY-MM-DDTHH:mm',
+            'DD/MM/YYYY HH:mm'
+        ], true);
+        if (parsed.isValid()) return parsed;
+    }
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? null : date;
+};
+
+const formatBookingTimeForHidden = (value) => {
+    const parsed = parseBookingTime(value);
+    if (!parsed) return '';
+    if (window.moment && parsed.format) {
+        return parsed.format('YYYY-MM-DD HH:mm');
+    }
+    const yyyy = parsed.getFullYear();
+    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+    const dd = String(parsed.getDate()).padStart(2, '0');
+    const hh = String(parsed.getHours()).padStart(2, '0');
+    const min = String(parsed.getMinutes()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd} ${hh}:${min}`;
+};
+
+const formatBookingTimeForDisplay = (value) => {
+    const parsed = parseBookingTime(value);
+    if (!parsed) return '';
+    if (window.moment && parsed.format) {
+        return parsed.format('DD/MM/YYYY HH:mm');
+    }
+    const dd = String(parsed.getDate()).padStart(2, '0');
+    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+    const yyyy = parsed.getFullYear();
+    const hh = String(parsed.getHours()).padStart(2, '0');
+    const min = String(parsed.getMinutes()).padStart(2, '0');
+    return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+};
+
+const syncArrivalTimeDisplay = () => {
+    if (!arrivalTimeHidden || !arrivalTimeDisplay) return;
+    if (!arrivalTimeHidden.value) {
+        arrivalTimeDisplay.value = '';
+        return;
+    }
+    arrivalTimeDisplay.value = formatBookingTimeForDisplay(arrivalTimeHidden.value);
+    if (window.jQuery && window.moment) {
+        const picker = jQuery(arrivalTimeDisplay).data('daterangepicker');
+        const parsed = moment(arrivalTimeHidden.value, ['YYYY-MM-DD HH:mm', 'YYYY-MM-DD HH:mm:ss'], true);
+        if (picker && parsed.isValid()) {
+            picker.setStartDate(parsed);
+            picker.setEndDate(parsed);
+        }
+    }
+};
+
+const initArrivalTimePicker = () => {
+    if (!arrivalTimeDisplay || !arrivalTimeHidden) return;
+    if (!window.jQuery || !jQuery.fn || !jQuery.fn.daterangepicker) return;
+
+    const $arrivalInput = jQuery(arrivalTimeDisplay);
+    const syncArrivalTimeInputs = (momentValue) => {
+        if (!momentValue) return;
+        $arrivalInput.val(momentValue.format('DD/MM/YYYY HH:mm'));
+        arrivalTimeHidden.value = momentValue.format('YYYY-MM-DD HH:mm');
+    };
+    const ensureArrivalPickerValue = (picker) => {
+        if (!picker || !window.moment) return;
+        const currentValue = $arrivalInput.val().trim();
+        if (currentValue) return;
+        const now = moment();
+        picker.setStartDate(now);
+        picker.setEndDate(now);
+        if (typeof picker.updateCalendars === 'function') {
+            picker.updateCalendars();
+        }
+    };
+
+    const setupMonthYearControls = (picker) => {
+        if (!picker || !picker.container) return;
+        const calendar = picker.container.find('.drp-calendar').first();
+        const headerCell = picker.container.find('.calendar-table th.month');
+        if (!headerCell.length || !calendar.length) return;
+        headerCell.attr('colspan', 7);
+
+        if (!headerCell.find('.vnt-month-year').length) {
+            headerCell.empty().append(`
+                <div class="vnt-month-year">
+                    <button type="button" class="vnt-nav vnt-prev" aria-label="Prev month">&#10094;</button>
+                    <button type="button" class="vnt-title" aria-haspopup="true" aria-expanded="false"></button>
+                    <button type="button" class="vnt-nav vnt-next" aria-label="Next month">&#10095;</button>
+                </div>
+            `);
+        }
+
+        if (!calendar.find('.vnt-panel').length) {
+            calendar.append(`
+                <div class="vnt-panel">
+                    <div class="vnt-month-grid"></div>
+                    <div class="vnt-year-list"></div>
+                </div>
+            `);
+        }
+
+        const header = headerCell.find('.vnt-month-year');
+        const titleBtn = header.find('.vnt-title');
+        const monthGrid = calendar.find('.vnt-month-grid');
+        const yearList = calendar.find('.vnt-year-list');
+
+        const monthNames = [
+            'Tháng Giêng', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư',
+            'Tháng Năm', 'Tháng Sáu', 'Tháng Bảy', 'Tháng Tám',
+            'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai'
+        ];
+        const monthShorts = [
+            'Thg1', 'Thg2', 'Thg3', 'Thg4', 'Thg5', 'Thg6',
+            'Thg7', 'Thg8', 'Thg9', 'Thg10', 'Thg11', 'Thg12'
+        ];
+
+        const getView = () => picker.container.data('vnt-view') || 'day';
+
+        const buildMonthGrid = () => {
+            const current = picker.leftCalendar.month.clone();
+            monthGrid.html(monthShorts.map((label, index) => {
+                const isSelected = index === current.month();
+                return `<button type="button" class="vnt-month-item${isSelected ? ' is-selected' : ''}" data-month="${index}">${label}</button>`;
+            }).join(''));
+        };
+
+        const buildYearList = () => {
+            const current = picker.leftCalendar.month.clone();
+            const range = 12;
+            let startYear = Number(picker.container.data('vnt-year-start'));
+            if (!startYear || Number.isNaN(startYear)) {
+                startYear = current.year() - Math.floor(range / 2);
+            }
+            const endYear = startYear + range - 1;
+            picker.container.data('vnt-year-start', startYear);
+
+            const items = [];
+            for (let year = startYear; year <= endYear; year++) {
+                const isSelected = year === current.year();
+                items.push(`<button type="button" class="vnt-year-item${isSelected ? ' is-selected' : ''}" data-year="${year}">${year}</button>`);
+            }
+            yearList.html(items.join(''));
+            return { startYear, endYear };
+        };
+
+        const updateTitle = (view) => {
+            const current = picker.leftCalendar.month.clone();
+            if (view === 'day') {
+                titleBtn.text(`${monthNames[current.month()]} ${current.year()}`);
+            } else {
+                titleBtn.text(`${current.year()}`);
+            }
+            titleBtn.attr('aria-expanded', view !== 'day');
+        };
+
+        const applyView = (view) => {
+            picker.container
+                .removeClass('vnt-view-day vnt-view-month vnt-view-year')
+                .addClass(`vnt-view-${view}`)
+                .data('vnt-view', view);
+            calendar
+                .removeClass('vnt-view-day vnt-view-month vnt-view-year')
+                .addClass(`vnt-view-${view}`);
+
+            if (view === 'month') {
+                buildMonthGrid();
+            }
+            if (view === 'year') {
+                buildYearList();
+            }
+            updateTitle(view);
+        };
+
+        const setCurrentDate = (momentValue, viewAfter) => {
+            if (viewAfter) {
+                picker.container.data('vnt-view', viewAfter);
+            }
+            picker.setStartDate(momentValue);
+            picker.setEndDate(momentValue);
+            picker.updateCalendars();
+            syncArrivalTimeInputs(momentValue);
+        };
+
+        const currentView = getView();
+        applyView(currentView);
+
+        header.off('click.vntMonthYear');
+        header.on('click.vntMonthYear', '.vnt-prev', (event) => {
+            event.preventDefault();
+            const view = getView();
+            if (view === 'year') {
+                const range = 12;
+                let startYear = Number(picker.container.data('vnt-year-start'));
+                if (!startYear || Number.isNaN(startYear)) {
+                    startYear = picker.leftCalendar.month.year() - Math.floor(range / 2);
+                }
+                picker.container.data('vnt-year-start', startYear - range);
+                applyView('year');
+                return;
+            }
+            const current = picker.leftCalendar.month.clone().subtract(1, view === 'month' ? 'year' : 'month');
+            picker.leftCalendar.month = current;
+            picker.updateCalendars();
+            picker.container.data('vnt-view', view);
+        });
+        header.on('click.vntMonthYear', '.vnt-next', (event) => {
+            event.preventDefault();
+            const view = getView();
+            if (view === 'year') {
+                const range = 12;
+                let startYear = Number(picker.container.data('vnt-year-start'));
+                if (!startYear || Number.isNaN(startYear)) {
+                    startYear = picker.leftCalendar.month.year() - Math.floor(range / 2);
+                }
+                picker.container.data('vnt-year-start', startYear + range);
+                applyView('year');
+                return;
+            }
+            const current = picker.leftCalendar.month.clone().add(1, view === 'month' ? 'year' : 'month');
+            picker.leftCalendar.month = current;
+            picker.updateCalendars();
+            picker.container.data('vnt-view', view);
+        });
+        header.on('click.vntMonthYear', '.vnt-title', (event) => {
+            event.preventDefault();
+            const view = getView();
+            if (view === 'day') {
+                applyView('month');
+                return;
+            }
+            if (view === 'month') {
+                applyView('year');
+                return;
+            }
+            applyView('month');
+        });
+
+        monthGrid.off('click.vntMonthGrid').on('click.vntMonthGrid', '.vnt-month-item', function (event) {
+            event.preventDefault();
+            const monthIndex = Number(jQuery(this).data('month'));
+            const base = picker.startDate ? picker.startDate.clone() : picker.leftCalendar.month.clone();
+            base.month(monthIndex);
+            setCurrentDate(base, 'day');
+        });
+
+        yearList.off('click.vntYearList').on('click.vntYearList', '.vnt-year-item', function (event) {
+            event.preventDefault();
+            const yearValue = Number(jQuery(this).data('year'));
+            const base = picker.startDate ? picker.startDate.clone() : picker.leftCalendar.month.clone();
+            base.year(yearValue);
+            setCurrentDate(base, 'month');
+        });
+    };
+
+    const setupTimeSelectControls = (picker) => {
+        if (!picker || !picker.container) return;
+        const timeWrap = picker.container.find('.calendar-time');
+        if (!timeWrap.length) return;
+
+        const closeTimeMenus = () => {
+            timeWrap.find('.vnt-time-select.open').each(function () {
+                const wrapper = jQuery(this);
+                wrapper.removeClass('open');
+                wrapper.find('.vnt-time-trigger').attr('aria-expanded', 'false');
+            });
+        };
+
+        timeWrap.find('.vnt-time-select').remove();
+
+        timeWrap.find('select').each(function () {
+            const select = jQuery(this);
+            const isHour = select.hasClass('hourselect');
+            const isMinute = select.hasClass('minuteselect');
+            const type = isHour ? 'hour' : (isMinute ? 'minute' : 'ampm');
+
+            select.addClass('vnt-native-time');
+            select.off('change.vntTime');
+
+            const wrapper = jQuery(`
+                <div class="vnt-time-select" data-type="${type}">
+                    <button type="button" class="vnt-time-trigger" aria-haspopup="true" aria-expanded="false"></button>
+                    <div class="vnt-time-menu" role="listbox"></div>
+                </div>
+            `);
+
+            select.after(wrapper);
+
+            const trigger = wrapper.find('.vnt-time-trigger');
+            const menu = wrapper.find('.vnt-time-menu');
+
+            const buildMenu = () => {
+                const items = select.find('option').map(function () {
+                    const option = jQuery(this);
+                    const value = option.val();
+                    const text = option.text();
+                    return `<button type="button" class="vnt-time-option" data-value="${value}" role="option">${text}</button>`;
+                }).get();
+                menu.html(items.join(''));
+            };
+
+            const updateTrigger = () => {
+                const selected = select.find('option:selected');
+                const value = selected.val();
+                trigger.text(selected.text());
+                menu.find('.vnt-time-option').removeClass('is-selected');
+                menu.find(`.vnt-time-option[data-value="${value}"]`).addClass('is-selected');
+            };
+
+            trigger.on('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                const isOpen = wrapper.hasClass('open');
+                closeTimeMenus();
+                if (!isOpen) {
+                    wrapper.addClass('open');
+                    trigger.attr('aria-expanded', 'true');
+                }
+            });
+
+            menu.on('click', '.vnt-time-option', function (event) {
+                event.preventDefault();
+                const value = jQuery(this).data('value');
+                select.val(value).trigger('change');
+                updateTrigger();
+                closeTimeMenus();
+            });
+
+            menu.on('click', function (event) {
+                event.stopPropagation();
+            });
+
+            select.on('change.vntTime', updateTrigger);
+
+            buildMenu();
+            updateTrigger();
+        });
+
+        jQuery(document).off('click.vntTimeDropdown').on('click.vntTimeDropdown', (event) => {
+            if (!jQuery(event.target).closest('.vnt-time-select').length) {
+                closeTimeMenus();
+            }
+        });
+    };
+
+    const repositionArrivalPicker = (picker) => {
+        if (!picker || !arrivalTimeDisplay) return;
+        if (!picker.container || !picker.container.length) return;
+        const inputRect = arrivalTimeDisplay.getBoundingClientRect();
+        const pickerEl = picker.container[0];
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        const spaceBelow = viewportHeight - inputRect.bottom;
+        const spaceAbove = inputRect.top;
+        const pickerHeight = pickerEl.offsetHeight || 0;
+        const desired = spaceBelow < pickerHeight && spaceAbove > spaceBelow ? 'up' : 'down';
+        if (picker.drops !== desired) {
+            picker.drops = desired;
+        }
+        if (typeof picker.move === 'function') {
+            picker.move();
+        }
+    };
+
+    const patchPickerUpdate = (picker) => {
+        if (!picker || picker._vntPatched) return;
+        const originalUpdate = picker.updateCalendars;
+        picker.updateCalendars = function () {
+            const result = originalUpdate.call(picker);
+            setupMonthYearControls(picker);
+            setupTimeSelectControls(picker);
+            repositionArrivalPicker(picker);
+            return result;
+        };
+        if (typeof picker.renderTimePicker === 'function') {
+            const originalRenderTime = picker.renderTimePicker;
+            picker.renderTimePicker = function () {
+                const result = originalRenderTime.apply(picker, arguments);
+                setupTimeSelectControls(picker);
+                repositionArrivalPicker(picker);
+                return result;
+            };
+        }
+        picker._vntPatched = true;
+    };
+
+    $arrivalInput.daterangepicker({
+        singleDatePicker: true,
+        timePicker: true,
+        timePicker24Hour: true,
+        autoUpdateInput: false,
+        showDropdowns: false,
+        autoApply: true,
+        parentEl: '#bookingModal',
+        opens: 'left',
+        locale: {
+            format: 'DD/MM/YYYY HH:mm'
+        }
+    }, function (start) {
+        syncArrivalTimeInputs(start);
+    });
+
+    $arrivalInput.off('click.daterangepicker');
+    $arrivalInput.off('focus.daterangepicker');
+
+    $arrivalInput.on('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const picker = jQuery(this).data('daterangepicker');
+        if (!picker) {
+            return;
+        }
+        if (picker.isShowing) {
+            picker.hide();
+        } else {
+            picker.show();
+        }
+    });
+
+    $arrivalInput.on('show.daterangepicker', function (event, picker) {
+        patchPickerUpdate(picker);
+        ensureArrivalPickerValue(picker);
+        setupMonthYearControls(picker);
+        setupTimeSelectControls(picker);
+        repositionArrivalPicker(picker);
+    });
+
+    $arrivalInput.off('apply.daterangepicker');
+    $arrivalInput.on('apply.daterangepicker', function (event, picker) {
+        if (!picker || !picker.startDate) return;
+        ensureArrivalPickerValue(picker);
+        syncArrivalTimeInputs(picker.startDate.clone ? picker.startDate.clone() : picker.startDate);
+    });
+
+    $arrivalInput.on('change', function () {
+        if (!window.moment) {
+            return;
+        }
+        const parsed = moment($arrivalInput.val(), 'DD/MM/YYYY HH:mm', true);
+        if (parsed.isValid()) {
+            syncArrivalTimeInputs(parsed);
+        }
+    });
+
+    syncArrivalTimeDisplay();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const btnTime = document.getElementById('timeBtn');
     const menuTime = document.getElementById('timeMenu');
@@ -47,6 +622,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const rows = document.querySelectorAll('.booking-info');
     const btnTable = document.getElementById('tableBtn');
     const tableSearch = document.getElementById('tableSearch');
+
+    initArrivalTimePicker();
     
     let currentPage = 1;
     const rowsPerPage = 15;
@@ -302,6 +879,9 @@ btnCreate.addEventListener('click',  () => {
 
     currentBookingId = null;
     document.getElementById('bookingForm').reset();
+    if (arrivalTimeHidden) arrivalTimeHidden.value = '';
+    if (arrivalTimeDisplay) arrivalTimeDisplay.value = '';
+    syncArrivalTimeDisplay();
 
     phoneInput.value = '';
     nameInput.value = '';
@@ -313,7 +893,10 @@ btnCreate.addEventListener('click',  () => {
     nameInput.placeholder = 'Nhập số điện thoại trước';
     nameInput.classList.remove('new-customer', 'input-readonly');
 
-    document.querySelector('[name="table_id"]').value = '';
+    if (bookingTableSelect) bookingTableSelect.value = '';
+    if (typeof syncBookingSelects === 'function') {
+        syncBookingSelects();
+    }
 
     preorderItems = {};
     renderPreorderSummary();
@@ -720,7 +1303,7 @@ function resetSaveButton(handler) {
 function openEditBookingModal(booking) {
     console.log('booking.table_id =', booking.table_id);
 
-    const tableSelect = document.querySelector('[name="table_id"]');
+    const tableSelect = bookingTableSelect || document.querySelector('[name="table_id"]');
     
     
     currentBookingId = booking.id;
@@ -741,14 +1324,21 @@ function openEditBookingModal(booking) {
 
     document.getElementById('customer_id').value = booking.customer_id;
 
-    document.querySelector('[name="arrival_time"]').value =
-        booking.booking_time?.replace(' ', 'T') || '';
+    if (arrivalTimeHidden) {
+        arrivalTimeHidden.value = formatBookingTimeForHidden(booking.booking_time);
+    }
+    syncArrivalTimeDisplay();
 
     document.querySelector('[name="note"]').value = booking.note || '';
 
-    tableSelect.value = booking.table_id
-    ? String(booking.table_id)
-    : '';
+    if (tableSelect) {
+        tableSelect.value = booking.table_id
+        ? String(booking.table_id)
+        : '';
+    }
+    if (typeof syncBookingSelects === 'function') {
+        syncBookingSelects();
+    }
 
     // ===== PROMOTION =====
     document.getElementById('promotion_name').value =
@@ -780,7 +1370,7 @@ async function updateBooking(id) {
     const formData = new FormData();
 
     formData.append('booking_time',
-        document.querySelector('[name="arrival_time"]').value
+        (arrivalTimeHidden && arrivalTimeHidden.value) || ''
     );
 
     const adult = Number(document.querySelector('[name="adult"]').value || 0);
@@ -788,7 +1378,7 @@ async function updateBooking(id) {
 
     formData.append('guest_count', adult + child);
     formData.append('table_id',
-        document.querySelector('[name="table_id"]').value || ''
+        (bookingTableSelect && bookingTableSelect.value) || ''
     );
 
     formData.append(

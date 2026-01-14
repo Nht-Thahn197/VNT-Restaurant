@@ -2,6 +2,18 @@
     width: 100%;
 }
 
+:root {
+    --time-primary: #357ebd;
+    --time-accent: #357ebd;
+    --time-hover: #f0f6ff;
+    --time-bg: #f4f7f5;
+    --time-surface: #ffffff;
+    --time-border: #d9e2dc;
+    --time-text: #1f2937;
+    --time-muted: #6b7280;
+    --time-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+}
+
 .ingredient-search {
     display: flex;
     justify-content: flex-start;
@@ -134,6 +146,30 @@ input[type="text"] {
     border: 1px solid #ccc;
 }
 
+.right-box .datetime-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--time-border);
+    background: linear-gradient(180deg, #ffffff 0%, #f6faf7 100%);
+    color: var(--time-text);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.right-box .datetime-input:hover {
+    border-color: #bcd1c4;
+}
+
+.right-box .datetime-input:focus {
+    outline: none;
+    border-color: var(--time-accent);
+    box-shadow: 0 0 0 3px rgba(21, 154, 111, 0.18);
+    background: #ffffff;
+}
+
 input[type="datetime-local"], select, textarea {
     width: 100%;
     padding: 5px;
@@ -163,4 +199,471 @@ button.complete {
 .delete-btn {
     color: red;
     cursor: pointer;
+}
+
+.daterangepicker {
+    border-radius: 14px !important;
+    border: 1px solid var(--time-border);
+    box-shadow: var(--time-shadow);
+    background: var(--time-surface);
+    overflow: hidden;
+}
+
+.daterangepicker .drp-calendar {
+    padding: 12px 16px;
+    background: var(--time-surface);
+}
+
+.daterangepicker .calendar-table {
+    background: transparent;
+    width: 100%;
+}
+
+.daterangepicker .calendar-table th {
+    font-weight: 600;
+    color: var(--time-text);
+}
+
+.daterangepicker .calendar-table table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.daterangepicker .calendar-table th.month {
+    font-weight: 700;
+    color: var(--time-primary);
+    letter-spacing: 0.3px;
+}
+
+.daterangepicker .calendar-table th.prev,
+.daterangepicker .calendar-table th.next {
+    color: var(--time-muted);
+}
+
+.daterangepicker .calendar-table td {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker td.available:focus {
+    background: var(--time-hover);
+    color: var(--time-text);
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+    background: var(--time-primary);
+    color: #fff;
+    box-shadow: 0 8px 16px rgba(53, 126, 189, 0.3);
+}
+
+.daterangepicker td.in-range {
+    background: var(--time-hover);
+    color: var(--time-text);
+}
+
+.daterangepicker td.off,
+.daterangepicker td.off.in-range {
+    color: #c2c8d0;
+}
+
+.daterangepicker .calendar-time select {
+    appearance: none;
+    border: 1px solid #d6e3dc;
+    border-radius: 12px;
+    padding: 7px 30px 7px 12px;
+    background: #fff;
+    font-weight: 700;
+    color: var(--time-text);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--time-muted) 50%),
+        linear-gradient(135deg, var(--time-muted) 50%, transparent 50%),
+        linear-gradient(to right, #fff, #fff);
+    background-position:
+        calc(100% - 16px) 14px,
+        calc(100% - 11px) 14px,
+        calc(100% - 28px) 0.8em;
+    background-size: 5px 5px, 5px 5px, 1px 1.6em;
+    background-repeat: no-repeat;
+}
+
+.daterangepicker .calendar-time select:focus {
+    outline: none;
+    border-color: var(--time-accent);
+    box-shadow: 0 0 0 3px rgba(21, 154, 111, 0.16);
+}
+
+.daterangepicker .calendar-time {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin: 6px 8px 0 2px !important;
+    border-radius: 14px;
+    border: 1px solid #e1ece5;
+    background: linear-gradient(135deg, #f2f8f4 0%, #edf6f1 100%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.daterangepicker .calendar-time span {
+    justify-self: center;
+}
+
+.daterangepicker .calendar-time .vnt-native-time {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.daterangepicker .vnt-time-select {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.daterangepicker .vnt-time-trigger {
+    width: 100%;
+    height: 36px;
+    border-radius: 12px;
+    border: 1px solid #d6e3dc;
+    background: #ffffff;
+    color: var(--time-text);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.daterangepicker .vnt-time-trigger:hover {
+    border-color: #c7d7cf;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.daterangepicker .vnt-time-select.open .vnt-time-trigger {
+    border-color: var(--time-accent);
+    box-shadow: 0 0 0 3px rgba(21, 154, 111, 0.16);
+}
+
+.daterangepicker .vnt-time-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    max-height: 240px;
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid var(--time-border);
+    background: #ffffff;
+    box-shadow: var(--time-shadow);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    z-index: 12;
+}
+
+.daterangepicker .vnt-time-select.open .vnt-time-menu {
+    display: flex;
+}
+
+.daterangepicker .vnt-time-select.open {
+    z-index: 20;
+}
+
+.daterangepicker .vnt-time-option {
+    border: none;
+    background: transparent;
+    text-align: center;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    color: var(--time-text);
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.daterangepicker .vnt-time-option:hover {
+    background: var(--time-hover);
+    color: var(--time-primary);
+}
+
+.daterangepicker .vnt-time-option.is-selected {
+    background: var(--time-primary);
+    color: #ffffff;
+}
+
+.daterangepicker .calendar-time select.hourselect,
+.daterangepicker .calendar-time select.minuteselect,
+.daterangepicker .calendar-time select.ampmselect {
+    min-width: 0;
+    width: 100%;
+    height: 36px;
+    font-weight: 700;
+}
+
+.daterangepicker .calendar-time span {
+    font-weight: 700;
+    color: var(--time-muted);
+    letter-spacing: 0.4px;
+}
+
+.daterangepicker .calendar-time select:hover {
+    border-color: #c7d7cf;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.daterangepicker .calendar-time .hourselect + span,
+.daterangepicker .calendar-time .minuteselect + span {
+    font-weight: 700;
+    color: var(--time-muted);
+}
+
+.daterangepicker .drp-buttons {
+    border-top: 1px solid var(--time-border);
+    background: #f7faf8;
+    padding: 10px 14px;
+}
+
+.daterangepicker .drp-buttons .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 6px 12px;
+}
+
+.daterangepicker .drp-buttons .btn.applyBtn {
+    background: var(--time-primary);
+    color: #fff;
+    border: 1px solid var(--time-primary);
+}
+
+.daterangepicker .drp-buttons .btn.cancelBtn {
+    background: #fff;
+    color: var(--time-text);
+    border: 1px solid var(--time-border);
+}
+
+.daterangepicker .calendar-table th.prev,
+.daterangepicker .calendar-table th.next {
+    display: none;
+}
+
+.daterangepicker .calendar-table th.month {
+    position: relative;
+    padding: 4px 0 12px;
+    text-align: center;
+}
+
+.daterangepicker .vnt-month-year {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr) 32px;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    width: 100%;
+    max-width: none;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.daterangepicker .vnt-month-year .vnt-nav {
+    justify-self: center;
+}
+
+.daterangepicker .vnt-month-year .vnt-field {
+    justify-self: center;
+}
+
+.daterangepicker .vnt-nav {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 1px solid var(--time-border);
+    background: #fff;
+    color: var(--time-text);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.daterangepicker .vnt-nav:hover {
+    background: var(--time-hover);
+    border-color: #c7d6ce;
+    transform: translateY(-1px);
+}
+
+.daterangepicker .vnt-field {
+    min-width: 0;
+    width: 100%;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid var(--time-border);
+    background: #fff;
+    color: var(--time-text);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    text-align: center;
+}
+
+.daterangepicker .vnt-field:hover,
+.daterangepicker .vnt-field:focus {
+    border-color: var(--time-accent);
+    box-shadow: 0 0 0 2px rgba(21, 154, 111, 0.16);
+    outline: none;
+}
+
+.daterangepicker .vnt-dropdown {
+    position: absolute;
+    top: 40px;
+    min-width: 140px;
+    max-height: 220px;
+    padding: 6px;
+    background: #fff;
+    border: 1px solid var(--time-border);
+    border-radius: 12px;
+    box-shadow: var(--time-shadow);
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.daterangepicker .vnt-dropdown.open {
+    display: flex;
+}
+
+.daterangepicker .vnt-month-menu {
+    left: 0;
+}
+
+.daterangepicker .vnt-year-menu {
+    right: 0;
+}
+
+.daterangepicker .vnt-option {
+    border: none;
+    background: transparent;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--time-text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.daterangepicker .vnt-option:hover {
+    background: var(--time-hover);
+    color: var(--time-primary);
+}
+
+.daterangepicker .vnt-month-year {
+    grid-template-columns: 32px minmax(0, 1fr) 32px;
+}
+
+.daterangepicker .vnt-title {
+    width: 100%;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid #d9e2dc;
+    background: #ffffff;
+    color: var(--time-text);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    text-align: center;
+}
+
+.daterangepicker .vnt-title:hover {
+    background: #f1f1f1;
+}
+
+.daterangepicker .vnt-panel {
+    display: none;
+    padding: 8px 10px 12px;
+}
+
+.daterangepicker .vnt-month-grid,
+.daterangepicker .vnt-year-list {
+    display: none;
+}
+
+.daterangepicker.vnt-view-month .vnt-panel,
+.daterangepicker.vnt-view-year .vnt-panel {
+    display: block;
+}
+
+.daterangepicker.vnt-view-month .vnt-month-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.daterangepicker.vnt-view-year .vnt-year-list {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.daterangepicker.vnt-view-month .calendar-table tbody,
+.daterangepicker.vnt-view-month .calendar-table thead tr:nth-child(2),
+.daterangepicker.vnt-view-year .calendar-table tbody,
+.daterangepicker.vnt-view-year .calendar-table thead tr:nth-child(2) {
+    display: none;
+}
+
+.daterangepicker.vnt-view-month .calendar-time,
+.daterangepicker.vnt-view-year .calendar-time,
+.daterangepicker.vnt-view-month .drp-buttons,
+.daterangepicker.vnt-view-year .drp-buttons {
+    display: none;
+}
+
+.daterangepicker .vnt-month-item,
+.daterangepicker .vnt-year-item {
+    border: 1px solid transparent;
+    background: #ffffff;
+    padding: 10px 0;
+    border-radius: 12px;
+    font-weight: 600;
+    color: var(--time-text);
+    cursor: pointer;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    text-align: center;
+}
+
+.daterangepicker .vnt-month-item:hover,
+.daterangepicker .vnt-year-item:hover {
+    background: var(--time-hover);
+    color: var(--time-primary);
+}
+
+.daterangepicker .vnt-month-item.is-selected {
+    border-color: #d6d6d6;
+    background: #f3f4f6;
+    color: var(--time-text);
+}
+
+.daterangepicker .vnt-year-item.is-selected {
+    background: var(--time-primary);
+    color: #ffffff;
 }

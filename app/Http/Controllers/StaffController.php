@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
@@ -23,7 +24,15 @@ class StaffController extends Controller
     public function show($id)
     {
         $staff = Staff::with('role')->findOrFail($id);
-        return response()->json(['success' => true, 'staff' => $staff]);
+        $salary = DB::table('salary_config')
+            ->where('staff_id', $id)
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'staff' => $staff,
+            'salary' => $salary,
+        ]);
     }
 
 
@@ -77,6 +86,39 @@ class StaffController extends Controller
         }
 
         $staff->update($data);
+
+        if ($request->has('salary_type') || $request->has('salary_rate')) {
+            $salaryType = $request->input('salary_type');
+            $salaryRate = $request->input('salary_rate');
+
+            $validTypes = ['hour', 'shift', 'day', 'month'];
+            if (!$salaryType || !in_array($salaryType, $validTypes, true)) {
+                return response()->json(['success' => false, 'message' => 'Loai luong khong hop le.'], 422);
+            }
+
+            if ($salaryRate === null || $salaryRate === '' || !is_numeric($salaryRate) || $salaryRate < 0) {
+                return response()->json(['success' => false, 'message' => 'Muc luong khong hop le.'], 422);
+            }
+
+            $existing = DB::table('salary_config')->where('staff_id', $id)->first();
+            if ($existing) {
+                DB::table('salary_config')
+                    ->where('staff_id', $id)
+                    ->update([
+                        'salary_type' => $salaryType,
+                        'salary_rate' => $salaryRate,
+                        'updated_at' => now(),
+                    ]);
+            } else {
+                DB::table('salary_config')->insert([
+                    'staff_id' => $id,
+                    'salary_type' => $salaryType,
+                    'salary_rate' => $salaryRate,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
 
         return response()->json(['success' => true, 'staff' => $staff]);
     }

@@ -284,7 +284,8 @@
                                 <input type="text" name="phone" id="phone" placeholder="Nhập số điện thoại">
 
                                 <label>Giờ đến</label>
-                                <input type="datetime-local" name="arrival_time">
+                                <input type="hidden" name="arrival_time" id="arrival_time">
+                                <input type="text" name="arrival_time_display" id="arrival_time_display" autocomplete="off" placeholder="DD/MM/YYYY HH:mm">
 
                                 <label>Tiền đặt cọc</label>
                                 <input type="number" name="deposit" placeholder="Nhập số tiền">
@@ -315,7 +316,13 @@
                                 </div>
 
                                 <label>Phòng/Bàn</label>
-                                <select name="table_id">
+                                <div class="booking-select" data-booking-select>
+                                    <button type="button" class="booking-select-trigger" id="bookingTableDisplay" aria-expanded="false" aria-controls="bookingTableMenu">
+                                        <span class="booking-select-value is-placeholder" id="bookingTableText"></span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="booking-select-menu" id="bookingTableMenu" aria-hidden="true"></div>
+                                    <select name="table_id" id="table_id">
                                     <option value="">Chờ xếp bàn</option>
                                     @foreach ($tables as $table)
                                         <option value="{{ $table->id }}"
@@ -323,7 +330,8 @@
                                             {{ $table->name }}
                                         </option>
                                     @endforeach
-                                </select>
+                                    </select>
+                                </div>
 
                                 <label>Ghi chú</label>
                                 <textarea name="note" rows="3"></textarea>

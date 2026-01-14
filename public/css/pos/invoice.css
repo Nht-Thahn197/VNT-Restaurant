@@ -238,8 +238,8 @@
 
 .custom-dropdown.drop-up .dropdown-list {
   top: auto;
-  bottom: calc(100% + 5px); /* Cách trên 5px */
-  transform: translateY(10px); /* Hiệu ứng trượt từ trên xuống khi mở */
+  bottom: calc(100% + 15px);
+  transform: translateY(10px);
 }
 
 .custom-dropdown.active .dropdown-list {
