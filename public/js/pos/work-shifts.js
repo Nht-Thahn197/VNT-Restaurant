@@ -106,7 +106,7 @@
     }
 
     if (action === 'delete') {
-      if (!confirm('Bạn có chắc muốn xóa ca này?')) return;
+      if (!await openConfirmDialog('Bạn có chắc muốn xóa ca này?')) return;
       try {
         await fetchJson(`${deleteEndpoint}/${id}`, {
           method: 'DELETE',

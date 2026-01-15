@@ -187,8 +187,7 @@
                                 </table>
 
                                 @if ($import->status === 'completed')
-                                    <form method="POST" action="{{ route('import.cancel', $import->id) }}"
-                                        onsubmit="return confirm('Hủy phiếu nhập này?')">
+                                    <form method="POST" action="{{ route('import.cancel', $import->id) }}" data-confirm-message="Hủy phiếu nhập này?">
                                         @csrf
                                         @can('delete_import')
                                             <button class="btn btn-danger"><i class="fas fa-close"></i> Hủy phiếu</button>

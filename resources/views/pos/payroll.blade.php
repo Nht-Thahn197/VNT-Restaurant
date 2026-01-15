@@ -50,8 +50,8 @@
                         </div>
                         <div class="month-grid" id="payrollMonthGrid"></div>
                         <div class="month-actions">
-                            <button type="button" class="month-clear">X&#243;a</button>
-                            <button type="button" class="month-current">Th&#225;ng n&#224;y</button>
+                            <button type="button" class="month-clear">Xóa</button>
+                            <button type="button" class="month-current">Tháng này</button>
                         </div>
                     </div>
                 </div>

@@ -133,22 +133,17 @@ function applyIngredientFilters() {
     allRows.forEach(row => {
         let match = true;
 
-        // 🔍 Search theo name/code (Thêm kiểm tra để tránh lỗi undefined)
         if (filters.keyword) {
             const name = (row.dataset.name || '').toLowerCase();
             const code = (row.dataset.code || '').toLowerCase();
             match = name.includes(filters.keyword) || code.includes(filters.keyword);
         }
 
-        // 📦 Category
         if (match && filters.category) {
-            // Lưu ý: dataset.categoryId tương ứng với data-category-id trong HTML
             match = row.dataset.categoryId === filters.category;
         }
 
         row.dataset.filtered = match ? '1' : '0';
-        
-        // QUAN TRỌNG: Nếu không khớp, ẩn ngay lập tức để không chiếm chỗ
         if (!match) row.style.display = 'none';
     });
 
@@ -156,7 +151,6 @@ function applyIngredientFilters() {
     renderIngredientPagination();
 }
 
-// Lấy các row được phép hiển thị
 function getIngredientRows() {
     return Array.from(document.querySelectorAll('.ingredient-item'))
         .filter(row => row.dataset.filtered !== '0');
@@ -169,25 +163,20 @@ function renderIngredientPagination() {
     const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
 
     if (currentPage > totalPages) currentPage = totalPages;
-
-    // Bước 1: Ẩn TẤT CẢ các hàng trước khi hiển thị trang mới
     allRows.forEach(row => {
         row.style.display = 'none';
         const detail = document.getElementById(`detail-${row.dataset.id}`);
         if (detail) detail.style.display = 'none';
     });
-
-    // Bước 2: Chỉ hiển thị các hàng thuộc trang hiện tại
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     filteredRows.forEach((row, i) => {
         if (i >= start && i < end) {
-            row.style.display = ''; // Hiển thị lại
+            row.style.display = '';
         }
     });
 
-    // Cập nhật UI phân trang
     const pageInfo = document.getElementById('pageInfo');
     if(pageInfo) pageInfo.innerText = `Trang ${currentPage} / ${totalPages}`;
     
@@ -371,6 +360,9 @@ document.addEventListener("DOMContentLoaded", function () {
           if (li) li.querySelector(".cat-name").textContent = name;
           closePopup();
           showToast("Cập nhật nhóm thành công", "success");
+          setTimeout(() => {
+            location.reload();
+          }, 800);
         } else showToast(data.message || "Cập nhật thất bại", "error");
       })
       .catch(err => {
@@ -398,6 +390,9 @@ document.addEventListener("DOMContentLoaded", function () {
         `);
         closePopup();
         showToast("Thêm nhóm thành công", "success");
+        setTimeout(() => {
+          location.reload();
+        }, 800);
       } else showToast(data.message || "Thêm thất bại", "error");
     })
     .catch(err => {
@@ -405,12 +400,12 @@ document.addEventListener("DOMContentLoaded", function () {
       showToast("Lỗi server!", "error");
     });
   });
-  if (deleteBtn) deleteBtn.addEventListener("click", function () {
+  if (deleteBtn) deleteBtn.addEventListener("click", async function () {
     if (!editId) {
       showToast("Không có nhóm để xóa", "warning");
       return;
     }
-    if (!confirm("Bạn có chắc muốn xóa?")) return;
+    if (!await openConfirmDialog("Bạn có chắc muốn xóa?")) return;
     fetch(`/VNT-Restaurant/public/pos/ingredient-category/delete/${editId}`, {
       method: "DELETE",
       headers: { "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content }
@@ -422,11 +417,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (li) li.remove();
         closePopup();
         showToast("Xóa nhóm thành công", "success");
+        setTimeout(() => {
+          location.reload();
+        }, 800);
       } else showToast(data.message || "Xóa thất bại", "error");
     })
     .catch(err => {
       console.error(err);
-      alert("Lỗi server!");
       showToast("Lỗi server!", "error");
     });
   });
@@ -443,6 +440,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function unformatMoney(value) {
         return value.replace(/\./g, "");
+    }
+
+    function getJsonErrorMessage(payload, fallback) {
+        if (payload && payload.errors) {
+            const firstKey = Object.keys(payload.errors)[0];
+            if (firstKey && payload.errors[firstKey] && payload.errors[firstKey][0]) {
+                return payload.errors[firstKey][0];
+            }
+        }
+        if (payload && payload.message) {
+            return payload.message;
+        }
+        return fallback || "Request failed.";
+    }
+
+    async function readJsonResponse(res) {
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+            await res.text();
+            throw new Error(`Unexpected response (${res.status}).`);
+        }
+        return res.json();
     }
 
     // ====== ELEMENTS ======
@@ -516,9 +535,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const id = this.closest(".detail-row").id.replace("detail-", "");
 
             try {
-                const res = await fetch(SHOW_URL + id);
-                const json = await res.json();
-                if (!json.status) return;
+                const res = await fetch(SHOW_URL + id, {
+                    headers: {
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                const json = await readJsonResponse(res);
+                if (!res.ok || !json.status) {
+                    showToast(getJsonErrorMessage(json, "Load failed."), "error");
+                    return;
+                }
 
                 const ing = json.data;
 
@@ -561,14 +588,29 @@ document.addEventListener("DOMContentLoaded", function () {
         // ✔ REMOVE DOT BEFORE SEND
         formData.append("price", unformatMoney(priceInput.value));
 
-        formData.append("unit", unitInput.value);
+        const unitValue = unitInput.value.trim();
+        if (isEdit || unitValue) {
+            formData.append("unit", unitValue);
+        }
 
         try {
-            const res = await fetch(url, { method: "POST", body: formData });
-            const json = await res.json();
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: formData
+            });
+            const json = await readJsonResponse(res);
+
+            if (!res.ok || !json.status) {
+                showToast(getJsonErrorMessage(json, "Save failed."), "error");
+                return;
+            }
 
             if (json.status) {
-                alert(isEdit ? "Cập nhật thành công!" : "Thêm thành công!");
+                showToast(isEdit ? "Cập nhật thành công!" : "Thêm thành công!", "success");
                 setTimeout(() => location.reload(), 800);
             }
         } catch (err) {
@@ -581,20 +623,29 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.addEventListener("click", async function (e) {
             e.preventDefault();
 
-            if (!confirm("Bạn có chắc muốn xóa nguyên liệu này?")) return;
+            if (!await openConfirmDialog("Bạn có chắc muốn xóa nguyên liệu này?")) return;
 
             const id = this.closest(".detail-row").id.replace("detail-", "");
 
             try {
                 const res = await fetch(DELETE_URL + id, {
                     method: "DELETE",
-                    headers: { "X-CSRF-TOKEN": csrfToken }
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
                 });
 
-                const json = await res.json();
+                const json = await readJsonResponse(res);
+
+                if (!res.ok || !json.status) {
+                    showToast(getJsonErrorMessage(json, "Delete failed."), "error");
+                    return;
+                }
 
                 if (json.status) {
-                    alert("Xóa thành công!");
+                    showToast("Xóa thành công!", "success");
                     setTimeout(() => location.reload(), 800);
                 }
             } catch (err) {

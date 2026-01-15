@@ -582,6 +582,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function getJsonErrorMessage(payload, fallback) {
+        if (payload && payload.errors) {
+            const firstKey = Object.keys(payload.errors)[0];
+            if (firstKey && payload.errors[firstKey] && payload.errors[firstKey][0]) {
+                return payload.errors[firstKey][0];
+            }
+        }
+        if (payload && payload.message) {
+            return payload.message;
+        }
+        return fallback || 'Request failed.';
+    }
+
+    async function readJsonResponse(res) {
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            await res.text();
+            throw new Error(`Unexpected response (${res.status}).`);
+        }
+        return res.json();
+    }
+
 
 // ====== MỞ / ĐÓNG FORM ======
     function openCustomerForm() {
@@ -617,21 +639,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: formData
             });
 
-            const data = await res.json();
+            const data = await readJsonResponse(res);
+
+            if (!res.ok || !data.success) {
+                showToast(getJsonErrorMessage(data, 'Luu that bai!'), 'error');
+                return;
+            }
 
             if (data.success) {
                 showToast('Lưu thành công!', 'success');
                 setTimeout(() => {
                     location.reload();
                 }, 800);
-            } else {
-            showToast(data.message || 'Lưu thất bại!', 'error');
-        }
+            }
         } catch (err) {
             console.error('SAVE CUSTOMER ERROR:', err);
             showToast('Lỗi server!', 'error');
@@ -647,8 +674,17 @@ document.addEventListener('DOMContentLoaded', () => {
             editingCustomerId = id;
 
             try {
-                const res = await fetch(`${BASE_URL}/customer/${id}`);
-                const data = await res.json();
+                const res = await fetch(`${BASE_URL}/customer/${id}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await readJsonResponse(res);
+                if (!res.ok || !data.success) {
+                    showToast(getJsonErrorMessage(data, 'Loi tai khach hang!'), 'error');
+                    return;
+                }
                 if (data.success) {
                     const cus = data.customer;
                     document.querySelector('#customerInfoForm [name="name"]').value = cus.name;

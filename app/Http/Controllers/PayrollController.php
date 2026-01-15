@@ -85,6 +85,8 @@ class PayrollController extends Controller
     {
         $data = $request->validate([
             'month' => ['required', 'regex:/^\d{4}-\d{2}$/'],
+        ], [
+            'month.required' => 'Chưa chọn tháng',
         ]);
 
         $month = $data['month'];

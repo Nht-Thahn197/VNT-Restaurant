@@ -28,10 +28,24 @@ class CustomerController extends Controller
     
     public function store(Request $request)
     {
-        $request->validate([
-            'name'  => 'required',
-            'phone' => 'required',
+        $validator = Validator::make($request->all(), [
+            'name'  => 'required|string|max:150',
+            'phone' => 'required|string|max:20',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors'  => $validator->errors()
+            ], 422);
+        }
+
+        if (Customer::where('phone', $request->phone)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Số điện thoại đã tồn tại.'
+            ], 409);
+        }
 
         DB::transaction(function () use ($request) {
             Customer::create([
@@ -63,6 +77,13 @@ class CustomerController extends Controller
                 'success' => false,
                 'errors'  => $validator->errors()
             ], 422);
+        }
+
+        if (Customer::where('phone', $request->phone)->where('id', '!=', $customer->id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Số điện thoại đã tồn tại.'
+            ], 409);
         }
 
         $customer->update([

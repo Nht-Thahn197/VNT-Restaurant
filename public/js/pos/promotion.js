@@ -208,10 +208,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    deleteBtn.addEventListener('click', function() {
+    deleteBtn.addEventListener('click', async function() {
         const selectedId = document.getElementById('filter-type').value;
         if (!selectedId) return showToast('Vui lòng chọn loại khuyến mãi để xóa', 'warning');
-        if (!confirm('Bạn có chắc chắn muốn xóa loại khuyến mãi này?')) return;
+        if (!await openConfirmDialog('Bạn có chắc chắn muốn xóa loại khuyến mãi này?')) return;
 
         const formData = new FormData(typeForm);
         formData.append('_method', 'DELETE');
@@ -293,9 +293,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    deletePromotionBtn.addEventListener('click', function() {
+    deletePromotionBtn.addEventListener('click', async function() {
         const id = formPromotion.action.split('/').pop();
-        if (!confirm('Bạn có chắc chắn muốn xóa chương trình này?')) return;
+        if (!await openConfirmDialog('Bạn có chắc chắn muốn xóa chương trình này?')) return;
 
         const formData = new FormData(formPromotion);
         formData.append('_method', 'DELETE');

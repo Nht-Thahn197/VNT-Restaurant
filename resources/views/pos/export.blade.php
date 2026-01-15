@@ -170,8 +170,7 @@
                                     </table>
 
                                     @if ($export->status === 'completed')
-                                        <form method="POST" action="{{ route('export.cancel', $export->id) }}"
-                                            onsubmit="return confirm('Hủy phiếu xuất này?')">
+                                        <form method="POST" action="{{ route('export.cancel', $export->id) }}" data-confirm-message="Hủy phiếu xuất này?">
                                             @csrf
                                             @can('delete_export')
                                                 <button class="btn btn-danger"><i class="fas fa-close"></i> Hủy phiếu</button>

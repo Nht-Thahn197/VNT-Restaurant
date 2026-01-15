@@ -215,7 +215,7 @@
                 @endcan
                 <button id="cancel-popup" class="btn-cancel" type="button"><i class="fas fa-ban"></i> Hủy</button>
                 @can('delete_role')
-                    <button id="delete-popup" class="btn-delete" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
+                    <button id="delete-popup" class="btn-destroy" type="button"><i class="far fa-trash-alt"></i> Xóa</button>
                 @endcan
             </div>
         </div>
@@ -413,6 +413,24 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div class="salary-confirm-overlay" id="salaryConfirmOverlay" aria-hidden="true">
+            <div class="salary-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="salaryConfirmTitle" aria-describedby="salaryConfirmMessage" tabindex="-1">
+                <div class="salary-confirm-header">
+                    <h3 id="salaryConfirmTitle">Thiet lap luong</h3>
+                    <button type="button" class="salary-confirm-close" id="salaryConfirmClose" aria-label="Dong">&times;</button>
+                </div>
+                <div class="salary-confirm-body">
+                    <div class="salary-confirm-icon">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <p id="salaryConfirmMessage">Nhan vien chua duoc thiet lap luong. Ban co muon thiet lap ngay khong?</p>
+                </div>
+                <div class="salary-confirm-actions">
+                    <button type="button" class="salary-confirm-btn secondary" id="salaryConfirmLater">De sau</button>
+                    <button type="button" class="salary-confirm-btn primary" id="salaryConfirmYes">Thiet lap</button>
+                </div>
             </div>
         </div>
     </div>

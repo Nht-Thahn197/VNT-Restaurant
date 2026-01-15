@@ -35,6 +35,24 @@
     @include('user.partials.footer')
 
     {{-- JS --}}
+    <div class="app-confirm-overlay" id="appConfirmOverlay" aria-hidden="true">
+        <div class="app-confirm-dialog" id="appConfirmDialog" role="dialog" aria-modal="true" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage" tabindex="-1">
+            <div class="app-confirm-header">
+                <h3 id="appConfirmTitle">Xác nhận</h3>
+                <button type="button" class="app-confirm-close" id="appConfirmClose" aria-label="Dong">&times;</button>
+            </div>
+            <div class="app-confirm-body">
+                <div class="app-confirm-icon">
+                    <i class="fas fa-triangle-exclamation"></i>
+                </div>
+                <p id="appConfirmMessage"></p>
+            </div>
+            <div class="app-confirm-actions">
+                <button type="button" class="app-confirm-btn secondary" id="appConfirmCancel">Hủy</button>
+                <button type="button" class="app-confirm-btn primary" id="appConfirmOk">Đồng ý</button>
+            </div>
+        </div>
+    </div>
     <script>
         window.APP_URL = "{{ url('/') }}";
     </script>

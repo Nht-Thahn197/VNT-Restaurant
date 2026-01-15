@@ -38,7 +38,7 @@ class IngredientController extends Controller
             'name'        => 'required',
             'category_id' => 'required',
             'price'       => 'required|numeric',
-            'unit'        => 'required'
+            'unit'        => 'nullable|string|max:50'
         ]);
 
 
@@ -62,7 +62,7 @@ class IngredientController extends Controller
             'name'        => 'required',
             'category_id' => 'required',
             'price'       => 'required|numeric',
-            'unit'        => 'required'
+            'unit'        => 'nullable|string|max:50'
         ]);
 
         Ingredient::where('id', $id)->update([

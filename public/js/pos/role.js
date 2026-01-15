@@ -163,12 +163,12 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    function deleteRole(id) {
+    async function deleteRole(id) {
         if (!id) {
             notify("Không có chức vụ để xóa", "error");
             return;
         }
-        if (!confirm("Bạn có chắc muốn xóa?")) return;
+        if (!await openConfirmDialog("Bạn có chắc muốn xóa?")) return;
 
         const deleteUrl = window.routes.role.delete.replace(":id", id);
         fetch(deleteUrl, {

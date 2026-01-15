@@ -1,5 +1,3 @@
-
-
 document.documentElement.classList.add('js');
 
 var tableSelectControls = [];
@@ -165,13 +163,10 @@ document.addEventListener("DOMContentLoaded", function () {
             hiddenInput.value = value;
             dropdown.classList.remove('active');
             
-            // Hiện icon edit nếu có chọn giá trị
             if (value !== "") {
-                // ĐÂY LÀ CHỖ THÊM CLASS ĐỂ CSS THU NHỎ 85%
                 dropdown.classList.add('area-has-value');
                 if (editBtn) editBtn.classList.remove('d-none');
             } else {
-                // Nếu chọn "Tất cả" thì quay lại 100%
                 dropdown.classList.remove('area-has-value');
                 if (editBtn) editBtn.classList.add('d-none');
             }
@@ -190,18 +185,15 @@ document.addEventListener("DOMContentLoaded", function () {
         rows.forEach(row => {
             let match = true;
 
-            // 🔍 keyword
             const text = (row.dataset.name + ' ' + row.dataset.areaName).toLowerCase();
             if (filters.keyword) {
                 match = text.includes(filters.keyword);
             }
 
-            // 🏠 area
             if (match && filters.area) {
                 match = row.dataset.area === filters.area;
             }
 
-            // 🔘 status
             if (match && filters.status !== 'all') {
                 match = row.dataset.status === filters.status;
             }
@@ -224,19 +216,15 @@ document.addEventListener("DOMContentLoaded", function () {
         const totalPages = Math.ceil(filteredRows.length / rowsPerPage) || 1;
         if (currentPage > totalPages) currentPage = totalPages;
 
-        // Ẩn tất cả trước
         allRows.forEach(row => {
             row.style.display = 'none';
             const detail = document.getElementById(`detail-${row.dataset.id}`);
             if (detail) detail.style.display = 'none';
         });
-
-        // Hiển thị row đúng page
         const start = (currentPage - 1) * rowsPerPage;
         const end = start + rowsPerPage;
         filteredRows.slice(start, end).forEach(row => row.style.display = '');
         
-        // Cập nhật thông tin pagination
         document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${totalPages}`;
         document.getElementById('prevPage').disabled = currentPage === 1;
         document.getElementById('nextPage').disabled = currentPage === totalPages;
@@ -308,9 +296,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateAreaUI() {
         const areaInput = document.getElementById("areaSelect");
-        if (!areaInput) return; // tránh crash
+        if (!areaInput) return; 
 
-        const selectedAreaId = areaInput.value; // "" hoặc area_id
+        const selectedAreaId = areaInput.value;
         const tableRows = document.querySelectorAll(".table-row");
 
         tableRows.forEach(row => {
@@ -374,6 +362,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (option) option.textContent = name;
                     showToast("Cập nhật khu vực thành công");
                     closePopup();
+                    setTimeout(() => location.reload(), 800);
                 } else {
                     showToast(data.message || "Cập nhật thất bại", "error");
                 }
@@ -394,20 +383,18 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(res => res.json())
         .then(data => {
         if (data.success) {
-            // Thêm option mới vào select
             const newOption = document.createElement("option");
             newOption.value = data.area.id;
             newOption.textContent = data.area.name;
             areaSelect.appendChild(newOption);
 
-            // Giữ select ở "-- Tất cả --"
             areaSelect.value = "";
             updateAreaUI();
 
-            // Hiện tất cả table
             tableRows.forEach(row => row.style.display = "");
             showToast("Thêm khu vực thành công");
             closePopup();
+            setTimeout(() => location.reload(), 800);
         } else {
             showToast(data.message || "Thêm thất bại", "error");
         }
@@ -421,12 +408,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===========================
     // DELETE AREA
     // ===========================
-    if (deleteBtn) deleteBtn.addEventListener("click", function () {
+    if (deleteBtn) deleteBtn.addEventListener("click", async function () {
         if (!editId) {
         showToast("Không có khu vực để xóa", "warning");
         return;
         }
-        if (!confirm("Bạn có chắc muốn xóa?")) return;
+        if (!await openConfirmDialog("Bạn có chắc muốn xóa?")) return;
 
         fetch(`/VNT-Restaurant/public/pos/area/delete/${editId}`, {
         method: "DELETE",
@@ -435,18 +422,16 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(res => res.json())
         .then(data => {
         if (data.success) {
-            // Xóa option trong select
             const option = document.querySelector(`#areaSelect option[value="${editId}"]`);
             if (option) option.remove();
 
-            // Reset select về "Tất cả"
             areaSelect.value = "";
-            updateAreaUI(); // update width + icon
+            updateAreaUI();
 
-            // Hiện tất cả table
             tableRows.forEach(row => row.style.display = "");
             showToast("Xóa khu vực thành công");
             closePopup();
+            setTimeout(() => location.reload(), 800);
         } else {
             showToast(data.message || "Xóa thất bại", "error");
         }
@@ -513,7 +498,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }); 
             document.querySelectorAll(".table-info").forEach(r => {
                  if (r !== this) r.classList.remove("active"); }); 
-            // Toggle row chi tiết của chính nó 
             if (detailRow.style.display === "none" || detailRow.style.display === "") { 
                 detailRow.style.display = "table-row"; 
                 this.classList.add("active");
@@ -538,7 +522,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         if (btnDelete) btnDelete.addEventListener("click", async function (e) {
             e.preventDefault();
-            if (!confirm("Bạn có chắc muốn xoá phòng/bàn này?")) return;
+            if (!await openConfirmDialog("Bạn có chắc muốn xoá phòng/bàn này?")) return;
             try {
                 const res = await fetch(`${BASE_URL}/pos/table/${id}`, {
                     method: "DELETE",

@@ -866,9 +866,9 @@ document.addEventListener('click', function() {
 });
 
 if (logoutLink) {
-    logoutLink.addEventListener('click', function(e) {
+    logoutLink.addEventListener('click', async function(e) {
         e.preventDefault();
-        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+        if (await openConfirmDialog('Bạn có chắc chắn muốn đăng xuất?')) {
             document.getElementById('logout-form').submit();
         }
     });
@@ -1440,7 +1440,7 @@ function renderStatusLine(status) {
 }
 
 async function cancelBooking(id) {
-    if (!confirm('❌ Xác nhận hủy đặt bàn?')) return;
+    if (!await openConfirmDialog('Xác nhận hủy đặt bàn?')) return;
     try {
         const res = await fetch(`${BASE_URL}/pos/booking/${id}/cancel`, {
             method: 'POST',
@@ -1479,7 +1479,7 @@ cancelBookingBtn.onclick = () => {
 document.querySelectorAll('.receive-icon').forEach(icon => {
     icon.addEventListener('click', async function() {
         const id = this.dataset.id;
-        if (!confirm('Xác nhận khách đã đến và nhận bàn?')) return;
+        if (!await openConfirmDialog('Xác nhận khách đã đến và nhận bàn?')) return;
 
         try {
             const res = await fetch(`/VNT-Restaurant/public/pos/booking/${id}/receive`, {
@@ -1500,3 +1500,72 @@ document.querySelectorAll('.receive-icon').forEach(icon => {
     });
 });
 
+
+(function () {
+    if (typeof window.openConfirmDialog === 'function') {
+        return;
+    }
+    const overlay = document.getElementById('appConfirmOverlay');
+    if (!overlay) {
+        window.openConfirmDialog = (message) => {
+            return Promise.resolve(window.confirm(message || 'Xac nhan?'));
+        };
+        return;
+    }
+    const dialog = document.getElementById('appConfirmDialog');
+    const titleEl = document.getElementById('appConfirmTitle');
+    const messageEl = document.getElementById('appConfirmMessage');
+    const confirmBtn = document.getElementById('appConfirmOk');
+    const cancelBtn = document.getElementById('appConfirmCancel');
+    const closeBtn = document.getElementById('appConfirmClose');
+    const iconEl = overlay.querySelector('.app-confirm-icon i');
+    let resolveConfirm = null;
+    let keyHandler = null;
+
+    const closeConfirm = (result) => {
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+        if (resolveConfirm) {
+            resolveConfirm(Boolean(result));
+            resolveConfirm = null;
+        }
+        if (keyHandler) {
+            document.removeEventListener('keydown', keyHandler);
+            keyHandler = null;
+        }
+    };
+
+    const openConfirmDialog = (message, options = {}) => {
+        const opts = options || {};
+        const msg = message || '';
+        if (titleEl) titleEl.textContent = opts.title || 'Xác nhận';
+        if (messageEl) messageEl.textContent = msg;
+        if (confirmBtn) confirmBtn.textContent = opts.confirmText || 'Đồng ý';
+        if (cancelBtn) cancelBtn.textContent = opts.cancelText || 'Hủy';
+        if (dialog) dialog.dataset.variant = opts.variant || '';
+        if (iconEl) iconEl.className = `fas ${opts.icon || 'fa-triangle-exclamation'}`;
+        overlay.classList.add('active');
+        overlay.setAttribute('aria-hidden', 'false');
+        if (confirmBtn && typeof confirmBtn.focus === 'function') {
+            confirmBtn.focus();
+        }
+        keyHandler = (event) => {
+            if (event.key === 'Escape') {
+                closeConfirm(false);
+            }
+        };
+        document.addEventListener('keydown', keyHandler);
+        return new Promise(resolve => {
+            resolveConfirm = resolve;
+        });
+    };
+
+    overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) closeConfirm(false);
+    });
+    if (confirmBtn) confirmBtn.addEventListener('click', () => closeConfirm(true));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => closeConfirm(false));
+    if (closeBtn) closeBtn.addEventListener('click', () => closeConfirm(false));
+
+    window.openConfirmDialog = openConfirmDialog;
+})();

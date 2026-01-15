@@ -1,4 +1,26 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+function getJsonErrorMessage(payload, fallback) {
+    if (payload && payload.errors) {
+        const firstKey = Object.keys(payload.errors)[0];
+        if (firstKey && payload.errors[firstKey] && payload.errors[firstKey][0]) {
+            return payload.errors[firstKey][0];
+        }
+    }
+    if (payload && payload.message) {
+        return payload.message;
+    }
+    return fallback || 'Request failed.';
+}
+
+async function readJsonResponse(res) {
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
+        await res.text();
+        throw new Error(`Unexpected response (${res.status}).`);
+    }
+    return res.json();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
     // ELEMENTS
     const searchInput = document.querySelector(".input-text");
     const statusRadios = document.querySelectorAll("input[name='status']");
@@ -21,6 +43,28 @@
         status: 'all',
         role: ''
     };
+
+    function getJsonErrorMessage(payload, fallback) {
+        if (payload && payload.errors) {
+            const firstKey = Object.keys(payload.errors)[0];
+            if (firstKey && payload.errors[firstKey] && payload.errors[firstKey][0]) {
+                return payload.errors[firstKey][0];
+            }
+        }
+        if (payload && payload.message) {
+            return payload.message;
+        }
+        return fallback || 'Request failed.';
+    }
+
+    async function readJsonResponse(res) {
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            await res.text();
+            throw new Error(`Unexpected response (${res.status}).`);
+        }
+        return res.json();
+    }
 
     setupRoleDropdown('roleDropdown', 'filter-role', 'currentRoleText', 'role');
     setupSimpleDropdown('salaryTypeDropdown', 'salary_type', 'currentSalaryTypeText');
@@ -268,54 +312,66 @@
     // ===========================
     // SAVE AREA (ADD/UPDATE)
     // ===========================
-    saveBtn.addEventListener("click", function () {
+    saveBtn.addEventListener("click", async function () {
         const name = nameInput.value.trim();
         if (!name) return showToast("Vui lòng nhập tên chức vụ!", "error");
 
         // UPDATE
         if (editId) {
-            fetch(`/VNT-Restaurant/public/pos/role/update/${editId}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ name })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-
-                    const option = roleSelect.querySelector(`option[value="${editId}"]`);
-                    if (option) option.textContent = name;
-                    showToast("Cập nhật chức vụ thành công", "success");
-                    closePopup();
-                } else showToast(data.message || "Cập nhật thất bại", "error");
-            })
-            .catch(err => { console.error(err); showToast("Lỗi server!", "error"); });
+            try {
+                const res = await fetch(`/VNT-Restaurant/public/pos/role/update/${editId}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: JSON.stringify({ name })
+                });
+                const data = await readJsonResponse(res);
+                if (!res.ok || !data.success) {
+                    showToast(getJsonErrorMessage(data, "Cập nhật thất bại"), "error");
+                    return;
+                }
+                const option = roleSelect.querySelector(`option[value="${editId}"]`);
+                if (option) option.textContent = name;
+                showToast("Cập nhật chức vụ thành công", "success");
+                closePopup();
+                setTimeout(() => {
+                    location.reload();
+                }, 800);
+            } catch (err) {
+                console.error(err);
+                showToast("Lỗi server!", "error");
+            }
             return;
         }
-
         // ADD NEW
         const formData = new FormData();
         formData.append("name", name);
 
-        fetch(window.routes.role.store, {
-        method: "POST",
-        headers: { "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content },
-        body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-        if (data.success) {
-            // Thêm vào custom dropdown
+        try {
+            const res = await fetch(window.routes.role.store, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                body: formData
+            });
+            const data = await readJsonResponse(res);
+            if (!res.ok || !data.success) {
+                showToast(getJsonErrorMessage(data, "Thêm thất bại"), "error");
+                return;
+            }
             const dropdownList = document.querySelector('#roleDropdown .dropdown-list');
             const newItem = document.createElement('li');
             newItem.setAttribute('data-value', data.role.id);
             newItem.textContent = data.role.name;
             dropdownList.appendChild(newItem);
 
-            // Cập nhật event listener cho item mới
             newItem.addEventListener('click', (e) => {
                 e.stopPropagation();
                 document.getElementById('currentRoleText').innerText = newItem.textContent;
@@ -324,8 +380,6 @@
                 applyStaffFilters();
                 document.getElementById('roleDropdown').classList.remove('active');
             });
-
-            // Reset hiển thị về "-- Tất cả --"
             document.getElementById('currentRoleText').innerText = "-- Tất cả --";
             document.getElementById('filter-role').value = "";
             filters.role = "";
@@ -333,60 +387,51 @@
 
             showToast("Thêm chức vụ thành công", "success");
             closePopup();
-        } else {
-            showToast(data.message || "Thêm thất bại", "error");
-        }
-        })
-        .catch(err => {
+            setTimeout(() => {
+                location.reload();
+            }, 800);
+        } catch (err) {
             console.error(err);
             showToast("Lỗi server!", "error");
-        });
-    });
-
-    // ===========================
-    // DELETE AREA
-    // ===========================
-    deleteBtn.addEventListener("click", function () {
-        if (!editId) {
-        showToast("Không có role để xóa", "error");
-        return;
         }
-        if (!confirm("Bạn có chắc muốn xóa?")) return;
+    });
+    // ===========================
+    // DELETE ROLE
+    // ===========================
+    deleteBtn.addEventListener("click", async function () {
+        if (!editId) {
+            showToast("Không có chức vụ để xóa", "error");
+            return;
+        }
+        if (!await openConfirmDialog("Bạn có chắc chắn muốn xóa?")) return;
 
         const deleteUrl = window.routes.role.delete.replace(':id', editId);
 
-        fetch(deleteUrl, {
-        method: "DELETE",
-        headers: { "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content }
-        })
-        .then(res => res.json())
-        .then(data => {
-        if (data.success) {
-            // Xóa role trong custom dropdown
-            const li = document.querySelector(`#roleDropdown .dropdown-list li[data-value="${editId}"]`);
-            if (li) li.remove();
-
-            // Reset dropdown về mặc định
-            document.getElementById('filter-role').value = '';
-            document.getElementById('currentRoleText').textContent = '-- Tất cả --';
-
-            // Hiện tất cả nhân viên
-            const tableRows = Array.from(document.querySelectorAll('.staff-info'));
-            tableRows.forEach(row => row.style.display = '');
-
-            showToast("Xóa chức vụ thành công", "success");
-            closePopup();
-        } else {
-            showToast(data.message || "Xóa thất bại", "error");
-        }
-        })
-        .catch(err => {
+        try {
+            const res = await fetch(deleteUrl, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                    "Accept": "application/json",
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            });
+            const data = await readJsonResponse(res);
+            if (!res.ok || !data.success) {
+                showToast(getJsonErrorMessage(data, "Xóa thất bại"), "error");
+                return;
+            }
+            if (data.success) {
+                showToast("Xóa thành công", "success");
+                setTimeout(() => {
+                    location.reload();
+                }, 800);
+            }
+        } catch (err) {
             console.error(err);
             showToast("Lỗi server!", "error");
-        });
+        }
     });
-
-
     // ===========================
     // STATUS BOX COLLAPSE
     // ===========================
@@ -554,6 +599,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const startDateHiddenInput = document.getElementById('start_date');
     const startDateDisplayInput = document.getElementById('start_date_display');
 
+
+    const salaryConfirmOverlay = document.getElementById('salaryConfirmOverlay');
+    const salaryConfirmYes = document.getElementById('salaryConfirmYes');
+    const salaryConfirmLater = document.getElementById('salaryConfirmLater');
+    const salaryConfirmClose = document.getElementById('salaryConfirmClose');
+
+    let salaryConfirmResolve = null;
+
+    const closeSalaryConfirm = (result) => {
+        if (!salaryConfirmOverlay) {
+            if (salaryConfirmResolve) {
+                salaryConfirmResolve(Boolean(result));
+                salaryConfirmResolve = null;
+            }
+            return;
+        }
+        salaryConfirmOverlay.classList.remove('active');
+        salaryConfirmOverlay.setAttribute('aria-hidden', 'true');
+        if (salaryConfirmResolve) {
+            salaryConfirmResolve(Boolean(result));
+            salaryConfirmResolve = null;
+        }
+    };
+
+    const openSalaryConfirm = () => {
+        if (!salaryConfirmOverlay) return Promise.resolve(false);
+        salaryConfirmOverlay.classList.add('active');
+        salaryConfirmOverlay.setAttribute('aria-hidden', 'false');
+        const focusTarget = salaryConfirmYes || salaryConfirmLater;
+        if (focusTarget && typeof focusTarget.focus === 'function') {
+            focusTarget.focus();
+        }
+        return new Promise(resolve => {
+            salaryConfirmResolve = resolve;
+        });
+    };
+
+    if (salaryConfirmOverlay) {
+        salaryConfirmOverlay.addEventListener('click', (e) => {
+            if (e.target === salaryConfirmOverlay) closeSalaryConfirm(false);
+        });
+    }
+    if (salaryConfirmYes) salaryConfirmYes.addEventListener('click', () => closeSalaryConfirm(true));
+    if (salaryConfirmLater) salaryConfirmLater.addEventListener('click', () => closeSalaryConfirm(false));
+    if (salaryConfirmClose) salaryConfirmClose.addEventListener('click', () => closeSalaryConfirm(false));
+
     let editingStaffId = null;
 
     const syncSalaryRateState = () => {
@@ -613,7 +704,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!dateString) return '';
     const date = new Date(dateString);
     const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0'); // tháng từ 0-11
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
     const dd = String(date.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
     }
@@ -954,9 +1045,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeStaffForm() {
         overlay.style.display = "none";
         document.removeEventListener('keydown', escHandler);
+        closeSalaryConfirm(false);
         resetForm();
     }
-    function escHandler(e) { if (e.key === 'Escape') closeStaffForm(); }
+    function escHandler(e) {
+        if (e.key !== 'Escape') return;
+        if (salaryConfirmOverlay && salaryConfirmOverlay.classList.contains('active')) {
+            closeSalaryConfirm(false);
+            return;
+        }
+        closeStaffForm();
+    }
 
     if (btnOpen) btnOpen.addEventListener('click', e => { e.preventDefault(); openStaffForm(); });
     if (btnCloseHeader) btnCloseHeader.addEventListener('click', e => { e.preventDefault(); closeStaffForm(); });
@@ -982,7 +1081,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ====== TAB SWITCH ======
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            const target = tab.dataset.tab; // info ho?c salary
+            const target = tab.dataset.tab;
 
             // remove active
             tabs.forEach(t => t.classList.remove('active'));
@@ -1045,13 +1144,13 @@ document.addEventListener('DOMContentLoaded', () => {
             previewImage.style.display = "block";
             removeImageBtn.style.display = "block";
             addText.style.display = "none";
-            deleteImageInput.value = 0; // chưa xóa
+            deleteImageInput.value = 0;
         }
     }
 
     // ====== IMAGE UPLOAD ======
     imageBox.addEventListener("click", (e) => {
-    if (e.target === removeImageBtn) return; // không mở file khi click X
+    if (e.target === removeImageBtn) return;
     imageInput.click();
     });
     imageInput.addEventListener("change", function () {
@@ -1064,20 +1163,51 @@ document.addEventListener('DOMContentLoaded', () => {
             addText.style.display = "none";
         };
         reader.readAsDataURL(this.files[0]);
-        deleteImageInput.value = 0; // chọn ảnh mới → chưa xóa
+        deleteImageInput.value = 0;
     }
     });
     removeImageBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     e.preventDefault();
     resetImageBox();
-    deleteImageInput.value = 1; // thông báo backend xóa ảnh
+    deleteImageInput.value = 1;
     });
 
     // ====== SAVE STAFF ======
-    document.querySelectorAll('#save-popup').forEach(btn => {
+    document.querySelectorAll('#staffForm .staff-footer .staff-save').forEach(btn => {
         btn.addEventListener('click', async () => {
             const form = document.getElementById('staffInfoForm');
+            const nameValue = form.querySelector('[name="name"]')?.value.trim() || '';
+            const phoneValue = form.querySelector('[name="phone"]')?.value.trim() || '';
+            const roleValue = roleSelect ? roleSelect.value : '';
+            const passwordValue = form.querySelector('[name="password"]')?.value || '';
+
+            if (!nameValue) {
+                showToast('Vui long nhap ten nhan vien', 'error');
+                return;
+            }
+            if (!phoneValue) {
+                showToast('Vui long nhap so dien thoai', 'error');
+                return;
+            }
+            if (!roleValue) {
+                showToast('Vui long chon chuc vu', 'error');
+                return;
+            }
+            if (!editingStaffId && !passwordValue) {
+                showToast('Vui long nhap password', 'error');
+                return;
+            }
+
+            const salaryTypeValue = salaryType ? salaryType.value : '';
+            const salaryRateValue = salaryRate ? parseSalaryValue(salaryRate.value) : 0;
+            let stayForSalary = false;
+            if (!editingStaffId && (!salaryTypeValue || !salaryRateValue)) {
+
+                stayForSalary = await openSalaryConfirm();
+
+            }
+
             const formData = new FormData(form);
             if (imageInput.files[0]) formData.append('img', imageInput.files[0]);
             const url = editingStaffId ? `${BASE_URL}/staff/${editingStaffId}/update` : `${BASE_URL}/staff/store`;
@@ -1085,14 +1215,37 @@ document.addEventListener('DOMContentLoaded', () => {
             formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
 
             try {
-                const res = await fetch(url, { method: 'POST', body: formData });
-                const data = await res.json();
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                });
+                const data = await readJsonResponse(res);
+                if (!res.ok || !data.success) {
+                    showToast(getJsonErrorMessage(data, 'Lưu thất bại'), 'error');
+                    return;
+                }
                 if (data.success) {
+                    if (!editingStaffId && stayForSalary && data.staff && data.staff.id) {
+                        editingStaffId = data.staff.id;
+                        const staffIdInput = document.getElementById('staff_id');
+                        if (staffIdInput) staffIdInput.value = data.staff.id;
+                        const salaryStaffInput = document.getElementById('salary_staff_id');
+                        if (salaryStaffInput) salaryStaffInput.value = data.staff.id;
+                        const formTitle = document.getElementById('formTitle');
+                        if (formTitle) formTitle.innerText = 'Cập nhật nhân viên';
+                        activateTab('salary');
+                        showToast('Nhân viên đã được tạo. Hay thiết lập lương.', 'info');
+                        return;
+                    }
                     showToast('Lưu thành công', 'success');
                     setTimeout(() => {
                         location.reload();
                     }, 800);
-                } else showToast(data.message || 'Lưu thất bại', 'error');
+                }
             } catch (err) { console.error(err); showToast('Lỗi server!', 'error'); }
         });
     });
@@ -1161,7 +1314,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault(); e.stopPropagation();
             const detailRow = btn.closest('.detail-row');
             if (!detailRow) {
-                console.error('Không tìm thấy detailRow cho nút này:', btn);
+                console.error('Không tìm thấy thông tin chi tiết:', btn);
                 return;
             }
             const id = detailRow.id.replace('detail-', '');
@@ -1173,13 +1326,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.success) {
                     const s = data.staff;
                     resetImageBox();
-                    // Nếu nhân viên có ảnh
                     if (s.img) {
                         previewImage.src = `${window.location.origin}/VNT-Restaurant/public/images/staff/${s.img}`;
                         previewImage.style.display = "block";
                         removeImageBtn.style.display = "block";
                         addText.style.display = "none";
-                        document.getElementById('delete_image').value = 0; // chưa xoá
+                        document.getElementById('delete_image').value = 0;
                     } else {
                         resetImageBox();
                     }
@@ -1299,7 +1451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             const id = detailRow.id.replace('detail-', '');
-            if (!confirm('Bạn có chắc muốn xóa nhân viên này?')) return;
+            if (!await openConfirmDialog('Bạn có chắc muốn xóa nhân viên này?')) return;
             try {
                 const res = await fetch(`${BASE_URL}/staff/${id}`, {
                     method: 'DELETE',
@@ -1313,6 +1465,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     detailRow.previousElementSibling.remove();
                     detailRow.remove();
                     showToast('Xóa nhân viên thành công', 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 800);
                 } else showToast('Xóa thất bại', 'error');
             } catch(err){ console.error(err); }
         });

@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.filters.from = from ? Math.floor(from.getTime() / 1000) : null;
         window.filters.to   = to   ? Math.floor(to.getTime() / 1000) : null;
 
-        applyFilters(); // hàm filter invoice của bạn
+        applyFilters();
     }
 
 });
@@ -144,13 +144,11 @@ function setupCustomDropdown(dropdownId, hiddenInputId, textSpanId, filterKey, r
     const hiddenInput = document.getElementById(hiddenInputId);
     const textSpan = document.getElementById(textSpanId);
 
-    // --- Xử lý Mở/Đóng và Drop-up ---
     display.addEventListener('click', (e) => {
         e.stopPropagation();
         
         const isOpening = !dropdown.classList.contains('active');
 
-        // Đóng các dropdown khác trước
         document.querySelectorAll('.custom-dropdown').forEach(d => {
             if (d !== dropdown) d.classList.remove('active');
         });
@@ -389,11 +387,11 @@ document.querySelectorAll('.invoice-row').forEach(row => {
 });
 
 document.querySelectorAll('.btn-cancel').forEach(btn => {
-    btn.addEventListener('click', e => {
-        e.stopPropagation(); // không đóng detail
+    btn.addEventListener('click', async e => {
+        e.stopPropagation();
         const id = btn.dataset.id;
 
-        if (!confirm('Bạn chắc chắn muốn hủy hóa đơn này?')) return;
+        if (!await openConfirmDialog('Bạn chắc chắn muốn hủy hóa đơn này?')) return;
 
         fetch(`/pos/invoice/${id}/cancel`, {
             method: 'POST',

@@ -192,8 +192,8 @@ function updateCartUI() {
 }
 
 // Xóa hết
-document.getElementById('clearCart').addEventListener('click', () => {
-    if(confirm('Bạn có muốn xóa hết danh sách món ăn?')) {
+document.getElementById('clearCart').addEventListener('click', async () => {
+    if (await openConfirmDialog('Bạn có muốn xóa hết danh sách món ăn?')) {
         cart = [];
         updateCartUI();
     }

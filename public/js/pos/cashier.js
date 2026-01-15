@@ -109,9 +109,9 @@ payMethodRadios.forEach(radio => {
     });
 
     if (logoutLink) {
-        logoutLink.addEventListener('click', function(e) {
+        logoutLink.addEventListener('click', async function(e) {
             e.preventDefault();
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+            if (await openConfirmDialog('Bạn có chắc chắn muốn đăng xuất?')) {
                 document.getElementById('logout-form').submit();
             }
         });

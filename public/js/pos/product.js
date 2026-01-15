@@ -175,19 +175,16 @@ function renderPagination() {
 
   if (currentPage > totalPages) currentPage = totalPages;
 
-  // Bước 1: Ẩn tất cả trước
   allRows.forEach(row => row.style.display = 'none');
 
-  // Bước 2: Chỉ hiển thị những row thuộc trang hiện tại trong danh sách đã lọc
   const start = (currentPage - 1) * rowsPerPage;
   const end = start + rowsPerPage;
 
   filteredRows.forEach((row, i) => {
     if (i >= start && i < end) {
-      row.style.display = ''; // Hiển thị
+      row.style.display = '';
     }
     
-    // Ẩn detail row nếu có
     const detail = document.getElementById(`detail-${row.dataset.id}`);
     if (detail) detail.style.display = 'none';
   });
@@ -359,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     addText.style.display = "block";
     imageInput.value = "";
 
-    document.getElementById('delete_image').value = 0; // reset
+    document.getElementById('delete_image').value = 0;
   }
 
   // ====== INGREDIENT TABLE ======
@@ -432,14 +429,12 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.value = "";
     });
 
-    // Click vào ô ảnh => mở file dialog
     imageBox.addEventListener("click", function (e) {
     // Nếu click vào nút X thì không mở input
     if (e.target === removeImageBtn) return;
     imageInput.click();
     });
 
-    // Khi chọn ảnh
     imageInput.addEventListener("change", function () {
       if (this.files && this.files[0]) {
         const reader = new FileReader();
@@ -452,7 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.readAsDataURL(this.files[0]);
       }
     });
-    // Nút X – xóa ảnh (không đóng form!)
     removeImageBtn.addEventListener("click", function (e) {
     e.stopPropagation();
     e.preventDefault();
@@ -464,7 +458,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     imageInput.value = "";
 
-    // 🔥 Báo backend là user muốn xoá ảnh
     document.getElementById('delete_image').value = 1;
     });
 
@@ -523,7 +516,6 @@ document.addEventListener('DOMContentLoaded', () => {
           const res = await fetch(`${BASE_URL}/products/${id}`);
           const data = await res.json();
           const p = data.product;
-          // LOAD ẢNH CŨ
           resetImageBox();
 
           if (p.img) {
@@ -565,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!detailRow) return;
             const id = detailRow.id.replace('detail-', '');
             if (!id) return;
-            if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+            if (!await openConfirmDialog('Bạn có chắc muốn xóa sản phẩm này?')) return;
 
             try {
                 const res = await fetch(`${BASE_URL}/products/${id}`, {
@@ -577,10 +569,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await res.json();
                 if (data.status) {
-                    showToast('Xóa sản phẩm thành công', 'success');
-                    const productRow = detailRow.previousElementSibling;
-                    productRow?.remove();
-                    detailRow.remove();
+                  showToast('Xóa sản phẩm thành công', 'success');
+                  const productRow = detailRow.previousElementSibling;
+                  productRow?.remove();
+                  detailRow.remove();
+                  setTimeout(() => {
+                    location.reload();
+                  }, 800);
                 } else {
                   showToast('Xóa thất bại', 'error');
                 }
@@ -721,6 +716,9 @@ document.addEventListener("DOMContentLoaded", function () {
           if (li) li.querySelector(".cat-name").textContent = name;
           closePopup();
           showToast("Cập nhật nhóm thành công", "success");
+          setTimeout(() => {
+            location.reload();
+          }, 800);
         } else showToast(data.message || "Cập nhật thất bại", "error");
       })
       .catch(err => {
@@ -750,6 +748,9 @@ document.addEventListener("DOMContentLoaded", function () {
         `);
         closePopup();
         showToast("Thêm nhóm thành công", "success");
+        setTimeout(() => {
+          location.reload();
+        }, 800);
       } else showToast(data.message || "Thêm thất bại", "error");
     })
     .catch(err => {
@@ -757,12 +758,12 @@ document.addEventListener("DOMContentLoaded", function () {
       showToast("Lỗi server!", "error");
     });
   });
-  if (deleteBtn) deleteBtn.addEventListener("click", function () {
+  if (deleteBtn) deleteBtn.addEventListener("click", async function () {
     if (!editId) {
       showToast("Không có nhóm để xóa", "warning");
       return;
     }
-    if (!confirm("Bạn có chắc muốn xóa?")) return;
+    if (!await openConfirmDialog("Bạn có chắc muốn xóa?")) return;
     fetch(`/VNT-Restaurant/public/pos/product-category/delete/${editId}`, {
       method: "DELETE",
       headers: { "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content }
@@ -774,6 +775,9 @@ document.addEventListener("DOMContentLoaded", function () {
         if (li) li.remove();
         closePopup();
         showToast("Xóa nhóm thành công", "success");
+        setTimeout(() => {
+          location.reload();
+        }, 800);
       } else showToast(data.message || "Xóa thất bại", "error");
     })
     .catch(err => {

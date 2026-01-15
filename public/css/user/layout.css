@@ -652,3 +652,124 @@ circle {
   fill: rgb(255, 168, 39);
 }
 /* FOOTER END */
+/* APP CONFIRM */
+.app-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10060;
+}
+
+.app-confirm-overlay.active {
+  display: flex;
+}
+
+.app-confirm-dialog {
+  width: 420px;
+  max-width: calc(100% - 32px);
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+  padding: 18px 20px 16px;
+  animation: appConfirmPop 0.2s ease-out;
+}
+
+.app-confirm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-confirm-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.app-confirm-close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-confirm-close:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.app-confirm-body {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.5;
+  align-items: center;
+}
+
+.app-confirm-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #eef6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #357ebd;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.app-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.app-confirm-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.15s ease;
+}
+
+.app-confirm-btn.primary {
+  background: #00b63e;
+  border-color: #00b63e;
+  color: #fff;
+}
+
+.app-confirm-btn.primary:hover {
+  background: #009c35;
+  border-color: #009c35;
+}
+
+.app-confirm-btn.secondary {
+  background: #fff;
+  border-color: #d0d0d0;
+  color: #334155;
+}
+
+.app-confirm-btn.secondary:hover {
+  background: #f1f5f9;
+}
+
+@keyframes appConfirmPop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
