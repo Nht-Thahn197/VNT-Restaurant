@@ -15,12 +15,10 @@ class AreaController extends Controller
     
     public function store(Request $request)
     {
-        // Validate đơn giản
         $request->validate([
             'name' => 'required|string|max:150',
         ]);
 
-        // Tạo mới
         $area = Area::create([
             'name' => $request->name
         ]);

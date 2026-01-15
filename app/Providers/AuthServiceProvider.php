@@ -58,6 +58,17 @@ class AuthServiceProvider extends ServiceProvider
             'update_area' => ['Admin', 'Quản Lý'],
             'delete_area' => ['Admin', 'Quản Lý'],
 
+            'view_location' => ['Admin'],
+            'create_location' => ['Admin'],
+            'update_location' => ['Admin'],
+            'update_status_location' => ['Admin'],
+            'delete_location' => ['Admin'],
+
+            'view_region' => ['Admin'],
+            'create_region' => ['Admin'],
+            'update_region' => ['Admin'],
+            'delete_region' => ['Admin'],
+
             'view_table' => ['Admin', 'Quản Lý', 'Kế Toán', 'Bếp Trưởng', 'Bếp Phó', 'Bảo Vệ', 'Nhân Viên Bàn', 'Nhân viên Phục Vụ', 'Tạp Vụ', 'Chảo', 'Thớt', 'Chảo Non', 'Phụ Bếp'],
             'create_table' => ['Admin', 'Quản Lý'],
             'update_table' => ['Admin', 'Quản Lý'],
@@ -163,6 +174,15 @@ class AuthServiceProvider extends ServiceProvider
         'update_table',
         'update_status_table',
         'delete_table',
+        'view_location',
+        'create_location',
+        'update_location',
+        'update_status_location',
+        'delete_location',
+        'view_region',
+        'create_region',
+        'update_region',
+        'delete_region',
 
         'view_invoice',
         'cancel_invoice',
@@ -218,6 +238,7 @@ class AuthServiceProvider extends ServiceProvider
         'view_dashboard',
 
         'view_table',
+        'view_location',
 
         'view_invoice',
         'cancel_invoice',

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Region;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,9 +11,12 @@ class Location extends Model
     use HasFactory;
 
     protected $table = 'location';
+    public $timestamps = false;
 
     protected $fillable = [
+        'region_id',
         'code',
+        'thumbnail',
         'status',
         'name',
         'capacity',
@@ -20,6 +24,11 @@ class Location extends Model
         'floors',
         'time_start',
         'time_end',
-        'create_at'
+        'created_at',
     ];
+
+    public function region()
+    {
+        return $this->belongsTo(Region::class, 'region_id', 'id');
+    }
 }

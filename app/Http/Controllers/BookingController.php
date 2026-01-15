@@ -33,9 +33,7 @@ class BookingController extends Controller
         DB::beginTransaction();
 
         try {
-            // ===== 1. XÁC ĐỊNH CUSTOMER =====
             if ($request->customer_id) {
-                // khách cũ
                 $customer = Customer::find($request->customer_id);
 
                 if (!$customer) {
@@ -45,11 +43,9 @@ class BookingController extends Controller
                     ], 400);
                 }
             } else {
-                // kiểm tra theo phone
                 $customer = Customer::where('phone', $request->phone)->first();
 
                 if (!$customer) {
-                    // khách mới → bắt buộc phải có tên
                     if (!$request->customer_name) {
                         return response()->json([
                             'success' => false,
@@ -67,7 +63,6 @@ class BookingController extends Controller
             $customerId = $customer->id;
             $customerName = $customer->name;
 
-            // ===== 2. TẠO BOOKING =====
             $booking = Booking::create([
                 'customer_id'   => $customerId,
                 'customer_name' => $customerName,
@@ -82,7 +77,6 @@ class BookingController extends Controller
                 'created_by'    => Auth::guard('staff')->id()
             ]);
 
-            // ===== 3. LƯU MÓN ĐẶT TRƯỚC =====
             if ($request->filled('preorder_items')) {
                 $items = json_decode($request->preorder_items, true);
 
@@ -217,7 +211,7 @@ class BookingController extends Controller
             $booking->status = 'received';
             $booking->save();
 
-            DB::commit(); // Phải commit trước khi return
+            DB::commit();
 
             return response()->json([
                 'success' => true,
@@ -235,7 +229,6 @@ class BookingController extends Controller
     public function getBookingItems($id)
     {
         try {
-            // Sử dụng tên bảng chính xác như bạn đã cung cấp: booking_item và product
             $items = DB::table('booking_item')
                 ->join('product', 'booking_item.product_id', '=', 'product.id')
                 ->where('booking_item.booking_id', $id)

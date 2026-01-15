@@ -16,6 +16,9 @@
         <div class="setting">
             <button class="icon" id="settingsBtn" title="Cài đặt">Thiết lập <i class="hide-mobile fas fa-cog"></i></button>
             <div class="setting-dropdown" id="settingDropdown">
+                @can('view_location')
+                    <a href="{{ url('/pos/location') }}">Quản lý chi nhánh</a>
+                @endcan
                 @can('manage_role')
                     <a href="{{ url('/pos/role') }}">Quản lý quyền truy cập</a>
                 @endcan

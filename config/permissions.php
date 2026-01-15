@@ -49,6 +49,21 @@ return [
         'delete_table' => 'Xóa bàn ăn',
     ],
 
+    'Chi nhánh' => [
+        'view_location' => 'Xem chi nhánh',
+        'create_location' => 'Thêm chi nhánh',
+        'update_location' => 'Sửa chi nhánh',
+        'update_status_location' => 'Cập nhật trạng thái chi nhánh',
+        'delete_location' => 'Xóa chi nhánh',
+    ],
+
+    'Khu vực chi nhánh' => [
+        'view_region' => 'Xem khu vực chi nhánh',
+        'create_region' => 'Thêm khu vực chi nhánh',
+        'update_region' => 'Sửa khu vực chi nhánh',
+        'delete_region' => 'Xóa khu vực chi nhánh',
+    ],
+
     'Hóa đơn' => [
         'view_invoice'   => 'Xem hóa đơn',
         'cancel_invoice' => 'Hủy hóa đơn',

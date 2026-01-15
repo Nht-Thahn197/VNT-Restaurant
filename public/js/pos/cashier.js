@@ -1083,6 +1083,9 @@ payMethodRadios.forEach(radio => {
 
                 renderOrderList();
                 updateTableStatus();
+                removeServing(currentTableId)
+                    .then(() => updateServicingCount())
+                    .catch(err => console.error('Không thể cập nhật số lượng bàn đang phục vụ', err));
                 closePayDrawer();
                 clearTableUI(currentTableId);
             } else {

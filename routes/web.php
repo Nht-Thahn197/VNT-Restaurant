@@ -15,6 +15,8 @@ use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\CategoryIngredientController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\RegionController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\ExportController;
@@ -182,6 +184,40 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
         ->name('area.update');    
     Route::delete('/area/delete/{id}', [AreaController::class, 'destroy'])->middleware('can:delete_table')
         ->name('area.delete');
+
+    // LOCATION
+    Route::get('/location', [LocationController::class, 'index'])
+        ->name('pos.location')
+        ->middleware('can:view_location');
+    Route::get('/location/{id}', [LocationController::class, 'show'])
+        ->name('pos.location.show')
+        ->middleware('can:view_location');
+    Route::post('/location/store', [LocationController::class, 'store'])
+        ->name('pos.location.store')
+        ->middleware('can:create_location');
+    Route::post('/location/{id}/update', [LocationController::class, 'update'])
+        ->name('pos.location.update')
+        ->middleware('can:update_location');
+    Route::post('/location/{id}/toggle-status', [LocationController::class, 'toggleStatus'])
+        ->name('pos.location.toggleStatus')
+        ->middleware('can:update_status_location');
+    Route::delete('/location/{id}', [LocationController::class, 'destroy'])
+        ->name('pos.location.delete')
+        ->middleware('can:delete_location');
+
+    // REGION
+    Route::get('/regions', [RegionController::class, 'index'])
+        ->name('pos.region.list')
+        ->middleware('can:view_region');
+    Route::post('/region/store', [RegionController::class, 'store'])
+        ->name('pos.region.store')
+        ->middleware('can:create_region');
+    Route::post('/region/update/{id}', [RegionController::class, 'update'])
+        ->name('pos.region.update')
+        ->middleware('can:update_region');
+    Route::delete('/region/delete/{id}', [RegionController::class, 'destroy'])
+        ->name('pos.region.delete')
+        ->middleware('can:delete_region');
 
     // INVOICE
     Route::get('/invoice', [InvoiceController::class, 'index'])->name('pos.invoice')->middleware('can:view_invoice');
