@@ -24,6 +24,8 @@ async function readJsonResponse(res) {
 
 var locationSelectControls = [];
 
+let selectedFile = null;
+
 var closeLocationSelectMenus = function () {
     locationSelectControls.forEach(function (control) {
         control.close();
@@ -562,6 +564,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 locationThumbnailInput.value = "";
                 clearLocationPreview();
             }
+            selectedFile = null;
             locationCapacityInput.value = location.capacity || "";
             locationAreaInput.value = location.area || "";
             locationFloorsInput.value = location.floors || "";
@@ -580,7 +583,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function updateLocationPreview(src) {
         if (!locationPreviewImage || !locationAddImageText) return;
-        locationPreviewImage.src = src;
+        locationPreviewImage.src = window.routes.assetUrl + src;
         locationPreviewImage.style.display = "block";
         locationAddImageText.style.display = "none";
         locationRemoveImageBtn && (locationRemoveImageBtn.style.display = "inline-flex");
@@ -618,6 +621,7 @@ document.addEventListener("DOMContentLoaded", function () {
         locationForm.reset();
         locationIdInput.value = "";
         clearLocationPreview();
+        selectedFile = null;
         openLocationForm(false);
     });
 
@@ -628,10 +632,15 @@ document.addEventListener("DOMContentLoaded", function () {
     locationImageInput?.addEventListener("change", () => {
         const file = locationImageInput.files?.[0];
         if (!file) return;
+        selectedFile = file;
+        locationThumbnailInput.value = "";
         const reader = new FileReader();
         reader.onload = (e) => {
             const result = e.target.result;
-            updateLocationPreview(result);
+            locationPreviewImage.src = result;
+            locationPreviewImage.style.display = "block";
+            locationAddImageText.style.display = "none";
+            locationRemoveImageBtn && (locationRemoveImageBtn.style.display = "inline-flex");
         };
         reader.readAsDataURL(file);
     });
@@ -639,6 +648,8 @@ document.addEventListener("DOMContentLoaded", function () {
     locationRemoveImageBtn?.addEventListener("click", (event) => {
         event.preventDefault();
         clearLocationPreview();
+        selectedFile = null;
+        locationThumbnailInput.value = "";
     });
 
     locationSaveBtn?.addEventListener("click", async () => {
@@ -665,20 +676,39 @@ document.addEventListener("DOMContentLoaded", function () {
             ? window.routes.location.updatePattern.replace("__ID__", id)
             : window.routes.location.store;
 
+        let body, headers;
+        if (selectedFile) {
+            const formData = new FormData();
+            for (let key in payload) {
+                formData.append(key, payload[key]);
+            }
+            formData.append('thumbnail', selectedFile);
+            body = formData;
+            headers = {
+                "X-CSRF-TOKEN": csrfToken,
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest"
+            };
+        } else {
+            body = JSON.stringify(payload);
+            headers = {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest"
+            };
+        }
+
         try {
             const res = await fetch(url, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRF-TOKEN": csrfToken,
-                    "Accept": "application/json",
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                body: JSON.stringify(payload)
+                headers,
+                body
             });
             const data = await readJsonResponse(res);
             if (res.ok && data.success) {
                 showToast(id ? "Cập nhật địa điểm thành công" : "Thêm địa điểm thành công", "success");
+                selectedFile = null;
                 closeLocationForm();
                 setTimeout(() => location.reload(), 600);
             } else {

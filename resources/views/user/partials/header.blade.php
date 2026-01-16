@@ -41,6 +41,7 @@
                                 <li value="{{ $location->id }}">{{ $location->name }}</li>
                             @endforeach
                         </ul>
+                        <input type="hidden" name="location_id" id="location_id">
                     </div>
                     <div class="row">
                         <div class="field">

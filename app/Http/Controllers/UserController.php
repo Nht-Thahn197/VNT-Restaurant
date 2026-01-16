@@ -31,7 +31,19 @@ class UserController extends Controller
 
     public function location()  
     {
-        return view('user.location'); 
+        $regions = \App\Models\Region::whereHas('locations', function($q) {
+            $q->where('status', 'active');
+        })->orderBy('name')->get();
+        $locations = \App\Models\Location::with('region')->where('status', 'active')->get();
+
+        // Format times
+        $locations->transform(function($location) {
+            $location->formatted_time_start = $location->time_start ? \Carbon\Carbon::parse($location->time_start)->format('H:i') : '09:00';
+            $location->formatted_time_end = $location->time_end ? \Carbon\Carbon::parse($location->time_end)->format('H:i') : '24:00';
+            return $location;
+        });
+
+        return view('user.location', compact('regions', 'locations')); 
     }
 
     public function news()      

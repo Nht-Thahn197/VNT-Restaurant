@@ -56,6 +56,7 @@
     <script>
         window.APP_URL = "{{ url('/') }}";
     </script>
+    <script src="{{ asset('js/user/common/toast.js') }}"></script>
     <script src="{{ asset('js/user/layout.js') }}"></script>
     <script src="{{ asset('js/user/calendar.js') }}"></script>
     @stack('js')

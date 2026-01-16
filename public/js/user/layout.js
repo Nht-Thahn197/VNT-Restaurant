@@ -37,11 +37,13 @@ bookingButtons.forEach(btn => {
 
 closeBookingBtn.addEventListener('click', () => {
   bookingOverlayy.classList.remove('active');
+  document.body.style.setProperty('pointer-events', 'auto', 'important');
 });
 
 bookingOverlayy.addEventListener('click', (e) => {
   if (e.target === bookingOverlayy) {
     bookingOverlayy.classList.remove('active');
+    document.body.style.setProperty('pointer-events', 'auto', 'important');
   }
 });
 
@@ -87,10 +89,16 @@ const openBooking = document.querySelector(".btn-booking");
 const closeBooking2 = document.getElementById("closeBooking2");
 
 openBooking.addEventListener("click", () => bookingOverlay.classList.add("active"));
-closeBooking2.addEventListener("click", () => bookingOverlay.classList.remove("active"));
+closeBooking2.addEventListener("click", () => {
+  bookingOverlay.classList.remove("active");
+  document.body.style.setProperty('pointer-events', 'auto', 'important');
+});
 
 bookingOverlay.addEventListener("click", (e) => {
-  if (e.target === bookingOverlay) bookingOverlay.classList.remove("active");
+  if (e.target === bookingOverlay) {
+    bookingOverlay.classList.remove("active");
+    document.body.style.setProperty('pointer-events', 'auto', 'important');
+  }
 });
 
 
@@ -183,7 +191,7 @@ document.querySelector('.submit-btn').addEventListener('click', async (e) => {
         !booking_date ||
         !booking_time
     ) {
-        alert('⚠️ Vui lòng nhập đầy đủ thông tin bắt buộc');
+        showToast('<i class="fas fa-exclamation-triangle"></i> Vui lòng nhập đầy đủ thông tin bắt buộc', 'warning');
         return;
     }
 
@@ -220,16 +228,16 @@ document.querySelector('.submit-btn').addEventListener('click', async (e) => {
         const data = await res.json();
 
         if (!data.success) {
-            alert(data.message || '❌ Đặt bàn thất bại');
+            showToast('<i class="fas fa-times-circle"></i> ' + (data.message || 'Đặt bàn thất bại'), 'error');
             return;
         }
 
-        alert('✅ Đặt bàn thành công! Chúng tôi sẽ liên hệ sớm.');
+        showToast('<i class="fas fa-check-circle"></i> Đặt bàn thành công! Chúng tôi sẽ liên hệ sớm.', 'success');
         document.getElementById('bookingOverlay').style.display = 'none';
 
     } catch (err) {
         console.error(err);
-        alert('❌ Có lỗi xảy ra, vui lòng thử lại');
+        showToast('<i class="fas fa-times-circle"></i> Có lỗi xảy ra, vui lòng thử lại', 'error');
     }
 });
 
@@ -268,10 +276,10 @@ document.querySelector('.submit-btn').addEventListener('click', async (e) => {
     const openConfirmDialog = (message, options = {}) => {
         const opts = options || {};
         const msg = message || '';
-        if (titleEl) titleEl.textContent = opts.title || 'Xac nhan';
+        if (titleEl) titleEl.textContent = opts.title || 'Xác nhận';
         if (messageEl) messageEl.textContent = msg;
-        if (confirmBtn) confirmBtn.textContent = opts.confirmText || 'Dong y';
-        if (cancelBtn) cancelBtn.textContent = opts.cancelText || 'Huy';
+        if (confirmBtn) confirmBtn.textContent = opts.confirmText || 'Đồng ý';
+        if (cancelBtn) cancelBtn.textContent = opts.cancelText || 'Hủy';
         if (dialog) dialog.dataset.variant = opts.variant || '';
         if (iconEl) iconEl.className = `fas ${opts.icon || 'fa-triangle-exclamation'}`;
         overlay.classList.add('active');

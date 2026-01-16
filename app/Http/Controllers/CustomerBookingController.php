@@ -12,19 +12,24 @@ use Illuminate\Http\Request;
 
 class CustomerBookingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $locations = DB::table('location')
-            ->where('status', 1) // nếu có
+            ->where('status', 'active')
             ->orderBy('name')
             ->get();
 
         $promotions = DB::table('promotion')
-            ->where('status', 1)
+            ->where('status', 'active')
             ->orderBy('name')
             ->get();
 
-        return view('customer.booking', compact('locations', 'promotions'));
+        $selectedLocation = null;
+        if ($request->has('location_id')) {
+            $selectedLocation = $locations->where('id', $request->location_id)->first();
+        }
+
+        return view('customer.booking', compact('locations', 'promotions', 'selectedLocation'));
     }
 
     public function store(Request $request)

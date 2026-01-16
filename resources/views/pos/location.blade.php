@@ -308,6 +308,7 @@
     <script>
         window.routes = {
             baseUrl: "{{ url('') }}",
+            assetUrl: "{{ asset('') }}",
             location: {
                 store: "{{ route('pos.location.store') }}",
                 showPattern: "{{ route('pos.location.show', ['id' => '__ID__']) }}",
