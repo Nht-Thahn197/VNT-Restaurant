@@ -148,9 +148,9 @@
       } else {
         console.error('Save shift error:', data.errors || data.message || data);
         if (typeof showToast === 'function') {
-          showToast(data.message || 'Du lieu khong hop le', 'error');
+          showToast(data.message || 'Dữ liệu không hợp lệ', 'error');
         } else {
-          alert(data.message || 'Du lieu khong hop le');
+          alert(data.message || 'Dữ liệu không hợp lệ');
         }
       }
     } catch (err) {

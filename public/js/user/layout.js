@@ -32,17 +32,20 @@ const closeBookingBtn = document.getElementById('closeBooking2');
 bookingButtons.forEach(btn => {
   btn.addEventListener('click', () => {
     bookingOverlayy.classList.add('active');
+    bookingOverlayy.style.removeProperty('display');
   });
 });
 
 closeBookingBtn.addEventListener('click', () => {
   bookingOverlayy.classList.remove('active');
+  bookingOverlayy.style.removeProperty('pointer-events');
   document.body.style.setProperty('pointer-events', 'auto', 'important');
 });
 
 bookingOverlayy.addEventListener('click', (e) => {
   if (e.target === bookingOverlayy) {
     bookingOverlayy.classList.remove('active');
+    bookingOverlayy.style.removeProperty('pointer-events');
     document.body.style.setProperty('pointer-events', 'auto', 'important');
   }
 });
@@ -88,15 +91,20 @@ const bookingOverlay = document.getElementById("bookingOverlay");
 const openBooking = document.querySelector(".btn-booking");
 const closeBooking2 = document.getElementById("closeBooking2");
 
-openBooking.addEventListener("click", () => bookingOverlay.classList.add("active"));
+openBooking.addEventListener("click", () => {
+  bookingOverlay.classList.add("active");
+  bookingOverlay.style.removeProperty('display');
+});
 closeBooking2.addEventListener("click", () => {
   bookingOverlay.classList.remove("active");
+  bookingOverlay.style.removeProperty('pointer-events');
   document.body.style.setProperty('pointer-events', 'auto', 'important');
 });
 
 bookingOverlay.addEventListener("click", (e) => {
   if (e.target === bookingOverlay) {
     bookingOverlay.classList.remove("active");
+    bookingOverlay.style.removeProperty('pointer-events');
     document.body.style.setProperty('pointer-events', 'auto', 'important');
   }
 });

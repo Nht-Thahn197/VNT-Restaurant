@@ -119,7 +119,8 @@ class AuthServiceProvider extends ServiceProvider
             'view_product_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
             'view_staff_report' => ['Admin', 'Quản Lý', 'Kế Toán'],
 
-            'view_analysis' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_sales_analysis' => ['Admin', 'Quản Lý', 'Kế Toán'],
+            'view_product_analysis' => ['Admin', 'Quản Lý', 'Kế Toán'],
 
             'view_contact' => ['Admin', 'Quản Lý', 'Kế Toán'],
             'update_contact' => ['Admin', 'Quản Lý'],

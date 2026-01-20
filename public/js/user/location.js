@@ -7,6 +7,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const bookingOverlay = document.getElementById('bookingOverlay');
     const closeBookingBtn = document.getElementById('closeBooking2');
 
+    const resetBookingOverlayStyles = () => {
+        if (!bookingOverlay) return;
+        const overlayProps = ['display', 'visibility', 'opacity', 'pointer-events', 'z-index', 'position', 'top', 'left', 'width', 'height'];
+        overlayProps.forEach(prop => bookingOverlay.style.removeProperty(prop));
+        const popup = bookingOverlay.querySelector('.booking-popup');
+        if (popup) {
+            ['display', 'visibility', 'opacity', 'pointer-events'].forEach(prop => popup.style.removeProperty(prop));
+        }
+    };
+
+    const openBookingOverlay = () => {
+        if (!bookingOverlay) return;
+        resetBookingOverlayStyles();
+        bookingOverlay.classList.add('active');
+        document.body.style.setProperty('pointer-events', 'auto', 'important');
+    };
+
+    const closeBookingOverlay = () => {
+        if (!bookingOverlay) return;
+        bookingOverlay.classList.remove('active');
+        resetBookingOverlayStyles();
+        document.body.style.setProperty('pointer-events', 'auto', 'important');
+    };
+
     if (openBookingBtn && bookingOverlay) {
         openBookingBtn.addEventListener('click', () => {
             // Reset booking form
@@ -21,26 +45,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const inputs = bookingOverlay.querySelectorAll('input[type="text"], textarea');
             inputs.forEach(input => input.value = '');
 
-            bookingOverlay.classList.add('active');
-            bookingOverlay.style.setProperty('display', 'flex', 'important');
-            const popup = bookingOverlay.querySelector('.booking-popup');
-            if (popup) {
-                popup.style.setProperty('display', 'block', 'important');
-                popup.style.setProperty('visibility', 'visible', 'important');
-                popup.style.setProperty('opacity', '1', 'important');
-                popup.style.setProperty('pointer-events', 'auto', 'important');
-            }
-            // Block body interactions
-            document.body.style.setProperty('pointer-events', 'none', 'important');
-            bookingOverlay.style.setProperty('pointer-events', 'auto', 'important');
+            openBookingOverlay();
         });
     }
     if (closeBookingBtn && bookingOverlay) {
         closeBookingBtn.addEventListener('click', () => {
-            bookingOverlay.classList.remove('active');
-            bookingOverlay.style.setProperty('display', 'none', 'important');
-            // Restore body interactions
-            document.body.style.setProperty('pointer-events', 'auto', 'important');
+            closeBookingOverlay();
         });
     }
 
@@ -78,33 +88,12 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('bookLocation called with id:', id);
         // Mở overlay đặt bàn
         if (bookingOverlay) {
-            console.log('Setting overlay display to flex');
-            bookingOverlay.classList.add('active');
-            bookingOverlay.style.setProperty('display', 'flex', 'important');
-            bookingOverlay.style.setProperty('visibility', 'visible', 'important');
-            bookingOverlay.style.setProperty('opacity', '1', 'important');
-            bookingOverlay.style.setProperty('z-index', '9999', 'important');
-            bookingOverlay.style.setProperty('position', 'fixed', 'important');
-            bookingOverlay.style.setProperty('top', '0', 'important');
-            bookingOverlay.style.setProperty('left', '0', 'important');
-            bookingOverlay.style.setProperty('width', '100%', 'important');
-            bookingOverlay.style.setProperty('height', '100%', 'important');
-            const popup = bookingOverlay.querySelector('.booking-popup');
-            if (popup) {
-                popup.style.setProperty('display', 'block', 'important');
-                popup.style.setProperty('visibility', 'visible', 'important');
-                popup.style.setProperty('opacity', '1', 'important');
-                popup.style.setProperty('pointer-events', 'auto', 'important');
-            }
-            // Block body interactions
-            document.body.style.setProperty('pointer-events', 'none', 'important');
-            bookingOverlay.style.setProperty('pointer-events', 'auto', 'important');
+            console.log('Opening booking overlay');
+            openBookingOverlay();
             // Add click outside to close
             const closeOverlay = (e) => {
                 if (e.target === bookingOverlay) {
-                    bookingOverlay.classList.remove('active');
-                    bookingOverlay.style.setProperty('display', 'none', 'important');
-                    document.body.style.setProperty('pointer-events', 'auto', 'important');
+                    closeBookingOverlay();
                     bookingOverlay.removeEventListener('click', closeOverlay);
                 }
             };

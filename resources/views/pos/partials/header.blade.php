@@ -197,9 +197,19 @@
             </li>
         @endcanany
 
-        @can('view_analysis')
-            <li><a href="#">Phân tích</a></li>
-        @endcan
+        @canany(['view_sales_analysis','view_product_analysis'])
+            <li class="dropdown">
+                <a href="#">Phân tích</a>
+                <ul class="dropdown-menu">
+                    @can('view_sales_analysis')
+                        <li><a href="{{ url('/pos/sales-analysis') }}">Bán hàng</a></li>
+                    @endcan
+                    @can('view_product_analysis')
+                        <li><a href="{{ url('/pos/product-analysis') }}">Hàng hóa</a></li>
+                    @endcan
+                </ul>
+            </li>
+        @endcanany
 
         @can('view_contact')
             <li><a href="{{ url('/pos/contact') }}">Liên hệ</a></li>

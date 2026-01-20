@@ -999,6 +999,9 @@ input[type="number"] {
   padding: 6px;
   z-index: 30;
   display: none;
+  max-height: 240px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .js .staff-select .staff-select-menu.open {

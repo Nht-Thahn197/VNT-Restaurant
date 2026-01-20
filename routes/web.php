@@ -30,6 +30,7 @@ use App\Http\Controllers\DailyReportController;
 use App\Http\Controllers\ProductReportController;
 use App\Http\Controllers\StaffReportController;
 use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\SalesAnalysisController;
 use App\Http\Controllers\WorkScheduleController;
 use App\Http\Controllers\WorkShiftController;
 use App\Http\Controllers\AttendanceController;
@@ -93,8 +94,6 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
             ->limit(10)
             ->get();
     });
-
-
 
     // CASHIER
     Route::get('/cashier', [CashierController::class, 'index'])->name('pos.cashier');
@@ -281,18 +280,19 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::delete('/role/delete/{id}', [RoleController::class, 'destroy'])->middleware('can:view_staff')
         ->name('role.delete');
 
-    // CONTACT
+    //CONTACT
     Route::get('/contact', [ContactController::class, 'index'])->name('pos.contact')->middleware('can:view_contact');
     Route::post('/contact/update-status/{id}', [ContactController::class, 'updateStatus'])->name('contact.update')->middleware('can:view_contact');
 
-    // DAILY REPORT
+    //REPORT
     Route::get('/daily-report', [DailyReportController::class, 'index'])->name('pos.daily-report')->middleware('can:view_daily_report');
     Route::post('/daily-report/close', [DailyReportController::class, 'closeDay'])->name('pos.daily-report.close')->middleware('can:view_daily_report');
-
-    // PRODUCT REPORT
     Route::get('/product-report', [ProductReportController::class, 'index'])->name('pos.product-report')->middleware('can:view_product_report');
     Route::get('/staff-report', [StaffReportController::class, 'index'])->name('pos.staff-report')->middleware('can:view_staff_report');
     Route::get('/sales-report', [SalesReportController::class, 'index'])->name('pos.sales-report')->middleware('can:view_sales_report');
+
+    //ANALYSIS
+    Route::get('/sales-analysis', [SalesAnalysisController::class, 'index'])->name('pos.sales-analysis')->middleware('can:view_sales_analysis');
 
     // PROMOTION
     Route::get('/promotion', [PromotionController::class, 'index'])->name('pos.promotion')->middleware('can:view_promotion');

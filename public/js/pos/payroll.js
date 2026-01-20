@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', function () {
       generateForm.dataset.submitting = '1';
       if (generateButton) {
         generateButton.disabled = true;
-        generateButton.textContent = 'Dang tong hop...';
+        generateButton.textContent = 'Đang tổng hợp...';
       }
     });
   }

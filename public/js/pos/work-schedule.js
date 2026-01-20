@@ -8,6 +8,7 @@
   const headerEl = document.getElementById('scheduleHeader');
   const bodyEl = document.getElementById('scheduleBody');
   const staffSearch = document.getElementById('staffSearch');
+  const shiftStaffSearch = document.querySelector('#shiftModal .modal-search input');
   const weekLabel = document.getElementById('weekLabel');
   const btnCurrentWeek = document.getElementById('btnCurrentWeek');
   const dataEndpoint = page?.dataset.endpoint || '';
@@ -313,6 +314,8 @@
     staff.forEach((person) => {
       const item = document.createElement('label');
       item.className = 'picker-item';
+      const searchKey = `${person.name || ''} ${person.code || ''}`.trim().toLowerCase();
+      item.dataset.search = searchKey;
       item.innerHTML = `
         <input type="checkbox" data-id="${person.id}">
         <div>
@@ -322,6 +325,7 @@
       `;
       container.appendChild(item);
     });
+    filterShiftStaffList();
   }
 
   function renderShiftPicker(targetId) {
@@ -343,6 +347,17 @@
     });
   }
 
+  function filterShiftStaffList() {
+    if (!shiftStaffSearch) return;
+    const query = shiftStaffSearch.value.trim().toLowerCase();
+    const items = document.querySelectorAll('#shiftStaffList .picker-item');
+    items.forEach((item) => {
+      const haystack = item.dataset.search || '';
+      const isMatch = !query || haystack.includes(query);
+      item.style.display = isMatch ? '' : 'none';
+    });
+  }
+
   async function saveSchedule(payload) {
     if (!storeEndpoint) return;
     const res = await fetch(storeEndpoint, {
@@ -358,7 +373,7 @@
     if (!data.success) {
       console.error('Save schedule failed:', data);
       if (typeof showToast === 'function') {
-        showToast(data.message || 'Luu that bai', 'error');
+        showToast(data.message || 'Lưu thất bại', 'error');
       }
       return false;
     }
@@ -472,6 +487,10 @@
     renderAll();
   });
 
+  shiftStaffSearch?.addEventListener('input', () => {
+    filterShiftStaffList();
+  });
+
   document.querySelectorAll('[data-close]').forEach((btn) => {
     btn.addEventListener('click', () => closeModal(btn.dataset.close));
   });
@@ -504,7 +523,7 @@
     if (!data.success) {
       console.error('Delete schedule failed:', data);
       if (typeof showToast === 'function') {
-        showToast(data.message || 'Xoa that bai', 'error');
+        showToast(data.message || 'Xóa thất bại', 'error');
       }
       return;
     }
@@ -519,7 +538,7 @@
     const staffIds = checked.map(input => Number(input.dataset.id)).filter(Boolean);
     if (!staffIds.length) {
       if (typeof showToast === 'function') {
-        showToast('Vui long chon nhan vien', 'error');
+        showToast('Vui lòng chọn nhân viên', 'error');
       }
       return;
     }
@@ -544,7 +563,7 @@
     const shiftIds = checked.map(input => Number(input.dataset.id)).filter(Boolean);
     if (!shiftIds.length) {
       if (typeof showToast === 'function') {
-        showToast('Vui long chon ca lam', 'error');
+        showToast('Vui lòng chọn ca làm', 'error');
       }
       return;
     }

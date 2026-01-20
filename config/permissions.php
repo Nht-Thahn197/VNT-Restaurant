@@ -128,7 +128,8 @@ return [
     ],
 
     'Phân tích' => [
-        'view_analysis'   => 'Xem phân tích',
+        'view_sales_analysis'   => 'Xem phân tích bán hàng',
+        'view_product_analysis' => 'Xem phân tích hàng hóa',
     ],
 
     'Liên hệ' => [
