@@ -51,9 +51,7 @@
                             <tr class="detail-row" id="detail-{{ $cus->id }}" style="display:none;">
                                 <td class="detail-td" colspan="6">
                                     <div class="detail-content">
-                                        <!-- Thông tin -->
                                         <div class="detail-col info">
-                                            <!-- Dòng 1 -->
                                             <div class="row">
                                                 <div class="field">
                                                     <div class="field-label">Mã khách hàng</div>
@@ -71,7 +69,6 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Dòng 2 -->
                                             <div class="row">
                                                 <div class="field">
                                                     <div class="field-label">Ngày sinh</div>

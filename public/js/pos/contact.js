@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const id = this.getAttribute('data-id');
         const btn = this;
         
-        // Đổi trạng thái nút bấm khi đang xử lý
         btn.innerText = 'Đang xử lý...';
         btn.disabled = true;
 
@@ -77,17 +76,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // 1. Đóng modal
                 document.getElementById('contactModal').style.display = 'none';
-
-                // 2. Tìm dòng <tr> tương ứng trong bảng để cập nhật giao diện
                 const row = document.querySelector(`tr[data-id="${id}"]`);
                 if (row) {
-                    // Cập nhật text ở cột Trạng thái (giả sử cột thứ 6)
                     const statusCell = row.querySelector('td:last-child');
                     statusCell.innerHTML = '<span class="status-pill processed">processed</span>';
-                    
-                    // Hiệu ứng highlight dòng vừa sửa
                     row.style.backgroundColor = '#d4edda';
                     setTimeout(() => { row.style.backgroundColor = ''; }, 2000);
                 }
@@ -160,13 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 from = null;
                 to = null;
                 break;
-            // Bạn có thể thêm các case last_week, last_month tương tự như mẫu bạn gửi
         }
 
         window.filters.from = from ? Math.floor(from.getTime() / 1000) : null;
         window.filters.to   = to   ? Math.floor(to.getTime() / 1000) : null;
 
-        // Reset ô DateRange nếu chọn Preset
         $('#dateRange').val('');
         
         applyFilters();
@@ -178,41 +169,33 @@ document.addEventListener('DOMContentLoaded', function() {
         rows.forEach(row => {
             let match = true;
 
-            // 🔍 Lọc theo mã liên hệ (search-input[0])
             if (filters.code && !row.dataset.code.includes(filters.code)) {
                 match = false;
             }
 
-            // 🔍 Lọc theo tên khách hàng (search-input[1])
             if (match && filters.name && !row.dataset.name.includes(filters.name)) {
                 match = false;
             }
 
-            // 🔍 Lọc theo số điện thoại (search-input[2])
             if (match && filters.phone && !row.dataset.phone.includes(filters.phone)) {
                 match = false;
             }
 
-            // ⚙️ Lọc theo trạng thái (Radio)
             if (match && filters.status !== 'all') {
-                // Map value: serving -> pending, completed -> processed
                 const mappedStatus = filters.status === 'serving' ? 'pending' : 'processed';
                 if (row.dataset.status !== mappedStatus) match = false;
             }
 
-            // 🏷️ Lọc theo loại liên hệ (Type Filter buttons)
             if (match && filters.type !== 'all' && row.dataset.type !== filters.type) {
                 match = false;
             }
 
-            // ⏰ Lọc theo thời gian (Timestamp)
             if (match && filters.from && filters.to) {
-                const rowTime = Number(row.dataset.time); // Bạn cần thêm data-time vào thẻ <tr>
+                const rowTime = Number(row.dataset.time);
                 if (rowTime < filters.from || rowTime > filters.to) match = false;
             }
 
             row.setAttribute('data-filtered', match ? '1' : '0');
-            // Luôn ẩn đi để renderPagination quyết định hàng nào được hiện theo trang
             row.style.display = 'none';
         });
         currentPage = 1;
@@ -224,7 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
     inputs[1].addEventListener('input', e => { filters.name = e.target.value.trim().toLowerCase(); applyFilters(); });
     inputs[2].addEventListener('input', e => { filters.phone = e.target.value.trim().toLowerCase(); applyFilters(); });
 
-    // Trạng thái Radio
     document.querySelectorAll('input[name="status"]').forEach(radio => {
         radio.addEventListener('change', e => {
             filters.status = e.target.value;
@@ -232,7 +214,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Loại liên hệ (Tất cả, Phản ánh, Hợp tác)
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -275,14 +256,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const rows = getContactRows();
         const totalPages = Math.ceil(rows.length / rowsPerPage) || 1;
 
-        // Kiểm tra nếu trang hiện tại vượt quá tổng số trang sau khi lọc
         if (currentPage > totalPages) currentPage = totalPages;
         if (currentPage < 1) currentPage = 1;
 
-        // Ẩn tất cả hàng trước
         document.querySelectorAll('.contact-info').forEach(r => r.style.display = 'none');
 
-        // Hiển thị chỉ những hàng thuộc trang hiện tại
         rows.forEach((row, index) => {
             const start = (currentPage - 1) * rowsPerPage;
             const end = start + rowsPerPage;
@@ -292,19 +270,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Cập nhật thông tin số trang
         const pageInfo = document.getElementById('pageInfo');
         if (pageInfo) {
             pageInfo.innerText = `Trang ${currentPage} / ${totalPages}`;
         }
 
-        // Xử lý nút bấm
         const prevBtn = document.getElementById('prevPage');
         const nextBtn = document.getElementById('nextPage');
         if (prevBtn) prevBtn.disabled = (currentPage === 1);
         if (nextBtn) nextBtn.disabled = (currentPage === totalPages);
 
-        // Ẩn/Hiện container phân trang nếu chỉ có 1 trang
         const paginationContainer = document.getElementById('pagination');
         if (paginationContainer) {
             if (totalPages <= 1) {

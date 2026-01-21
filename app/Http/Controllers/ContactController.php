@@ -14,7 +14,6 @@ class ContactController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validate dữ liệu
         $request->validate([
             'name'    => 'required|string|max:100',
             'email'   => 'required|email|max:100',
@@ -23,7 +22,6 @@ class ContactController extends Controller
             'type'    => 'required|in:complaint,media',
         ]);
 
-        // 3. Lưu vào DB
         Contact::create([
             'type'    => $request->type,
             'name'    => $request->name,

@@ -26,7 +26,6 @@
     {{-- HEADER --}}
     @include('user.partials.header')
 
-    {{-- NỘI DUNG TỪ TRANG CON --}}
     <main>
         @yield('content')
     </main>

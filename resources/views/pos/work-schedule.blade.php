@@ -23,9 +23,7 @@
           <button class="nav-btn" id="prevWeek" aria-label="Tuần trước">
             <i class="fas fa-chevron-left"></i>
           </button>
-          <button class="week-label" id="weekLabel">
-            Tuần 1 - Th. 01/2026
-          </button>
+          <button class="week-label" id="weekLabel"></button>
           <button class="nav-btn" id="nextWeek" aria-label="Tuần sau">
             <i class="fas fa-chevron-right"></i>
           </button>
@@ -67,8 +65,8 @@
         <button class="modal-close" data-close="shiftModal">×</button>
       </div>
       <div class="modal-meta">
-        <span><i class="far fa-clock"></i> <span id="modalShiftInfo">Ca Full1 (06:00 - 22:00)</span></span>
-        <span><i class="far fa-calendar"></i> <span id="modalShiftDate">Thứ 2, 12/01/2026</span></span>
+        <span><i class="far fa-clock"></i> <span id="modalShiftInfo"></span></span>
+        <span><i class="far fa-calendar"></i> <span id="modalShiftDate"></span></span>
       </div>
       <div class="modal-section">
         <div class="section-title">
@@ -107,8 +105,8 @@
         <button class="modal-close" data-close="staffModal">×</button>
       </div>
       <div class="modal-meta">
-        <span><i class="far fa-user"></i> <span id="modalStaffInfo">Đỗ Hữu Hải</span></span>
-        <span><i class="far fa-calendar"></i> <span id="modalStaffDate">Thứ 2, 12/01/2026</span></span>
+        <span><i class="far fa-user"></i> <span id="modalStaffInfo"></span></span>
+        <span><i class="far fa-calendar"></i> <span id="modalStaffDate"></span></span>
       </div>
       <div class="modal-section">
         <div class="section-title">

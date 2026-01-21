@@ -46,7 +46,6 @@ class SalesAnalysisController extends Controller
 
                 return [$startDate, $endDate];
             } catch (\Exception $e) {
-                // Fall back to default range.
             }
         }
 

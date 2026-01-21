@@ -16,15 +16,15 @@
 
   const formatCompact = (value) => {
     const abs = Math.abs(value);
-    if (abs >= 1_000_000_000) return `${trimDecimal(value / 1_000_000_000)} t\u1ef7`;
-    if (abs >= 1_000_000) return `${trimDecimal(value / 1_000_000)} tri\u1ec7u`;
-    if (abs >= 1_000) return `${trimDecimal(value / 1_000)} ngh\u00ecn`;
+    if (abs >= 1_000_000_000) return `${trimDecimal(value / 1_000_000_000)} tỷ`;
+    if (abs >= 1_000_000) return `${trimDecimal(value / 1_000_000)} triệu`;
+    if (abs >= 1_000) return `${trimDecimal(value / 1_000)} nghìn`;
     return formatNumber(value);
   };
 
   const formatAxis = (value) => {
     const abs = Math.abs(value);
-    if (abs >= 1_000_000_000) return `${trimDecimal(value / 1_000_000_000)} T\u1ef7`;
+    if (abs >= 1_000_000_000) return `${trimDecimal(value / 1_000_000_000)} Tỷ`;
     if (abs >= 1_000_000) return `${trimDecimal(value / 1_000_000)} Tr`;
     if (abs >= 1_000) return `${trimDecimal(value / 1_000)} N`;
     return value;
@@ -143,7 +143,7 @@
           },
           {
             type: 'bar',
-            label: 'L\u1ee3i nhu\u1eadn',
+            label: 'Lợi nhuận',
             data: analysisData.category.profit,
             backgroundColor: '#22c55e',
             borderRadius: 8,
@@ -151,7 +151,7 @@
           },
           {
             type: 'line',
-            label: 'T\u1ef7 su\u1ea5t l\u1ee3i nhu\u1eadn',
+            label: 'Tỷ suất lợi nhuận',
             data: analysisData.category.margin,
             borderColor: '#166534',
             backgroundColor: '#166534',
@@ -225,7 +225,7 @@
           legend: { display: false },
           tooltip: {
             callbacks: {
-              label: (context) => `Gi\u00e1 tr\u1ecb t\u1ed3n kho: ${formatCompact(context.parsed.x)}`,
+              label: (context) => `Giá trị tồn kho: ${formatCompact(context.parsed.x)}`,
             },
           },
         },
@@ -286,7 +286,7 @@
         if (isRevenue) {
           return `Doanh thu: ${formatCompact(context.parsed.x)}`;
         }
-        return `S\u1ed1 l\u01b0\u1ee3ng b\u00e1n: ${formatNumber(context.parsed.x)}`;
+        return `Số lượng bán: ${formatNumber(context.parsed.x)}`;
       };
       chart.options.scales.x.ticks.callback = (value) => formatAxis(value);
       chart.update();
@@ -323,9 +323,9 @@
         cancelLabel: 'B\u1ecf qua',
         daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
         monthNames: [
-          'Th\u00e1ng 1', 'Th\u00e1ng 2', 'Th\u00e1ng 3', 'Th\u00e1ng 4',
-          'Th\u00e1ng 5', 'Th\u00e1ng 6', 'Th\u00e1ng 7', 'Th\u00e1ng 8',
-          'Th\u00e1ng 9', 'Th\u00e1ng 10', 'Th\u00e1ng 11', 'Th\u00e1ng 12',
+          'Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4',
+          'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8',
+          'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12',
         ],
         firstDay: 1,
       },
@@ -595,10 +595,10 @@
   };
 
   if (analysisData) {
-    buildSparkline('productsSoldChart', analysisData.trend?.products || [], 'S\u1ea3n ph\u1ea9m \u0111\u00e3 b\u00e1n', formatNumber);
-    buildSparkline('quantitySoldChart', analysisData.trend?.quantity || [], 'S\u1ed1 l\u01b0\u1ee3ng \u0111\u00e3 b\u00e1n', formatNumber);
+    buildSparkline('productsSoldChart', analysisData.trend?.products || [], 'Sản phẩm đã bán', formatNumber);
+    buildSparkline('quantitySoldChart', analysisData.trend?.quantity || [], 'Số lượng đã bán', formatNumber);
     buildSparkline('avgRevenueChart', analysisData.trend?.avgRevenue || [], 'Doanh thu TB', formatCompact);
-    buildSparkline('avgProfitChart', analysisData.trend?.avgProfit || [], 'L\u1ee3i nhu\u1eadn TB', formatCompact);
+    buildSparkline('avgProfitChart', analysisData.trend?.avgProfit || [], 'Lợi nhuận TB', formatCompact);
     buildCategoryChart();
     buildInventoryChart();
     buildTopProductsChart();
@@ -609,19 +609,19 @@
     containerId: 'branchFilter',
     labelId: 'branchLabel',
     searchId: 'branchSearch',
-    allLabel: 'T\u1ea5t c\u1ea3 chi nh\u00e1nh',
-    noneLabel: 'Ch\u01b0a ch\u1ecdn chi nh\u00e1nh',
-    selectedLabel: '\u0110\u00e3 ch\u1ecdn',
-    unitLabel: 'chi nh\u00e1nh',
+    allLabel: 'Tất cả chi nhánh',
+    noneLabel: 'Chưa chọn chi nhánh',
+    selectedLabel: 'Đã chọn',
+    unitLabel: 'chi nhánh',
   });
   initMultiFilter({
     containerId: 'categoryFilter',
     labelId: 'categoryLabel',
     searchId: 'categorySearch',
-    allLabel: 'T\u1ea5t c\u1ea3 nh\u00f3m h\u00e0ng',
-    noneLabel: 'Ch\u01b0a ch\u1ecdn nh\u00f3m h\u00e0ng',
-    selectedLabel: '\u0110\u00e3 ch\u1ecdn',
-    unitLabel: 'nh\u00f3m h\u00e0ng',
+    allLabel: 'Tất cả nhóm hàng',
+    noneLabel: 'Chưa chọn nhóm hàng',
+    selectedLabel: 'Đã chọn',
+    unitLabel: 'nhóm hàng',
   });
   initCustomSelects();
   initReturnFilter();

@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.filters.from = from ? Math.floor(from.getTime() / 1000) : null;
         window.filters.to   = to   ? Math.floor(to.getTime() / 1000) : null;
 
-        applyImportFilters(); // hàm filter invoice của bạn
+        applyImportFilters();
     }
 
   let currentPage = 1;
@@ -142,29 +142,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let match = true;
 
-            // 🔍 mã phiếu
             if (filters.code) {
                 match = row.children[0].innerText.toLowerCase().includes(filters.code);
             }
 
-            // 🔍 nguyên liệu (trong detail)
             if (match && filters.ingredient) {
                 const detail = document.getElementById(`detail-${row.dataset.id}`);
                 const text = detail?.innerText.toLowerCase() || '';
                 match = text.includes(filters.ingredient);
             }
 
-            // 🔍 nhân viên
             if (match && filters.staff) {
                 match = row.children[2].innerText.toLowerCase().includes(filters.staff);
             }
 
-            // ⚙️ trạng thái
             if (match && filters.status !== 'all') {
                 match = row.dataset.status === filters.status;
             }
 
-            // ⏰ TIME FILTER (QUAN TRỌNG NHẤT)
             if (match && filters.from && filters.to && row.dataset.time) {
                 const t = Number(row.dataset.time);
                 match = t >= filters.from && t <= filters.to;
@@ -172,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
             row.dataset.filtered = match ? '1' : '0';
             row.style.display = match ? '' : 'none';
 
-            // ẩn detail khi filter
             const detail = document.getElementById(`detail-${row.dataset.id}`);
             if (detail) detail.style.display = 'none';
         });
@@ -194,28 +188,22 @@ function renderPagination() {
 
     if (currentPage > totalPages) currentPage = totalPages;
 
-    // 1. Ẩn tất cả trước
     document.querySelectorAll('.import-row').forEach(r => {
         r.style.display = 'none';
         const d = document.getElementById(`detail-${r.dataset.id}`);
         if (d) d.style.display = 'none';
     });
 
-    // 2. Hiển thị đúng các dòng của trang hiện tại
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
     rows.slice(start, end).forEach(r => r.style.display = '');
-
-    // 3. Xử lý Ẩn/Hiện thanh pagination
     const paginationContainer = document.getElementById('pagination');
     if (totalPages <= 1) {
-        // Dùng inline style để có độ ưu tiên cao nhất, chắc chắn ẩn
         paginationContainer.style.setProperty('display', 'none', 'important');
     } else {
         paginationContainer.style.setProperty('display', 'flex', 'important');
     }
 
-    // 4. Cập nhật thông tin text và nút
     document.getElementById('pageInfo').innerText = `Trang ${currentPage} / ${totalPages}`;
     document.getElementById('prevPage').disabled = (currentPage === 1);
     document.getElementById('nextPage').disabled = (currentPage === totalPages);
@@ -228,7 +216,6 @@ function renderPagination() {
         }
     });
 
-    // Gán sự kiện cho nút Sau
     document.getElementById('nextPage').addEventListener('click', () => {
         const rows = getRows();
         const totalPages = Math.ceil(rows.length / rowsPerPage) || 1;

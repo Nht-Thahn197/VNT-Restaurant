@@ -553,8 +553,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 nameInput.value = ing.name;
                 categorySelect.value = ing.category_id;
                 syncIngredientSelects();
-
-                // ✔ FORMAT PRICE
                 priceInput.value = formatMoney(ing.price);
 
                 unitInput.value = ing.unit;
@@ -569,7 +567,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ====== AUTO FORMAT INPUT PRICE WHEN TYPING ======
     priceInput.addEventListener("input", function () {
-        let val = this.value.replace(/\D/g, ""); // xóa ký tự không phải số
+        let val = this.value.replace(/\D/g, "");
         this.value = val ? formatMoney(val) : "";
     });
 
@@ -584,8 +582,6 @@ document.addEventListener("DOMContentLoaded", function () {
         formData.append("_token", csrfToken);
         formData.append("name", nameInput.value);
         formData.append("category_id", categorySelect.value);
-
-        // ✔ REMOVE DOT BEFORE SEND
         formData.append("price", unformatMoney(priceInput.value));
 
         const unitValue = unitInput.value.trim();

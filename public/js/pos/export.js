@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const detailRow = document.getElementById("detail-" + id);
             const isOpen = detailRow.style.display === "table-row";
 
-            // 🔒 Đóng tất cả detail + bỏ active
             document.querySelectorAll(".detail-row").forEach(r => {
                 r.style.display = "none";
             });
@@ -25,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 r.classList.remove("active");
             });
 
-            // 🔄 Toggle row hiện tại
             if (!isOpen) {
                 detailRow.style.display = "table-row";
                 row.classList.add("active");
@@ -145,30 +143,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.export-row').forEach(row => {
 
             let match = true;
-
-            // 🔍 mã phiếu
             if (filters.code) {
                 match = row.children[0].innerText.toLowerCase().includes(filters.code);
             }
-
-            // 🔍 nguyên liệu (trong detail)
             if (match && filters.ingredient) {
                 const detail = document.getElementById(`detail-${row.dataset.id}`);
                 const text = detail?.innerText.toLowerCase() || '';
                 match = text.includes(filters.ingredient);
             }
 
-            // 🔍 nhân viên
             if (match && filters.staff) {
                 match = row.children[2].innerText.toLowerCase().includes(filters.staff);
             }
 
-            // ⚙️ trạng thái
             if (match && filters.status !== 'all') {
                 match = row.dataset.status === filters.status;
             }
 
-            // ⏰ TIME FILTER (QUAN TRỌNG NHẤT)
             if (match && filters.from && filters.to && row.dataset.time) {
                 const t = Number(row.dataset.time);
                 match = t >= filters.from && t <= filters.to;
@@ -176,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
             row.dataset.filtered = match ? '1' : '0';
             row.style.display = match ? '' : 'none';
 
-            // ẩn detail khi filter
             const detail = document.getElementById(`detail-${row.dataset.id}`);
             if (detail) detail.style.display = 'none';
         });

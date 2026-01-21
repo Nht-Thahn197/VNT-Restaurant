@@ -13,5 +13,5 @@ class CategoryProduct extends Model
         'name',
     ];
 
-    public $timestamps = false; // Nếu không có created_at, updated_at
+    public $timestamps = false;
 }

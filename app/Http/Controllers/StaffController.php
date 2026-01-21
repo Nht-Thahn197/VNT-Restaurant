@@ -42,17 +42,13 @@ class StaffController extends Controller
             'name','phone','cccd','email','password','dob','gender','role_id','start_date'
         ]);
 
-        $data['status'] = 'Active'; // mặc định thêm mới là active
-
-        // Xử lý ảnh
+        $data['status'] = 'Active';
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images/staff'), $filename);
             $data['img'] = $filename;
         }
-
-        // Hash password nếu có
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
@@ -70,7 +66,6 @@ class StaffController extends Controller
             'name','phone','cccd','email','password','dob','gender','role_id','start_date'
         ]);
 
-        // Xử lý ảnh
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -78,11 +73,10 @@ class StaffController extends Controller
             $data['img'] = $filename;
         }
 
-        // Hash password nếu có
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
-            unset($data['password']); // giữ password cũ nếu không nhập
+            unset($data['password']);
         }
 
         $staff->update($data);
@@ -93,11 +87,11 @@ class StaffController extends Controller
 
             $validTypes = ['hour', 'shift', 'day', 'month'];
             if (!$salaryType || !in_array($salaryType, $validTypes, true)) {
-                return response()->json(['success' => false, 'message' => 'Loai luong khong hop le.'], 422);
+                return response()->json(['success' => false, 'message' => 'Loại lương không hợp lệ.'], 422);
             }
 
             if ($salaryRate === null || $salaryRate === '' || !is_numeric($salaryRate) || $salaryRate < 0) {
-                return response()->json(['success' => false, 'message' => 'Muc luong khong hop le.'], 422);
+                return response()->json(['success' => false, 'message' => 'Mức lương không hợp lệ.'], 422);
             }
 
             $existing = DB::table('salary_config')->where('staff_id', $id)->first();

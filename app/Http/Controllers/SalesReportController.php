@@ -79,7 +79,6 @@ class SalesReportController extends Controller
                     $endTime->format('Y-m-d'),
                 ];
             } catch (\Exception $e) {
-                // Fall back to default range.
             }
         }
 

@@ -5,13 +5,11 @@ const scrollContainer = document.getElementById('menuScroll');
   const checkScroll = () => {
     const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
 
-    // Ẩn hiện nút
     btnLeft.classList.toggle('hidden', scrollContainer.scrollLeft <= 0);
     btnRight.classList.toggle('hidden', scrollContainer.scrollLeft >= maxScrollLeft - 1);
 
-    // Làm mờ thẻ trong vùng fade
-    const leftBoundary = scrollContainer.scrollLeft + 40; // vùng fade trái
-    const rightBoundary = scrollContainer.scrollLeft + scrollContainer.clientWidth - 40; // vùng fade phải
+    const leftBoundary = scrollContainer.scrollLeft + 40;
+    const rightBoundary = scrollContainer.scrollLeft + scrollContainer.clientWidth - 40;
     const links = scrollContainer.querySelectorAll('a');
 
     links.forEach(link => {
@@ -60,12 +58,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const productContent = document.getElementById("productContent");
     const baseFilterUrl = document.querySelector('meta[name="filter-url"]').content;
 
-    // GÁN SỰ KIỆN CLICK
     categoryLinks.forEach(link => {
         link.addEventListener("click", function (e) {
             e.preventDefault();
 
-            // Active class
             categoryLinks.forEach(l => l.classList.remove("active"));
             this.classList.add("active");
 
@@ -133,7 +129,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    // ⭐⭐ CLICK MẶC ĐỊNH SAU KHI GÁN EVENT
     const defaultTab = document.querySelector('.category-item[data-category="all"]');
     if (defaultTab) {
         defaultTab.click();
@@ -191,7 +186,6 @@ function updateCartUI() {
     }
 }
 
-// Xóa hết
 document.getElementById('clearCart').addEventListener('click', async () => {
     if (await openConfirmDialog('Bạn có muốn xóa hết danh sách món ăn?')) {
         cart = [];
@@ -199,7 +193,6 @@ document.getElementById('clearCart').addEventListener('click', async () => {
     }
 });
 
-// Lưu ảnh thực đơn
 document.getElementById('saveImg').addEventListener('click', function() {
     const area = document.getElementById('captureArea');
     const scale = Math.max(3, window.devicePixelRatio || 1);
@@ -229,9 +222,8 @@ document.getElementById('saveImg').addEventListener('click', function() {
     });
 });
 
-// 2. Hàm thay đổi số lượng
 window.changeQty = function(id, delta, event) {
-    if (event) event.stopPropagation(); // Ngăn chặn nổi bọt sự kiện nếu có truyền event
+    if (event) event.stopPropagation();
     
     const item = cart.find(i => i.id == id);
     if (item) {
@@ -243,7 +235,6 @@ window.changeQty = function(id, delta, event) {
     }
 };
 
-// 3. Lắng nghe sự kiện click nút "Đặt" (Event Delegation)
 document.addEventListener('click', function(e) {
     if (e.target && e.target.classList.contains('btn-add')) {
         const btn = e.target;
@@ -254,7 +245,6 @@ document.addEventListener('click', function(e) {
             quantity: 1
         };
 
-        // Kiểm tra trùng
         const existingItem = cart.find(item => item.id === product.id);
         if (existingItem) {
             existingItem.quantity++;
@@ -266,31 +256,22 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// 4. Đóng/Mở Modal (Sửa lại logic này)
-
-// Mở Modal khi click vào nút trượt
 document.getElementById('openCart').addEventListener('click', function(e) {
     e.preventDefault();
     document.getElementById('cartOverlay').classList.add('active');
 });
 
-// Đóng Modal khi click nút X
 document.getElementById('closeCart').addEventListener('click', function(e) {
-    // Chặn sự kiện lan truyền để không kích hoạt click của Overlay
     e.stopPropagation(); 
     document.getElementById('cartOverlay').classList.remove('active');
 });
 
-// ĐÓNG MODAL KHI CLICK RA NGOÀI (Logic chuẩn xác nhất)
 document.getElementById('cartOverlay').addEventListener('click', function(e) {
-    // Kiểm tra: Nếu phần tử bị click (e.target) chính là cartOverlay (vùng đen)
-    // thì mới đóng. Nếu click trúng con của nó (modal, span, button...) thì target sẽ khác 'this'.
     if (e.target === this) {
         this.classList.remove('active');
     }
 });
 
-// Ngăn chặn nổi bọt từ Modal Area (Bảo hiểm thêm một lớp nữa)
 document.getElementById('captureArea').addEventListener('click', function(e) {
     e.stopPropagation();
 });
@@ -301,14 +282,11 @@ document.querySelector('.btn-submit-order').addEventListener('click', function()
         return;
     }
     
-    // 1. Đóng modal tạm tính
     document.getElementById('cartOverlay').classList.remove('active');
     
-    // 2. Mở modal đặt bàn (từ Layout của bạn)
     const bookingOverlay = document.getElementById("bookingOverlay");
     if (bookingOverlay) {
         bookingOverlay.classList.add("active");
-        // Lưu giỏ hàng vào biến window để layout.js có thể truy cập
         window.currentCart = cart; 
     } else {
         console.error("Không tìm thấy form đặt bàn!");
@@ -316,7 +294,6 @@ document.querySelector('.btn-submit-order').addEventListener('click', function()
 });
 
 window.currentCart = []; 
-// Nếu đang ở trang menu thì gọi thêm hàm xóa sạch giao diện:
 if (typeof cart !== 'undefined') {
     cart = [];
     updateCartUI();

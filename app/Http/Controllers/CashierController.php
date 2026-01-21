@@ -27,7 +27,6 @@ class CashierController extends Controller
     {
         try {
             $tableId = (int) $request->table_id;
-            // Kiểm tra xem dữ liệu đầu vào có table_id không
             if (!$tableId) {
                 return response()->json(['ok' => false, 'error' => 'Thiếu Table ID'], 400);
             }
@@ -48,10 +47,8 @@ class CashierController extends Controller
                 ]);
                 return response()->json(['ok' => true, 'message' => 'Created', 'data' => $invoice]);
             }
-
             return response()->json(['ok' => true, 'message' => 'Already exists']);
         } catch (\Exception $e) {
-            // Trả về lỗi chi tiết để debug
             return response()->json(['ok' => false, 'error' => $e->getMessage()], 500);
         }
     }
@@ -61,7 +58,6 @@ class CashierController extends Controller
         Invoice::where('table_id', $request->table_id)
             ->where('status', 'serving')
             ->delete();
-
         return response()->json(['ok' => true]);
     }
 

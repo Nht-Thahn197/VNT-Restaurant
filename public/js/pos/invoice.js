@@ -29,12 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const menu = document.getElementById('timeMenu');
 
     btn.addEventListener('click', (e) => {
-        e.stopPropagation(); // 🔥 NGĂN document click
+        e.stopPropagation();
         btn.parentElement.classList.toggle('open');
     });
 
     menu.addEventListener('click', (e) => {
-        e.stopPropagation(); // click item không đóng ngay
+        e.stopPropagation();
     });
 
     document.addEventListener('click', e => {
@@ -154,9 +154,8 @@ function setupCustomDropdown(dropdownId, hiddenInputId, textSpanId, filterKey, r
         });
 
         if (isOpening) {
-            // Kiểm tra khoảng cách để drop-up
             const rect = dropdown.getBoundingClientRect();
-            const listHeight = 250; // Chiều cao ước tính của menu đổ xuống
+            const listHeight = 250;
             const spaceBelow = window.innerHeight - rect.bottom;
 
             if (spaceBelow < listHeight && rect.top > listHeight) {
@@ -170,19 +169,16 @@ function setupCustomDropdown(dropdownId, hiddenInputId, textSpanId, filterKey, r
         }
     });
 
-    // --- Xử lý Chọn Item ---
     items.forEach(item => {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
             const val = item.getAttribute('data-value');
             const txt = item.innerText;
 
-            // Cập nhật giao diện và giá trị ẩn
             textSpan.innerText = txt;
             hiddenInput.value = val;
             window.filters[filterKey] = val;
 
-            // Logic Reset (Nếu chọn Khu vực thì xóa Bàn và ngược lại)
             if (resetLogic) {
                 const otherInput = document.getElementById(resetLogic.otherInputId);
                 const otherText = document.getElementById(resetLogic.otherTextId);
@@ -194,7 +190,6 @@ function setupCustomDropdown(dropdownId, hiddenInputId, textSpanId, filterKey, r
 
             dropdown.classList.remove('active');
             
-            // Gọi hàm lọc chính
             if (typeof applyFilters === 'function') applyFilters();
         });
     });
@@ -204,24 +199,20 @@ function applyFilters() {
     document.querySelectorAll('.invoice-row').forEach(row => {
         let match = true;
 
-        // 🔍 mã hóa đơn
         if (filters.code) {
             match = row.dataset.code.includes(filters.code);
         }
 
-        // 🔍 tên sản phẩm
         if (match && filters.product) {
             const detail = document.getElementById(`detail-${row.dataset.id}`);
             const text = detail?.innerText.toLowerCase() || '';
             match = text.includes(filters.product);
         }
 
-        // ⚙️ trạng thái
         if (match && filters.status !== 'all') {
             match = row.dataset.status === filters.status;
         }
 
-        // ⏰ thời gian
         if (match && filters.from && filters.to && row.dataset.time) {
             const t = Number(row.dataset.time);
             match = t >= filters.from && t <= filters.to;
@@ -231,12 +222,10 @@ function applyFilters() {
             match = filters.payment.includes(row.dataset.payment);
         }
 
-        // lọc theo khu vực
         if (match && filters.area) {
             match = row.dataset.areaId === filters.area;
         }
 
-        // lọc theo bàn
         if (match && filters.table) {
             match = row.dataset.tableId === filters.table;
         }
@@ -430,7 +419,7 @@ function renderPagination() {
 
         const show = index >= start && index < end;
         row.style.display = show ? '' : 'none';
-        if (detail) detail.style.display = 'none'; // luôn ẩn chi tiết
+        if (detail) detail.style.display = 'none';
     });
 
     document.getElementById('pageInfo').innerText =

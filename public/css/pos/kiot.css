@@ -332,31 +332,31 @@
 }
 
 .activity-item {
-    display: flex;
-    gap: 10px;
-    padding: 10px 8px;
-    border-bottom: 1px dashed #eee;
-    font-size: 13px;
+  display: flex;
+  gap: 10px;
+  padding: 10px 8px;
+  border-bottom: 1px dashed #eee;
+  font-size: 13px;
 }
 
 .activity-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .activity-content strong {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .activity-time {
-    font-size: 11px;
-    color: #888;
+  font-size: 11px;
+  color: #888;
 }
 
 /* ACTION COLORS */
@@ -367,12 +367,12 @@
 .activity-cancel_import,
 .activity-cancel_export,
 .activity-cancel_invoice {
-    background:#FFF5F5;
+  background:#FFF5F5;
 }
 
 .activity-cancel_import .activity-icon,
 .activity-cancel_export .activity-icon,
 .activity-cancel_invoice .activity-icon {
-    background:#FDECEA;
-    color:#D32F2F;
+  background:#FDECEA;
+  color:#D32F2F;
 }

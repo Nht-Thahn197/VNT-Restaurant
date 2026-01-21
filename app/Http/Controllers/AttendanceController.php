@@ -76,7 +76,7 @@ class AttendanceController extends Controller
     public function update(Request $request)
     {
         if (!Gate::allows('manage_shift')) {
-            return response()->json(['success' => false, 'message' => 'Khong co quyen.'], 403);
+            return response()->json(['success' => false, 'message' => 'Không có quyền truy cập.'], 403);
         }
 
         $validator = Validator::make($request->all(), [
@@ -107,7 +107,7 @@ class AttendanceController extends Controller
             if ($attendance && ($attendance->check_in || $attendance->check_out)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Khong the doi ca khi da cham cong.',
+                    'message' => 'Không thể đổi ca khi đã chấm công.',
                 ], 422);
             }
 
@@ -168,7 +168,7 @@ class AttendanceController extends Controller
     {
         $user = Auth::guard('staff')->user();
         if (!$user) {
-            return response()->json(['success' => false, 'message' => 'Chua dang nhap.'], 401);
+            return response()->json(['success' => false, 'message' => 'Chưa đăng nhập.'], 401);
         }
 
         $validator = Validator::make($request->all(), [
@@ -191,14 +191,14 @@ class AttendanceController extends Controller
             ->first();
 
         if (!$schedule) {
-            return response()->json(['success' => false, 'message' => 'Khong co lich lam viec.'], 422);
+            return response()->json(['success' => false, 'message' => 'Không có lịch làm việc.'], 422);
         }
 
         $shift = DB::table('work_shifts')->where('id', $data['shift_id'])->first();
         if ($shift) {
             $shiftStartAt = Carbon::parse($workDate->toDateString() . ' ' . $shift->start_time);
             if ($now->lt($shiftStartAt->copy()->subMinutes(30))) {
-                return response()->json(['success' => false, 'message' => 'Chua den ca.'], 422);
+                return response()->json(['success' => false, 'message' => 'Chưa đến ca.'], 422);
             }
         }
 
@@ -224,7 +224,7 @@ class AttendanceController extends Controller
         }
 
         if (in_array($attendance->attendance_type, ['leave_paid', 'leave_unpaid', 'off'], true)) {
-            return response()->json(['success' => false, 'message' => 'Khong the cham cong vi da nghi.'], 422);
+            return response()->json(['success' => false, 'message' => 'Không thể chấm công vì đã nghỉ.'], 422);
         }
 
         if (!$attendance->check_in) {
@@ -256,7 +256,7 @@ class AttendanceController extends Controller
             return response()->json(['success' => true, 'action' => 'check_out', 'time' => $now->toDateTimeString()]);
         }
 
-        return response()->json(['success' => false, 'message' => 'Da cham cong.'], 422);
+        return response()->json(['success' => false, 'message' => 'Đã chấm công.'], 422);
     }
 
     private function combineDateTime(Carbon $date, ?string $time): ?string

@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     statusRadios.forEach(radio => { 
         radio.addEventListener('change', e => { 
-            filters.status = e.target.value; // all | active | expired 
+            filters.status = e.target.value;
             applyPromotionFilters(); 
         }); 
     });
@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
         display.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOpening = !dropdown.classList.contains('active');
-            // Đóng các dropdown khác
             document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
             if (isOpening) dropdown.classList.add('active');
         });
@@ -137,12 +136,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const val = item.getAttribute('data-value');
                 const txt = item.innerText;
 
-                // Cập nhật giá trị
                 textSpan.innerText = txt;
                 hiddenInput.value = val;
                 filters[filterKey] = val;
 
-                // Xử lý co giãn khung (Type UI Logic)
                 if (val) {
                     wrapper.classList.add('type-has-value');
                     editIcon.classList.remove('d-none');
@@ -153,7 +150,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 dropdown.classList.remove('active');
                 
-                // Gọi hàm lọc type
                 if (typeof applyPromotionFilters === 'function') applyPromotionFilters();
             });
         });

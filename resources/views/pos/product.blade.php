@@ -290,7 +290,6 @@
             </tr>
           </thead>
           <tbody id="ingredientList">
-            <!-- Render bằng JS -->
           </tbody>
         </table>
 

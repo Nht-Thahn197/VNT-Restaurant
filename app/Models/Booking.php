@@ -36,8 +36,8 @@ class Booking extends Model
     {
         return $this->belongsTo(
             Promotion::class,
-            'promotion_id', // FK trong booking
-            'id'            // PK trong promotion
+            'promotion_id',
+            'id'
         );
     }
 

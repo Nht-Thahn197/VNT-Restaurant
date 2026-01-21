@@ -134,26 +134,22 @@ function applyFilters() {
   allRows.forEach(row => {
     let match = true;
 
-    // 🔍 Search keyword
     if (filters.keyword) {
       const name = row.dataset.name ? row.dataset.name.toLowerCase() : '';
       const code = row.dataset.code ? row.dataset.code.toLowerCase() : '';
       match = name.includes(filters.keyword) || code.includes(filters.keyword);
     }
 
-    // 🍽 Filter types
     if (match && filters.types.length > 0) {
       const rowType = row.dataset.type ? row.dataset.type.toLowerCase() : '';
       match = filters.types.includes(rowType);
     }
 
-    // 📦 Filter category
     if (match && filters.category) {
       match = row.dataset.categoryId === filters.category;
     }
 
     row.dataset.filtered = match ? '1' : '0';
-    // QUAN TRỌNG: Ẩn ngay lập tức những item không khớp filter
     if (!match) row.style.display = 'none'; 
   });
 
@@ -430,7 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     imageBox.addEventListener("click", function (e) {
-    // Nếu click vào nút X thì không mở input
     if (e.target === removeImageBtn) return;
     imageInput.click();
     });

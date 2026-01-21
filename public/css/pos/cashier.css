@@ -347,39 +347,39 @@ body {
 }
 
 .booking-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: auto;
 }
 
 .page-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid #dcdcdc;
-  background: #fff;
-  color: #000;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    color: #000;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .page-btn:hover {
-  background: #f7f7f7;
-  border-color: #c8c8c8;
+    background: #f7f7f7;
+    border-color: #c8c8c8;
 }
 
 #pageInfo {
-  min-width: 120px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 14px;
-  color: #444;
+    min-width: 120px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: #444;
 }
 
 .order-header {
@@ -1061,12 +1061,10 @@ body {
     border: 1px dashed #ccc;
     border-radius: 10px;
     background: #fafafa;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 6px;
-
     text-align: center;
 }
 

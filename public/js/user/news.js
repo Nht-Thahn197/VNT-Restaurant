@@ -5,13 +5,11 @@ const scrollContainer = document.getElementById('menuScroll');
   const checkScroll = () => {
     const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
 
-    // Ẩn hiện nút
     btnLeft.classList.toggle('hidden', scrollContainer.scrollLeft <= 0);
     btnRight.classList.toggle('hidden', scrollContainer.scrollLeft >= maxScrollLeft - 1);
 
-    // Làm mờ thẻ trong vùng fade
-    const leftBoundary = scrollContainer.scrollLeft + 40; // vùng fade trái
-    const rightBoundary = scrollContainer.scrollLeft + scrollContainer.clientWidth - 40; // vùng fade phải
+    const leftBoundary = scrollContainer.scrollLeft + 40;
+    const rightBoundary = scrollContainer.scrollLeft + scrollContainer.clientWidth - 40;
     const links = scrollContainer.querySelectorAll('a');
 
     links.forEach(link => {

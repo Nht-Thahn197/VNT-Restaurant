@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const locations = window.locations || [];
     const regions = window.regions || [];
 
-    // Handle header booking button
     const openBookingBtn = document.getElementById('openBooking');
     const bookingOverlay = document.getElementById('bookingOverlay');
     const closeBookingBtn = document.getElementById('closeBooking2');
@@ -33,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (openBookingBtn && bookingOverlay) {
         openBookingBtn.addEventListener('click', () => {
-            // Reset booking form
             const dropdown = bookingOverlay.querySelector('.custom-dropdown[data-placeholder="Lựa chọn cơ sở"]');
             if (dropdown) {
                 const selectedText = dropdown.querySelector('.selected-text');
@@ -41,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (selectedText) selectedText.textContent = 'Lựa chọn cơ sở';
                 if (hidden) hidden.value = '';
             }
-            // Reset other form fields if needed
             const inputs = bookingOverlay.querySelectorAll('input[type="text"], textarea');
             inputs.forEach(input => input.value = '');
 
@@ -54,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Handle dropdowns
     document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
         const selected = dropdown.querySelector('.dropdown-selected');
         const list = dropdown.querySelector('.dropdown-list');
@@ -68,7 +64,6 @@ document.addEventListener('DOMContentLoaded', function() {
             li.addEventListener('click', () => {
                 selectedText.textContent = li.textContent;
                 list.classList.remove('show');
-                // Set hidden input if exists
                 const hidden = dropdown.querySelector('input[type="hidden"]');
                 if (hidden) {
                     hidden.value = li.getAttribute('value');
@@ -77,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Close dropdowns on outside click
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.custom-dropdown')) {
             document.querySelectorAll('.dropdown-list').forEach(list => list.classList.remove('show'));
@@ -86,11 +80,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function bookLocation(id) {
         console.log('bookLocation called with id:', id);
-        // Mở overlay đặt bàn
         if (bookingOverlay) {
             console.log('Opening booking overlay');
             openBookingOverlay();
-            // Add click outside to close
             const closeOverlay = (e) => {
                 if (e.target === bookingOverlay) {
                     closeBookingOverlay();
@@ -98,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             bookingOverlay.addEventListener('click', closeOverlay);
-            // Set selected location
             const dropdown = bookingOverlay.querySelector('.custom-dropdown[data-placeholder="Lựa chọn cơ sở"]');
             if (dropdown) {
                 const selectedText = dropdown.querySelector('.selected-text');
@@ -133,10 +124,9 @@ document.addEventListener('DOMContentLoaded', function() {
             filtered = locations.filter(loc => loc.region_id == regionId);
         }
         if (filtered.length > 0) {
-            const location = filtered[0]; // Hiển thị location đầu tiên
+            const location = filtered[0];
             updateLocationDisplay(location);
         } else {
-            // Không có location
             document.querySelector('.location-section').innerHTML = '<p>Không có cơ sở nào trong khu vực này.</p>';
         }
     }
@@ -155,13 +145,11 @@ document.addEventListener('DOMContentLoaded', function() {
         container.querySelectorAll('.info-location div strong')[2].textContent = (location.floors || '---') + ' TẦNG';
         container.querySelector('.location-image img').src = window.assetUrl + (location.thumbnail || 'L12L04.jpg');
         container.querySelector('.location-image img').alt = location.name;
-        // Remove old listener
         const bookBtn = container.querySelector('.book');
         bookBtn.onclick = null;
         bookBtn.addEventListener('click', () => bookLocation(location.id));
     }
 
-    // Set initial onclick for first location
     if (locations.length > 0) {
         const bookBtn = document.querySelector('.book');
         if (bookBtn) {

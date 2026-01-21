@@ -842,7 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     statusCheckboxes.forEach(ck => {
         ck.addEventListener('change', () => {
-            // Lấy tất cả các giá trị của checkbox đang được check
             const checkedValues = Array.from(statusCheckboxes)
                 .filter(c => c.checked)
                 .map(c => c.value);
@@ -852,12 +851,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Khởi tạo
     applyBookingFilters();
 });
 
 menuBtn.addEventListener('click', function(e) {
-    e.stopPropagation(); // Ngăn sự kiện nổi bọt
+    e.stopPropagation();
     dropdownMenu.classList.toggle('show');
 });
 
@@ -1004,7 +1002,6 @@ searchInput.addEventListener('input', () => {
 
             const products = await res.json();
 
-            // ⛔ nếu keyword đã đổi → bỏ response cũ
             if (keyword !== lastSearchKeyword) return;
 
             products.forEach(p => {
@@ -1023,7 +1020,7 @@ searchInput.addEventListener('input', () => {
         } catch (err) {
             console.error('SEARCH PREORDER ERROR:', err);
         }
-    }, 300); // debounce 300ms
+    }, 300);
 });
 
 document.addEventListener('click', (e) => {
@@ -1189,7 +1186,7 @@ document.addEventListener('click', (e) => {
 
 btnAddPreorder.onclick = () => {
     preorderModal.style.display = 'flex';
-    renderPreorderTable(); // load lại món cũ
+    renderPreorderTable();
 };
 
 // ===== SAVE BOOKING =====

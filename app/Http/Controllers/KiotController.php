@@ -33,8 +33,8 @@ class KiotController extends Controller
 
     public function revenue(Request $request)
     {
-        $mode  = $request->mode;   // hour | day | weekday
-        $range = $request->range;  // today | yesterday | 7days ...
+        $mode  = $request->mode;
+        $range = $request->range;
 
         [$from, $to] = $this->resolveRange($range);
 
@@ -108,7 +108,7 @@ class KiotController extends Controller
     public function products(Request $request)
     {
         $range  = $request->range;
-        $metric = $request->metric ?? 'quantity'; // quantity | revenue
+        $metric = $request->metric ?? 'quantity';
 
         [$from, $to] = $this->resolveRange($range);
 

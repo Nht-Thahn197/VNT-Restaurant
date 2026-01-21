@@ -61,8 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function generateVietQR(amount, description = '') {
-        const bankId = 'MB';                  // MB Bank
-        const accountNo = '8410113801888';    // STK
+        const bankId = 'MB';
+        const accountNo = '8410113801888';
         const accountName = 'NGUYEN PHUC NHAT THANH';
 
         const encodedDesc = encodeURIComponent(description);
@@ -100,7 +100,7 @@ payMethodRadios.forEach(radio => {
 
     /* ================= DROPDOWN ================= */
     menuBtn.addEventListener('click', function(e) {
-        e.stopPropagation(); // Ngăn sự kiện nổi bọt
+        e.stopPropagation();
         dropdownMenu.classList.toggle('show');
     });
 
@@ -316,10 +316,7 @@ payMethodRadios.forEach(radio => {
 
     /* ================= CLICK BUTTON ĐỂ MỞ FORM ĐỔI BÀN ================= */
         selectedTableBtn.addEventListener('click', () => {
-            // Chỉ cho đổi bàn nếu bàn hiện tại đã được chọn
             if (!selectedTableBtn.classList.contains('active')) return;
-
-            // Kiểm tra xem bàn hiện tại có món không (để tránh đổi bàn trống vô nghĩa)
             if (Object.keys(orderItems).length === 0) {
                 showToast('Bàn chưa có món, bạn phải chọn bàn có món để đổi bàn.', 'warning');
                 return;
@@ -635,7 +632,7 @@ payMethodRadios.forEach(radio => {
     async function removeServing(tableId) {
         await fetch(`${BASE_URL}/pos/cashier/remove-serving`, {
             method: 'POST',
-            credentials: 'same-origin', // 🔥
+            credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
@@ -1121,7 +1118,7 @@ payMethodRadios.forEach(radio => {
             }
         });
 
-        currentTablePage = 1;   // 🔥 CỰC KỲ QUAN TRỌNG
+        currentTablePage = 1;
         paginateTables();
     }
 

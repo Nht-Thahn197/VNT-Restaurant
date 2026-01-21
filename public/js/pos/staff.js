@@ -84,7 +84,6 @@ document.addEventListener("DOMContentLoaded", function () {
         display.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOpening = !dropdown.classList.contains('active');
-            // Đóng các dropdown khác
             document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('active'));
             if (isOpening) dropdown.classList.add('active');
         });
@@ -95,12 +94,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const val = item.getAttribute('data-value');
                 const txt = item.innerText;
 
-                // Cập nhật giá trị
                 textSpan.innerText = txt;
                 hiddenInput.value = val;
                 filters[filterKey] = val;
 
-                // Xử lý co giãn khung (Role UI Logic)
                 if (val) {
                     wrapper.classList.add('role-has-value');
                     editIcon.classList.remove('d-none');
@@ -111,7 +108,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 dropdown.classList.remove('active');
                 
-                // Gọi hàm lọc nhân viên
                 if (typeof applyStaffFilters === 'function') applyStaffFilters();
             });
         });
@@ -159,18 +155,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             let match = true;
 
-            // 🔍 search mã + tên
             if (filters.keyword) {
                 const text = row.dataset.code + ' ' + row.dataset.name;
                 match = text.includes(filters.keyword);
             }
 
-            // ⚙️ trạng thái
             if (match && filters.status !== 'all') {
                 match = row.dataset.status === filters.status;
             }
 
-            // 🧑‍💼 chức vụ
             if (match && filters.role) {
                 match = row.dataset.role === filters.role;
             }
@@ -178,7 +171,6 @@ document.addEventListener("DOMContentLoaded", function () {
             row.dataset.filtered = match ? '1' : '0';
             row.style.display = match ? '' : 'none';
 
-            // ẩn detail
             const detail = document.getElementById(`detail-${row.dataset.id}`);
             if (detail) detail.style.display = 'none';
         });
@@ -294,15 +286,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===========================
     document.addEventListener("click", function (e) {
         if (e.target.closest("#editRoleBtn")) {
-            // Lấy ID từ input hidden
             const id = document.getElementById("filter-role").value;
-            // Lấy tên hiển thị từ span
             const name = document.getElementById("currentRoleText").textContent.trim();
-
-            // Kiểm tra nếu không có ID (đang chọn "-- Tất cả --") thì không mở popup
             if (!id || id === "") return;
-
-            // Mở popup ở chế độ sửa
             if (typeof openPopup === 'function') {
                 openPopup("edit", id, name);
             }
@@ -574,7 +560,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const BASE_URL = window.location.origin + "/VNT-Restaurant/public/pos";
 
     // ====== ELEMENTS ======
-    const overlay = document.getElementById('staffForm'); // ID overlay từ HTML của bạn
+    const overlay = document.getElementById('staffForm');
     const btnOpen = document.querySelector('.btn-create');
     const btnCloseHeader = document.getElementById('btnCloseHeader');
     const cancelBtns = document.querySelectorAll('.staff-cancel');
@@ -697,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!salaryType || !salaryTypeText || !salaryTypeDropdown) return;
         salaryType.value = value || '';
         const item = salaryTypeDropdown.querySelector(`.dropdown-list li[data-value="${salaryType.value}"]`);
-        salaryTypeText.innerText = item ? item.innerText : 'Chon loai luong';
+        salaryTypeText.innerText = item ? item.innerText : 'Chọn loại lương';
         salaryType.dispatchEvent(new Event('change', { bubbles: true }));
     };
     function formatDateForInput(dateString) {
@@ -1183,19 +1169,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const passwordValue = form.querySelector('[name="password"]')?.value || '';
 
             if (!nameValue) {
-                showToast('Vui long nhap ten nhan vien', 'error');
+                showToast('Vui lòng nhập tên nhân viên', 'error');
                 return;
             }
             if (!phoneValue) {
-                showToast('Vui long nhap so dien thoai', 'error');
+                showToast('Vui lòng nhập số điện thoại', 'error');
                 return;
             }
             if (!roleValue) {
-                showToast('Vui long chon chuc vu', 'error');
+                showToast('Vui lòng chọn chức vụ', 'error');
                 return;
             }
             if (!editingStaffId && !passwordValue) {
-                showToast('Vui long nhap password', 'error');
+                showToast('Vui lòng nhập mật khẩu', 'error');
                 return;
             }
 

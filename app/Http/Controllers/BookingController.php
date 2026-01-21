@@ -39,7 +39,7 @@ class BookingController extends Controller
                 if (!$customer) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Khách không tồn tại'
+                        'message' => 'Khách hàng không tồn tại'
                     ], 400);
                 }
             } else {

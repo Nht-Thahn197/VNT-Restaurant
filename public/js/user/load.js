@@ -6,7 +6,7 @@ const preloader = document.getElementById('preloader');
 
 const speed = 20;
   const loading = setInterval(() => {
-    progress += Math.floor(Math.random() * 5) + 2; // tăng ngẫu nhiên 2–6%
+    progress += Math.floor(Math.random() * 5) + 2;
     if (progress > 100) progress = 100;
     progressBar.style.width = progress + '%';
     percentText.textContent = progress + '%';

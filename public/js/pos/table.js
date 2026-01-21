@@ -568,7 +568,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const res = await fetch(`${BASE_URL}/pos/table/${id}`);
             const json = await res.json();
 
-            const t = json.data; // lấy đúng object chứa dữ liệu
+            const t = json.data;
 
             tableIdInput.value = t.id;
             nameInput.value = t.name;
@@ -620,11 +620,9 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateStatusButtonStyle(btn) {
         const text = btn.innerText.trim();
         if (text.includes("Ngừng")) {
-            // ACTIVE → nút đỏ
             btn.style.background = "#ff0000";
             btn.style.color = "#fff";
         } else {
-            // INACTIVE → nút xanh
             btn.style.background = "#00B63E";
             btn.style.color = "#fff";
         }

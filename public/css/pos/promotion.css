@@ -389,7 +389,6 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-
 .form-control {
   width: 100%;
   padding: 8px 10px;
@@ -462,7 +461,6 @@ input[type=number] {
   from {transform: translateY(50px); opacity: 0;}
   to {transform: translateY(0); opacity: 1;}
 }
-
 
 /* ===== Overlay ===== */
 .type-modal {

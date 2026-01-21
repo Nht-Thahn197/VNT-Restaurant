@@ -731,45 +731,45 @@ input[type=number] {
 }
 
 .btn-save {
-  align-content: center;
-  background: #0066CC;
-  color: white;
-  padding: 10px 30px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
+    align-content: center;
+    background: #0066CC;
+    color: white;
+    padding: 10px 30px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .btn-save:hover {
-  background: #0055ab;
+    background: #0055ab;
 }
 
 .btn-cancel {
-  align-content: center;
-  background: #85888C;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
+    align-content: center;
+    background: #85888C;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .btn-cancel:hover {
-  background: rgb(122, 123, 131);
+    background: rgb(122, 123, 131);
 }
 
 .btn-danger {
-  align-content: center;
-  background: #ff0000;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
+    align-content: center;
+    background: #ff0000;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .btn-danger:hover {
-  background: #b92c28;
+    background: #b92c28;
 }
 
 .d-none {
@@ -1261,32 +1261,32 @@ input[type=number] {
 }
 
 .booking-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  margin-top: auto;
-  padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: auto;
+    padding-bottom: 10px;
 }
 
 .page-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid #dcdcdc;
-  background: #fff;
-  color: #000;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #dcdcdc;
+    background: #fff;
+    color: #000;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
 }
 
 .page-btn:hover {
-  background: #f7f7f7;
-  border-color: #c8c8c8;
+    background: #f7f7f7;
+    border-color: #c8c8c8;
 }
 
 #pageInfo {

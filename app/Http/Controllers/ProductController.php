@@ -84,26 +84,20 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Lấy thông tin sản phẩm hiện tại
         $product = DB::table('product')->where('id', $id)->first();
 
-        $imgPath = $product->img; // Mặc định giữ ảnh cũ
+        $imgPath = $product->img;
 
-        // TRƯỜNG HỢP 1: User bấm X để xoá ảnh
         if ($request->delete_image == 1) {
-
-            // Xóa file nếu tồn tại
             if ($product->img && file_exists(public_path($product->img))) {
                 unlink(public_path($product->img));
             }
 
-            $imgPath = null; // Set về null trong DB
+            $imgPath = null;
         }
 
-        // TRƯỜNG HỢP 2: User upload ảnh mới
         if ($request->hasFile('img')) {
 
-            // Xóa ảnh cũ nếu có
             if ($product->img && file_exists(public_path($product->img))) {
                 unlink(public_path($product->img));
             }
@@ -115,7 +109,6 @@ class ProductController extends Controller
             $imgPath = 'images/product/' . $filename;
         }
 
-        // Dữ liệu update
         $updateData = [
             'name'        => $request->product_name,
             'category_id' => $request->category_id,
@@ -126,8 +119,6 @@ class ProductController extends Controller
         ];
 
         DB::table('product')->where('id', $id)->update($updateData);
-
-        // Reset recipe
         DB::table('recipe')->where('product_id', $id)->delete();
 
         $ingredients = json_decode($request->ingredients, true);

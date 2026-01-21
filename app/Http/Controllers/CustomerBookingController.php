@@ -36,7 +36,6 @@ class CustomerBookingController extends Controller
     {
         DB::beginTransaction();
         try {
-            // 1. Xử lý Customer (Giữ nguyên logic của bạn)
             $customer = DB::table('customer')->where('phone', $request->phone)->first();
             if (!$customer) {
                 $customerId = DB::table('customer')->insertGetId([
@@ -48,8 +47,6 @@ class CustomerBookingController extends Controller
             } else {
                 $customerId = $customer->id;
             }
-
-            // 2. Tạo Booking và lấy ID vừa tạo
             $bookingId = DB::table('booking')->insertGetId([
                 'customer_id'   => $customerId,
                 'customer_name' => $request->customer_name,
@@ -62,8 +59,6 @@ class CustomerBookingController extends Controller
                 'status'        => 'waiting',
                 'created_at'    => now()
             ]);
-
-            // 3. Xử lý lưu món ăn (Booking Items) nếu có
             if ($request->has('items') && is_array($request->items)) {
                 foreach ($request->items as $item) {
                     DB::table('booking_item')->insert([
@@ -72,7 +67,7 @@ class CustomerBookingController extends Controller
                         'product_name' => $item['name'],
                         'qty'          => $item['quantity'],
                         'price'        => $item['price'],
-                        'note'         => null // Có thể thêm nếu bạn làm thêm input ghi chú cho từng món
+                        'note'         => null
                     ]);
                 }
             }

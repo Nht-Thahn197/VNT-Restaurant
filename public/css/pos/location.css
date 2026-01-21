@@ -70,7 +70,7 @@
 }
 
 .selected-display {
-  width: 100%; /* Mặc định đầy đủ */
+  width: 100%;
   padding: 10px 15px;
   background: #fff;
   border: 1px solid #e6e6e6;

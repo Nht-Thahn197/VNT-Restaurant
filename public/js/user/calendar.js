@@ -1,4 +1,3 @@
-/* calendar-modal.js */
 (function(){
   // Helpers
   const pad = n => String(n).padStart(2,'0');

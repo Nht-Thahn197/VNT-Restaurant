@@ -58,7 +58,6 @@ class ProductAnalysisController extends Controller
 
                 return [$startDate, $endDate];
             } catch (\Exception $e) {
-                // Fall back to default range.
             }
         }
 
@@ -388,13 +387,13 @@ class ProductAnalysisController extends Controller
         $abs = abs($value);
 
         if ($abs >= 1000000000) {
-            return $sign . $this->formatDecimal($abs / 1000000000) . " t\u{1ef7}";
+            return $sign . $this->formatDecimal($abs / 1000000000) . " tỷ";
         }
         if ($abs >= 1000000) {
-            return $sign . $this->formatDecimal($abs / 1000000) . " tri\u{1ec7}u";
+            return $sign . $this->formatDecimal($abs / 1000000) . " triệu";
         }
         if ($abs >= 1000) {
-            return $sign . $this->formatDecimal($abs / 1000) . " ngh\u{00ec}n";
+            return $sign . $this->formatDecimal($abs / 1000) . " nghìn";
         }
         return $sign . number_format($abs, 0, ',', '.');
     }

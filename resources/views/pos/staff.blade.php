@@ -418,18 +418,18 @@
         <div class="salary-confirm-overlay" id="salaryConfirmOverlay" aria-hidden="true">
             <div class="salary-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="salaryConfirmTitle" aria-describedby="salaryConfirmMessage" tabindex="-1">
                 <div class="salary-confirm-header">
-                    <h3 id="salaryConfirmTitle">Thiet lap luong</h3>
+                    <h3 id="salaryConfirmTitle">Thiết lập lương</h3>
                     <button type="button" class="salary-confirm-close" id="salaryConfirmClose" aria-label="Dong">&times;</button>
                 </div>
                 <div class="salary-confirm-body">
                     <div class="salary-confirm-icon">
                         <i class="fas fa-wallet"></i>
                     </div>
-                    <p id="salaryConfirmMessage">Nhan vien chua duoc thiet lap luong. Ban co muon thiet lap ngay khong?</p>
+                    <p id="salaryConfirmMessage">Nhân viên chưa được thiết lập lương. Bạn có muốn thiết lập ngay không?</p>
                 </div>
                 <div class="salary-confirm-actions">
-                    <button type="button" class="salary-confirm-btn secondary" id="salaryConfirmLater">De sau</button>
-                    <button type="button" class="salary-confirm-btn primary" id="salaryConfirmYes">Thiet lap</button>
+                    <button type="button" class="salary-confirm-btn secondary" id="salaryConfirmLater">Để sau</button>
+                    <button type="button" class="salary-confirm-btn primary" id="salaryConfirmYes">Thiết lập</button>
                 </div>
             </div>
         </div>

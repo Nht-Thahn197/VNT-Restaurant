@@ -119,7 +119,6 @@ class ImportController extends Controller
                     );
                 }
 
-                // 🔻 TRỪ KHO
                 DB::statement(
                     "CALL use_stock(?, ?, ?, ?)",
                     [

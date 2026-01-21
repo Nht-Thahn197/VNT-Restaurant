@@ -324,7 +324,6 @@
         <script src="{{ asset('js/pos/common/toast.js') }}"></script>
         <script src="{{ asset('js/pos/cashier.js') }}"></script>
         <script>
-            // Laravel sẽ tự động tạo đường dẫn chính xác dựa vào cấu hình của bạn
             const APP_URL = "{{ url('/') }}";
         </script>
         <div id="toast-container"></div>

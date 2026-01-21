@@ -6,26 +6,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCloseHeader = document.getElementById('btnCloseUpdate');
     const form = document.getElementById('updateAccountForm');
 
-    // Mặc định ẩn
     accountForm.style.display = 'none';
     overlay.style.display = 'none';
 
-    // Mở form khi click vào Tài khoản trong drop-down
     btnAccountLink.addEventListener('click', function(e) {
         e.preventDefault();
         accountForm.style.display = 'block';
         overlay.style.display = 'block';
     });
 
-    // Hàm đóng form
     function closeForm() {
         accountForm.style.display = 'none';
         overlay.style.display = 'none';
-        // Xóa lỗi và thông báo
         form.querySelectorAll('.error-message').forEach(el => el.innerText = '');
         const successDiv = form.querySelector('.alert-success');
         if (successDiv) successDiv.innerText = '';
-        // Reset password fields
         form.querySelector('input[name=current_password]').value = '';
         form.querySelector('input[name=new_password]').value = '';
         form.querySelector('input[name=new_password_confirmation]').value = '';
@@ -35,17 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
     overlay.addEventListener('click', closeForm);
     btnCloseHeader.addEventListener('click', closeForm);
 
-    // AJAX submit
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Xóa lỗi cũ
         form.querySelectorAll('.error-message').forEach(el => el.innerText = '');
         const successDiv = form.querySelector('.alert-success');
         if (successDiv) successDiv.innerText = '';
 
         const formData = new FormData(form);
-        const url = form.getAttribute('action'); // Lấy URL từ action của form
+        const url = form.getAttribute('action');
 
         fetch(url, {
             method: 'POST',
@@ -61,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             if (data.success) {
-                // Hiển thị thông báo thành công
                 let successDiv = form.querySelector('.alert-success');
                 if (!successDiv) {
                     successDiv = document.createElement('div');
@@ -71,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 successDiv.innerText = data.message || 'Cập nhật thành công!';
 
-                // Đóng form sau 1 giây nếu update thành công
                 setTimeout(closeForm, 1000);
             }
         })
@@ -97,8 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
-// JS Dropdown Header
 document.addEventListener("DOMContentLoaded", function () {
     const dropdowns = document.querySelectorAll(".header-nav .dropdown");
 
@@ -110,10 +99,8 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             e.stopPropagation();
 
-            // Toggle class 'clicked-open'
             dropdown.classList.toggle("clicked-open");
 
-            // Đóng dropdown khác
             dropdowns.forEach(d => {
                 if (d !== dropdown) {
                     d.classList.remove("clicked-open");
@@ -121,13 +108,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
-        // Chặn click bên trong menu không đóng
         menu.addEventListener("click", function (e) {
             e.stopPropagation();
         });
     });
 
-    // Click ra ngoài → đóng tất cả
     document.addEventListener("click", function () {
         dropdowns.forEach(d => d.classList.remove("clicked-open"));
     });

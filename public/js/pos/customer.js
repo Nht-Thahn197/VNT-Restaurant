@@ -137,22 +137,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function applyCustomerFilters() {
         rows.forEach(row => {
-            // Lấy dữ liệu từ dataset (ép về chữ thường để so sánh không phân biệt hoa thường)
             const rowCode = (row.dataset.code || '').toLowerCase();
             const rowName = (row.dataset.name || '').toLowerCase();
             const rowPhone = (row.dataset.phone || '').toLowerCase();
-
-            // Logic: Khớp tất cả các ô (AND logic)
             const matchCode = rowCode.includes(filters.code);
             const matchName = rowName.includes(filters.name);
             const matchPhone = rowPhone.includes(filters.phone);
-
             const isMatch = matchCode && matchName && matchPhone;
-
-            // Đánh dấu và ẩn/hiện
             row.dataset.filtered = isMatch ? '1' : '0';
             
-            // Ẩn ngay lập tức những row không khớp để dành chỗ cho phân trang
             if (!isMatch) {
                 row.style.display = 'none';
                 const detail = document.getElementById(`detail-${row.dataset.id}`);
@@ -161,14 +154,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         currentPage = 1;
-        renderPagination(); // Gọi hàm phân trang của bạn
+        renderPagination();
     }
 
     [inputCode, inputName, inputPhone].forEach(input => {
         if (!input) return;
         
         input.addEventListener('input', function() {
-            // Cập nhật giá trị vào object filters dựa trên id của input
             if (this.id === 'searchCode') filters.code = this.value.trim().toLowerCase();
             if (this.id === 'searchName') filters.name = this.value.trim().toLowerCase();
             if (this.id === 'searchPhone') filters.phone = this.value.trim().toLowerCase();
@@ -188,10 +180,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (currentPage > totalPages) currentPage = totalPages;
 
-            // Ẩn tất cả trước
             rows.forEach(r => r.style.display = 'none');
 
-            // Hiển thị đúng các bản ghi thuộc trang hiện tại
             const start = (currentPage - 1) * rowsPerPage;
             const end = start + rowsPerPage;
 
@@ -201,7 +191,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            // Cập nhật UI (nút bấm, số trang...)
             const pageInfo = document.getElementById('pageInfo');
             if (pageInfo) pageInfo.innerText = `Trang ${currentPage} / ${totalPages}`;
             const paginationContainer = document.getElementById('pagination');
@@ -212,7 +201,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
         
-        // Khởi tạo lần đầu
         applyCustomerFilters();
 
 
@@ -252,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const BASE_URL = window.location.origin + "/VNT-Restaurant/public/pos";
 
     // ====== ELEMENTS ======
-    const overlay = document.getElementById('customerFormOverlay'); // ID overlay từ HTML của bạn
+    const overlay = document.getElementById('customerFormOverlay');
     const btnOpen = document.querySelector('.btn-create');
     const btnCloseHeader = document.getElementById('btnCloseHeader');
     const cancelBtns = document.querySelectorAll('.cus-cancel');
@@ -649,7 +637,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await readJsonResponse(res);
 
             if (!res.ok || !data.success) {
-                showToast(getJsonErrorMessage(data, 'Luu that bai!'), 'error');
+                showToast(getJsonErrorMessage(data, 'Lưu thất bại!'), 'error');
                 return;
             }
 
@@ -682,7 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await readJsonResponse(res);
                 if (!res.ok || !data.success) {
-                    showToast(getJsonErrorMessage(data, 'Loi tai khach hang!'), 'error');
+                    showToast(getJsonErrorMessage(data, 'Lỗi tải khách hàng!'), 'error');
                     return;
                 }
                 if (data.success) {

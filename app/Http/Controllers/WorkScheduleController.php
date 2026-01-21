@@ -87,7 +87,7 @@ class WorkScheduleController extends Controller
                 if (!$shiftId || empty($staffIds)) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Vui long chon ca va nhan vien.',
+                        'message' => 'Vui lòng chọn ca và nhân viên.',
                     ], 422);
                 }
                 $this->upsertSchedules($shiftId, $staffIds, $dates);
@@ -97,7 +97,7 @@ class WorkScheduleController extends Controller
                 if (!$staffId || empty($shiftIds)) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Vui long chon nhan vien va ca lam.',
+                        'message' => 'Vui lòng chọn nhân viên và ca làm việc.',
                     ], 422);
                 }
                 $this->upsertSchedulesForStaff($staffId, $shiftIds, $dates);

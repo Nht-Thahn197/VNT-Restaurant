@@ -1,7 +1,7 @@
 function timeAgo(dateString) {
     const now  = new Date();
     const past = new Date(dateString);
-    const diff = Math.floor((now - past) / 1000); // giây
+    const diff = Math.floor((now - past) / 1000);
 
     if (diff < 60) {
         return diff + ' giây trước';
@@ -127,12 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     indexAxis: isProduct ? 'y' : 'x',
                     plugins: { legend: { display: false } },
                     scales: {
-
-                        // ===== TRỤC X =====
                         x: {
                             grid: { display: false },
-
-                            // 👉 CHỈ FORMAT KHI X LÀ VALUE
                             ticks: isProduct ? {
                                 callback: v =>
                                     currentMetric === 'revenue'
@@ -140,13 +136,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                         : v.toLocaleString('vi-VN')
                             } : {}
                         },
-
-                        // ===== TRỤC Y =====
                         y: {
                             ticks: !isProduct ? {
                                 callback: v => v.toLocaleString('vi-VN')
                             } : {
-                                autoSkip: false // giữ đủ tên món
+                                autoSkip: false
                             }
                         }
                     }
@@ -175,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const menu = dropdown.querySelector('.range-menu');
 
         btn.addEventListener('click', e => {
-            e.stopPropagation(); // ⛔ chặn click lan ra document
+            e.stopPropagation();
             menu.classList.toggle('show');
         });
 
@@ -197,12 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    /* đóng menu khi click ra ngoài */
     document.addEventListener('click', () => {
         section.querySelectorAll('.range-menu')
             .forEach(m => m.classList.remove('show'));
     });
-
 
         /* ================= INIT ================= */
         loadData();

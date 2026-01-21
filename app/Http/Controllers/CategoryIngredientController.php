@@ -10,12 +10,9 @@ class CategoryIngredientController extends Controller
 {
     public function store(Request $request)
     {
-        // Validate đơn giản
         $request->validate([
             'name' => 'required|string|max:150',
         ]);
-
-        // Tạo mới
         $category = CategoryIngredient::create([
             'name' => $request->name
         ]);

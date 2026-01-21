@@ -9,12 +9,9 @@ class CategoryProductController extends Controller
 {
     public function store(Request $request)
     {
-        // Validate đơn giản
         $request->validate([
             'name' => 'required|string|max:150',
         ]);
-
-        // Tạo mới
         $category = CategoryProduct::create([
             'name' => $request->name
         ]);
