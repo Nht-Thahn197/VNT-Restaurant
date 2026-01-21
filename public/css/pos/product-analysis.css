@@ -1,0 +1,487 @@
+:root {
+  --analysis-bg: #f5f7fb;
+  --analysis-card: #ffffff;
+  --analysis-border: #e5e7eb;
+  --analysis-text: #0f172a;
+  --analysis-muted: #64748b;
+  --analysis-primary: #1d6ae5;
+  --analysis-success: #16a34a;
+  --analysis-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.product-analysis-page {
+  padding: 20px;
+  background: var(--analysis-bg);
+  border-radius: 18px;
+}
+
+.analysis-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.analysis-title h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--analysis-text);
+}
+
+.analysis-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--analysis-card);
+  border: 1px solid var(--analysis-border);
+  padding: 8px 12px;
+  border-radius: 12px;
+  min-width: 240px;
+  position: relative;
+}
+
+.filter-group i {
+  color: var(--analysis-muted);
+}
+
+.date-filter input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: var(--analysis-text);
+  background: transparent;
+}
+
+.multi-filter {
+  padding: 0;
+  border: none;
+  background: transparent;
+  min-width: 240px;
+}
+
+.filter-trigger {
+  width: 100%;
+  background: var(--analysis-card);
+  border: 1px solid var(--analysis-border);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--analysis-text);
+  cursor: pointer;
+}
+
+.filter-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background: var(--analysis-card);
+  border: 1px solid var(--analysis-border);
+  border-radius: 12px;
+  box-shadow: var(--analysis-shadow);
+  padding: 10px;
+  z-index: 20;
+  display: none;
+}
+
+.multi-filter.open .filter-menu {
+  display: block;
+}
+
+.filter-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--analysis-border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+}
+
+.filter-search input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--analysis-text);
+  accent-color: #056bd3;
+}
+
+.filter-option:hover {
+  background: #f3f6ff;
+}
+
+.filter-options {
+  max-height: 220px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.filter-empty {
+  font-size: 13px;
+  color: var(--analysis-muted);
+  padding: 8px 6px;
+}
+
+.return-filter select {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 13px;
+  color: var(--analysis-text);
+  background: transparent;
+}
+
+.analysis-meta {
+  margin-top: 6px;
+  color: var(--analysis-muted);
+  font-size: 13px;
+}
+
+.metrics-row {
+  margin-top: 18px;
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.metrics-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.metrics-side {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metric-card {
+  background: var(--analysis-card);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--analysis-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 140px;
+}
+
+.metric-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--analysis-muted);
+  font-weight: 600;
+}
+
+.metric-head i {
+  color: #94a3b8;
+}
+
+.metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--analysis-primary);
+}
+
+.metric-chart {
+  height: 56px;
+  margin-top: auto;
+}
+
+.inventory-card .metric-value {
+  color: var(--analysis-success);
+  font-size: 20px;
+}
+
+.panel {
+  background: var(--analysis-card);
+  border-radius: 18px;
+  box-shadow: var(--analysis-shadow);
+  padding: 18px;
+  margin-top: 18px;
+}
+
+.panel-header {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--analysis-text);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-header-row {
+  justify-content: space-between;
+}
+
+.panel-body {
+  position: relative;
+}
+
+.chart-wrap {
+  min-height: 260px;
+}
+
+.chart-wrap.tall {
+  min-height: 320px;
+}
+
+.panel-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.panel-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.metric-select {
+  border: 1px solid var(--analysis-border);
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 13px;
+  color: var(--analysis-text);
+  min-width: 180px;
+}
+
+.custom-select-hidden {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.custom-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  min-width: 180px;
+}
+
+.panel-header-row .custom-select-wrapper {
+  margin-left: auto;
+}
+
+.return-filter .custom-select-wrapper {
+  width: 100%;
+}
+
+.custom-select-trigger {
+  width: 100%;
+  padding: 8px 14px;
+  border: 1px solid var(--analysis-border);
+  border-radius: 12px;
+  font-size: 14px;
+  background: #ffffff;
+  color: var(--analysis-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.custom-select-leading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.custom-select-trigger .label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-select-icon {
+  color: var(--analysis-muted);
+  font-size: 14px;
+}
+
+.custom-select-trigger .arrow {
+  font-size: 11px;
+  color: var(--analysis-muted);
+  transition: transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.custom-select-trigger.is-open .arrow {
+  transform: rotate(180deg);
+}
+
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+  padding: 8px;
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.custom-select-dropdown.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.custom-select-search {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.custom-select-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.custom-select-option {
+  padding: 10px 12px;
+  margin: 4px 6px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #0f172a;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.custom-select-option:hover {
+  background: #e6f2ff;
+  color: #0f172a;
+}
+
+.custom-select-option.is-active {
+  background: #e6f2ff;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.custom-select-empty {
+  padding: 10px;
+  font-size: 12px;
+  color: var(--analysis-muted);
+  text-align: center;
+}
+
+.daterangepicker {
+  border-radius: 14px !important;
+  border: 1px solid var(--analysis-border) !important;
+  box-shadow: var(--analysis-shadow) !important;
+}
+
+.daterangepicker .calendar-table {
+  background: transparent !important;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover {
+  background-color: var(--analysis-primary) !important;
+}
+
+.daterangepicker .drp-buttons .btn {
+  border-radius: 8px !important;
+}
+
+@media (max-width: 1500px) {
+  .metrics-main {
+    grid-template-columns: repeat(2, minmax(200px, 1fr));
+  }
+
+  .metrics-side {
+    width: 280px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .metrics-row {
+    flex-direction: column;
+  }
+
+  .metrics-side {
+    width: 100%;
+    flex-direction: row;
+  }
+
+  .metrics-side .metric-card {
+    flex: 1;
+  }
+}
+
+@media (max-width: 960px) {
+  .panel-grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-main {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-side {
+    flex-direction: column;
+  }
+
+  .analysis-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 640px) {
+  .filter-group,
+  .multi-filter {
+    width: 100%;
+  }
+
+  .metric-select {
+    width: 100%;
+  }
+}

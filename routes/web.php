@@ -31,6 +31,7 @@ use App\Http\Controllers\ProductReportController;
 use App\Http\Controllers\StaffReportController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\SalesAnalysisController;
+use App\Http\Controllers\ProductAnalysisController;
 use App\Http\Controllers\WorkScheduleController;
 use App\Http\Controllers\WorkShiftController;
 use App\Http\Controllers\AttendanceController;
@@ -293,6 +294,7 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
 
     //ANALYSIS
     Route::get('/sales-analysis', [SalesAnalysisController::class, 'index'])->name('pos.sales-analysis')->middleware('can:view_sales_analysis');
+    Route::get('/product-analysis', [ProductAnalysisController::class, 'index'])->name('pos.product-analysis')->middleware('can:view_product_analysis');
 
     // PROMOTION
     Route::get('/promotion', [PromotionController::class, 'index'])->name('pos.promotion')->middleware('can:view_promotion');

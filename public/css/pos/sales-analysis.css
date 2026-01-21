@@ -130,6 +130,7 @@
   cursor: pointer;
   font-size: 13px;
   color: var(--analysis-text);
+  accent-color: #056bd3;
 }
 
 .branch-option:hover {
