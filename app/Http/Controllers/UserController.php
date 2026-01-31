@@ -48,7 +48,9 @@ class UserController extends Controller
 
     public function news()      
     { 
-        return view('user.news'); 
+        $promotions = \App\Models\Promotion::orderBy('start_date', 'desc')->get();
+
+        return view('user.news', compact('promotions')); 
     }
 
     public function contact()   

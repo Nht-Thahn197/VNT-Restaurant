@@ -188,6 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const locationTimeStartInput = document.getElementById("location_time_start");
     const locationTimeEndInput = document.getElementById("location_time_end");
     const locationStatusSelect = document.getElementById("location_status");
+    const locationMapUrlInput = document.getElementById("location_map_url");
     const locationImageInput = document.getElementById("locationImageInput");
     const locationPreviewImage = document.getElementById("locationPreviewImage");
     const locationImageBox = document.getElementById("locationImageBox");
@@ -571,6 +572,9 @@ document.addEventListener("DOMContentLoaded", function () {
             locationTimeStartInput.value = normalizeTimeValue(location.time_start || "");
             locationTimeEndInput.value = normalizeTimeValue(location.time_end || "");
             locationStatusSelect.value = location.status || "active";
+            if (locationMapUrlInput) {
+                locationMapUrlInput.value = location.map_url || "";
+            }
             if (typeof syncLocationSelects === "function") {
                 syncLocationSelects();
             }
@@ -664,7 +668,8 @@ document.addEventListener("DOMContentLoaded", function () {
             floors: locationFloorsInput.value ? Number(locationFloorsInput.value) : null,
             time_start: locationTimeStartInput.value || null,
             time_end: locationTimeEndInput.value || null,
-            status: locationStatusSelect.value
+            status: locationStatusSelect.value,
+            map_url: locationMapUrlInput ? locationMapUrlInput.value.trim() : ""
         };
 
         if (!payload.code || !payload.name || !payload.region_id) {

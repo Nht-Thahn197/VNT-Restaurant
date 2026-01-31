@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th1 20, 2026 lúc 07:09 PM
+-- Thời gian đã tạo: Th1 31, 2026 lúc 06:19 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -1141,15 +1141,16 @@ CREATE TABLE `location` (
   `floors` int(11) DEFAULT NULL,
   `time_start` time DEFAULT NULL,
   `time_end` time DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `map_url` varchar(500) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `location`
 --
 
-INSERT INTO `location` (`id`, `region_id`, `code`, `thumbnail`, `status`, `name`, `capacity`, `area`, `floors`, `time_start`, `time_end`, `created_at`) VALUES
-(1, 1, 'tbqdonghia', 'images/location/1768540586_L12L04.jpg', 'active', 'U04-L18, KĐT Đô Nghĩa', 210, 400.00, 2, '09:00:00', '02:00:00', '2025-11-25 19:27:41');
+INSERT INTO `location` (`id`, `region_id`, `code`, `thumbnail`, `status`, `name`, `capacity`, `area`, `floors`, `time_start`, `time_end`, `created_at`, `map_url`) VALUES
+(1, 1, 'tbqdonghia', 'images/location/1768540586_L12L04.jpg', 'active', 'U04-L18, KĐT Đô Nghĩa', 210, 400.00, 2, '09:00:00', '02:00:00', '2025-11-25 19:27:41', 'https://www.google.com/maps/place/Shin+-+Buffet+L%E1%BA%A9u+N%C6%B0%E1%BB%9Bng+139k/@20.9578528,105.7177341,15z/data=!4m20!1m13!4m12!1m4!2m2!1d105.7415611!2d20.9518899!4e1!1m6!1m2!1s0x3134530079db0fb5:0x2ac90a90fb659151!2z4buQYyBOxINtIFTGsCwgWFE5SCtYViwgUC4gUXVhbmcgVHJ1bmcsIEjDoCDEkMO0bmcsIEjDoCBO4buZaSwgVmnhu4d0IE5hbQ!2m2!1d105.7797629!2d20.9698494!3m5!1s0x313453551e2652d5:0xc363b3e3c51b0cbe!8m2!3d20.9578568!4d105.7367937!16s%2Fg%2F11y897v68v?entry=ttu&g_ep=EgoyMDI2MDEyOC4wIKXMDSoKLDEwMDc5MjA2N');
 
 -- --------------------------------------------------------
 
@@ -1366,6 +1367,7 @@ CREATE TABLE `product_available` (
 CREATE TABLE `promotion` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `code` varchar(10) DEFAULT NULL,
+  `images` varchar(255) NOT NULL,
   `location_id` bigint(20) UNSIGNED NOT NULL,
   `name` varchar(150) NOT NULL,
   `type_id` int(10) UNSIGNED NOT NULL,
@@ -1380,9 +1382,9 @@ CREATE TABLE `promotion` (
 -- Đang đổ dữ liệu cho bảng `promotion`
 --
 
-INSERT INTO `promotion` (`id`, `code`, `location_id`, `name`, `type_id`, `description`, `discount`, `start_date`, `end_date`, `created_at`) VALUES
-(1, 'KM000001', 1, 'giảm 10% ngày sinh nhật', 1, NULL, 10.00, '2023-12-23', NULL, '2025-12-30 09:42:48'),
-(2, 'KM000002', 1, 'Giảm 10% cho hóa đơn từ 500k trở lên', 1, NULL, 10.00, '2025-12-31', '2026-01-07', '2025-12-31 09:22:01');
+INSERT INTO `promotion` (`id`, `code`, `images`, `location_id`, `name`, `type_id`, `description`, `discount`, `start_date`, `end_date`, `created_at`) VALUES
+(1, 'KM000001', 'images/news/1769879273_news1.png', 1, 'giảm 10% ngày sinh nhật', 1, NULL, 10.00, '2023-12-23', NULL, '2025-12-30 09:42:48'),
+(2, 'KM000002', 'images/news/1769879925_giamgia.png', 1, 'giảm 10% cho hóa đơn từ 500k trở lên', 1, NULL, 10.00, '2025-12-31', '2026-01-07', '2025-12-31 09:22:01');
 
 --
 -- Bẫy `promotion`

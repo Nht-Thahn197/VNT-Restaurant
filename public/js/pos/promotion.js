@@ -1,4 +1,33 @@
 document.addEventListener('DOMContentLoaded', function() {
+    function getErrorMessage(payload, fallback) {
+        if (payload && payload.errors) {
+            const keys = Object.keys(payload.errors);
+            if (keys.length && payload.errors[keys[0]] && payload.errors[keys[0]][0]) {
+                return payload.errors[keys[0]][0];
+            }
+        }
+        if (payload && payload.message) return payload.message;
+        return fallback || 'Request failed.';
+    }
+
+    function readJsonResponse(res) {
+        const contentType = res.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            return res.text().then(text => {
+                const error = new Error('Non-JSON response.');
+                error.responseText = text;
+                throw error;
+            });
+        }
+        return res.json();
+    }
+
+    function jsonHeaders() {
+        return {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        };
+    }
     const addBtn = document.querySelector('.add-type-btn');
     const modal = document.getElementById('addTypeModal');
     const closeBtn = document.getElementById('closeTypeModal');
@@ -214,9 +243,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fetch(`/VNT-Restaurant/public/pos/promotion-type/${selectedId}`, {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: jsonHeaders()
         })
-        .then(res => res.json())
+        .then(async res => {
+            const data = await readJsonResponse(res);
+            if (!res.ok || data.success === false) {
+                throw new Error(getErrorMessage(data, 'Request failed.'));
+            }
+            return data;
+        })
         .then(data => {
             showToast("Đã xóa loại khuyến mãi!", 'success');
             modal.style.display = 'none';
@@ -224,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             }, 800);
         })
-        .catch(err => { console.error(err); showToast("Lỗi server!", 'error'); });
+        .catch(err => { console.error(err); showToast(err.message || "Lỗi server!", 'error'); });
     });
 
     typeForm.addEventListener('submit', function(e) {
@@ -233,9 +269,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fetch(typeForm.action, {
             method: typeForm.method,
-            body: formData
+            body: formData,
+            headers: jsonHeaders()
         })
-        .then(res => res.json())
+        .then(async res => {
+            const data = await readJsonResponse(res);
+            if (!res.ok || data.success === false) {
+                throw new Error(getErrorMessage(data, 'Request failed.'));
+            }
+            return data;
+        })
         .then(data => {
             showToast("Loại khuyến mãi đã được lưu!", 'success');
             modal.style.display = 'none';
@@ -243,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             }, 800);
         })
-        .catch(err => { console.error(err); showToast("Lỗi server!", 'error'); });
+        .catch(err => { console.error(err); showToast(err.message || "Lỗi server!", 'error'); });
     });
 
 
@@ -298,9 +341,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fetch(`/VNT-Restaurant/public/pos/promotion/${id}`, {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: jsonHeaders()
         })
-        .then(res => res.json())
+        .then(async res => {
+            const data = await readJsonResponse(res);
+            if (!res.ok || data.success === false) {
+                throw new Error(getErrorMessage(data, 'Request failed.'));
+            }
+            return data;
+        })
         .then(data => {
             showToast("Đã xóa chương trình!", 'success');
             modalpr.style.display = 'none';
@@ -308,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             }, 800);
         })
-        .catch(err => { console.error(err); showToast("Lỗi server!", 'error'); });
+        .catch(err => { console.error(err); showToast(err.message || "Lỗi server!", 'error'); });
     });
 
     formPromotion.addEventListener('submit', function(e) {
@@ -317,9 +367,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
         fetch(formPromotion.action, {
             method: formPromotion.method,
-            body: formData
+            body: formData,
+            headers: jsonHeaders()
         })
-        .then(res => res.json())
+        .then(async res => {
+            const data = await readJsonResponse(res);
+            if (!res.ok || data.success === false) {
+                throw new Error(getErrorMessage(data, 'Request failed.'));
+            }
+            return data;
+        })
         .then(data => {
             showToast("Tạo chương trình thành công!", 'success');
             modalpr.style.display = 'none';
@@ -327,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
             }, 800);
         })
-        .catch(err => { console.error(err); showToast("Lỗi server!", 'error'); });
+        .catch(err => { console.error(err); showToast(err.message || "Lỗi server!", 'error'); });
     });
 
     function resetPromotionForm() {

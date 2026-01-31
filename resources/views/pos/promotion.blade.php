@@ -127,7 +127,7 @@
                 <span class="close-btn promotion-close-btn" id="closePromotionModal">&times;</span>
             </div>
             <div class="modal-body promotion-modal-body">
-                <form method="POST" action="{{ route('promotion.store') }}">
+                <form method="POST" action="{{ route('promotion.store') }}" enctype="multipart/form-data">
                     @csrf
 
                     <div class="form-group">
@@ -163,6 +163,10 @@
                     <div class="form-group">
                         <label for="description">Mô tả</label>
                         <textarea id="description" name="description" class="form-control"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="images">Hình ảnh</label>
+                        <input type="file" id="images" name="images" class="form-control" accept="image/*">
                     </div>
 
                     <div class="form-group">

@@ -24,6 +24,7 @@ class Location extends Model
         'floors',
         'time_start',
         'time_end',
+        'map_url',
         'created_at',
     ];
 

@@ -83,6 +83,7 @@ class LocationController extends Controller
             'floors'    => 'nullable|integer|min:0',
             'time_start'=> 'nullable|date_format:H:i',
             'time_end'  => 'nullable|date_format:H:i',
+            'map_url'   => 'nullable|string|max:500',
             'status'    => 'required|in:active,inactive',
         ];
 
@@ -101,6 +102,10 @@ class LocationController extends Controller
             $data['thumbnail'] = 'images/location/' . $filename;
         } elseif (array_key_exists('thumbnail', $data) && $data['thumbnail'] === '') {
             $data['thumbnail'] = null;
+        }
+
+        if (array_key_exists('map_url', $data) && $data['map_url'] === '') {
+            $data['map_url'] = null;
         }
 
         return $data;

@@ -108,6 +108,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function setMapButton(button, mapUrl) {
+        if (!button) return;
+        button.dataset.mapUrl = mapUrl || '';
+        button.disabled = !mapUrl;
+        button.onclick = () => {
+            const url = button.dataset.mapUrl || '';
+            if (url) {
+                window.open(url, '_blank', 'noopener');
+            }
+        };
+    }
+
     document.querySelectorAll('#menuScroll a').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -148,6 +160,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const bookBtn = container.querySelector('.book');
         bookBtn.onclick = null;
         bookBtn.addEventListener('click', () => bookLocation(location.id));
+
+        const mapBtn = container.querySelector('.map');
+        setMapButton(mapBtn, location.map_url);
     }
 
     if (locations.length > 0) {
@@ -155,5 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (bookBtn) {
             bookBtn.addEventListener('click', () => bookLocation(locations[0].id));
         }
+        const mapBtn = document.querySelector('.map');
+        setMapButton(mapBtn, locations[0].map_url);
     }
 });

@@ -20,6 +20,7 @@ class Promotion extends Model
         'discount',
         'start_date',
         'end_date',
+        'images',
         'create_at'
     ];
 

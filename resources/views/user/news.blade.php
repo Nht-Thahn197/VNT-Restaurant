@@ -30,63 +30,43 @@
             </div>
             <div class="fade-zone right"></div>
         </div>
-        <div class="container">
-            <!-- Banner lớn đầu trang -->
-            <div class="news-banner">
-                <a href="#">
-                    <img class="big-banner" src="{{ asset('images/news/news4.png') }}" alt="Banner" />
-                    <div class="banner-text">
-                        <h2>TỰ DO TẶNG ÁO – MƯA GIÓ KHỎI LO</h2>
-                        <div class="banner-cta">
-                            <span class="icn">
-                                <img src="{{ asset('images/icon/rightarrow-icon.png') }}" />
-                            </span>
-                            <span class="txt">XEM NGAY</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <!-- Danh sách tin tức -->
-            <div class="news-grid">
-                <div class="news-item">
+                <div class="container">
+            @if($promotions->count() > 0)
+                @php $featured = $promotions->first(); @endphp
+                <div class="news-banner">
                     <a href="#">
-                        <img class="news-img" src="{{ asset('images/news/news1.png') }}" alt="News 1" />
-                        <div class="news-content">
-                            <h3>🎉 "SINH NHẬT ĐỘC NHẤT - SỐNG CHẤT TỰ DO" PHIÊN BẢN 2025</h3>
-                            <span class="icn">
-                                <img src="{{ asset('images/icon/rightarrow-icon.png') }}" style="width:14px;" /> 
-                            </span>
-                            <span class="txt">XEM NGAY</span>
+                        <img class="big-banner" src="{{ asset($featured->images ?? 'images/news/news4.png') }}" alt="{{ $featured->name ?? 'Banner' }}" />
+                        <div class="banner-text">
+                            <h2>{{ $featured->description ?? $featured->name }}</h2>
+                            <div class="banner-cta">
+                                <span class="icn">
+                                    <img src="{{ asset('images/icon/rightarrow-icon.png') }}" />
+                                </span>
+                                <span class="txt">XEM NGAY</span>
+                            </div>
                         </div>
                     </a>
                 </div>
 
-                <div class="news-item">
-                    <a href="#">
-                        <img class="news-img" src="{{ asset('images/news/news2.png') }}" alt="News 2" />
-                        <div class="news-content">
-                            <h3>Lady Day - Tặng ngay 1 tháp Cocktail dành cho phái đẹp - Thứ 3 hàng tuần</h3>
-                            <span class="icn">
-                                <img src="{{ asset('images/icon/rightarrow-icon.png') }}" style="width:14px;" /> 
-                            </span>
-                            <span class="txt">XEM NGAY</span>  
-                        </div> 
-                    </a>
-                </div>
-
-                <div class="news-item">
-                    <a href="#">
-                        <img class="news-img" src="{{ asset('images/news/news3.png') }}" alt="News 3" />
-                        <div class="news-content">
-                            <h3>Giảm 30% tất cả các món lẩu sau 22h - Áp dụng tại cơ sở 505 Minh Khai</h3>
-                            <span class="icn">
-                                <img src="{{ asset('images/icon/rightarrow-icon.png') }}" style="width:14px;" /> 
-                            </span>
-                            <span class="txt">XEM NGAY</span>    
+                <div class="news-grid">
+                    @foreach($promotions->skip(1) as $promotion)
+                        <div class="news-item">
+                            <a href="#">
+                                <img class="news-img" src="{{ asset($promotion->images ?? 'images/news/news1.png') }}" alt="{{ $promotion->name ?? 'News' }}" />
+                                <div class="news-content">
+                                    <h3>{{ $promotion->description ?? $promotion->name }}</h3>
+                                    <span class="icn">
+                                        <img src="{{ asset('images/icon/rightarrow-icon.png') }}" style="width:14px;" />
+                                    </span>
+                                    <span class="txt">XEM NGAY</span>
+                                </div>
+                            </a>
                         </div>
-                    </a>
+                    @endforeach
                 </div>
-            </div>
+            @else
+                <p>Chua co tin tuc.</p>
+            @endif
         </div>   
     </main>
     <!-- CONTENT START -->

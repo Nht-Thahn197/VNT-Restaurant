@@ -29,17 +29,8 @@ class PromotionController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:150',
-            'type_id' => 'required|exists:promotion_type,id',
-            'location_id' => 'required|exists:location,id',
-            'discount' => 'nullable|numeric',
-            'description' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
-
-        $promotion = Promotion::create($request->all());
+        $data = $this->validatePayload($request);
+        $promotion = Promotion::create($data);
 
         return response()->json([ 
             'success' => true, 
@@ -51,18 +42,9 @@ class PromotionController extends Controller
 
     public function update(Request $request, $id) 
     { 
-        $request->validate([ 
-            'name' => 'required|string|max:150',
-            'type_id' => 'required|exists:promotion_type,id',
-            'location_id' => 'required|exists:location,id',
-            'discount' => 'nullable|numeric',
-            'description' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
-        
+        $data = $this->validatePayload($request);
         $promotion = Promotion::findOrFail($id);
-        $promotion->update($request->all());
+        $promotion->update($data);
 
         return response()->json([ 
             'success' => true, 
@@ -108,5 +90,30 @@ class PromotionController extends Controller
             'success' => true,
             'data' => $promotions
         ]);
+    }
+
+    protected function validatePayload(Request $request): array
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:150',
+            'type_id' => 'required|exists:promotion_type,id',
+            'location_id' => 'required|exists:location,id',
+            'discount' => 'nullable|numeric',
+            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'images' => 'nullable|image|max:5120',
+        ]);
+
+        if ($request->hasFile('images')) {
+            $file = $request->file('images');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images/news'), $filename);
+            $data['images'] = 'images/news/' . $filename;
+        } else {
+            unset($data['images']);
+        }
+
+        return $data;
     }
 }

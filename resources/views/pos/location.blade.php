@@ -278,6 +278,10 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Link b&#7843;n &#273;&#7891;</label>
+                        <input class="write" type="text" id="location_map_url" placeholder="https://www.google.com/maps?q=...">
+                    </div>
                     <div class="form-group full-width">
                         <label>Ảnh đại diện</label>
                         <div class="image-upload-wrap">
