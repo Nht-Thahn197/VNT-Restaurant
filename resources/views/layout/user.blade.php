@@ -6,8 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     {{-- CSS --}}
-    <link rel="icon" href="{{ asset('favicon-user.ico') }}" type="image/x-icon">
-    <link rel="shortcut icon" href="{{ asset('favicon-user.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('favicon-pos.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('favicon-pos.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ asset('css/user/layout.css') }}?v={{ filemtime(public_path('css/user/layout.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/user/calendar.css') }}?v={{ filemtime(public_path('css/user/calendar.css')) }}">
     

@@ -1,0 +1,278 @@
+/* Cổng thanh toán ATM nội địa giả lập - Napas Style */
+
+.napas-gateway-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.napas-gateway-container {
+    background-color: #ffffff;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: napasFadeIn 0.3s ease;
+    border: 1px solid #e1e8ed;
+}
+
+@keyframes napasFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.napas-header {
+    background-color: #0b4a8f; /* Màu xanh Napas đặc trưng */
+    color: #ffffff;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #003366;
+}
+
+.napas-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.napas-close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.napas-close:hover {
+    opacity: 1;
+}
+
+.napas-body {
+    padding: 20px 24px;
+}
+
+.napas-order-summary {
+    background-color: #f4f7f9;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-left: 4px solid #0b4a8f;
+}
+
+.napas-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #4a5568;
+}
+
+.napas-summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.napas-summary-row strong {
+    color: #1a202c;
+}
+
+.napas-amount-highlight {
+    font-size: 18px;
+    font-weight: 700;
+    color: #e53e3e;
+}
+
+.napas-step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.napas-step {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+    color: #a0aec0;
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.napas-step.active {
+    color: #0b4a8f;
+    border-bottom-color: #0b4a8f;
+}
+
+.napas-step.done {
+    color: #2f855a;
+    border-bottom-color: #2f855a;
+}
+
+.napas-form-group {
+    margin-bottom: 16px;
+}
+
+.napas-form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.napas-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.napas-input:focus {
+    outline: none;
+    border-color: #0b4a8f;
+    box-shadow: 0 0 0 3px rgba(11, 74, 143, 0.15);
+}
+
+.napas-input::placeholder {
+    color: #a0aec0;
+}
+
+.napas-input-row {
+    display: flex;
+    gap: 16px;
+}
+
+.napas-input-row .napas-form-group {
+    flex: 1;
+}
+
+.napas-error-msg {
+    color: #e53e3e;
+    font-size: 13px;
+    margin-top: 4px;
+    display: none;
+    font-weight: 500;
+}
+
+.napas-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    border-top: 1px solid #edf2f7;
+    padding-top: 16px;
+}
+
+.napas-btn {
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.napas-btn-primary {
+    background-color: #0b4a8f;
+    color: #ffffff;
+}
+
+.napas-btn-primary:hover {
+    background-color: #08376b;
+}
+
+.napas-btn-secondary {
+    background-color: #e2e8f0;
+    color: #4a5568;
+}
+
+.napas-btn-secondary:hover {
+    background-color: #cbd5e0;
+}
+
+.napas-btn:active {
+    transform: scale(0.98);
+}
+
+/* OTP MOCK CSS */
+.napas-otp-instructions {
+    font-size: 14px;
+    color: #4a5568;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.napas-otp-countdown {
+    font-size: 13px;
+    color: #718096;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.napas-otp-countdown span {
+    color: #e53e3e;
+    font-weight: 700;
+}
+
+/* SUCCESS ANIMATION */
+.napas-success-animation {
+    text-align: center;
+    padding: 30px 10px;
+    display: none;
+}
+
+.napas-success-icon {
+    font-size: 56px;
+    color: #48bb78;
+    margin-bottom: 16px;
+    animation: napasPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes napasPop {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.napas-success-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2f855a;
+    margin-bottom: 8px;
+}
+
+.napas-success-desc {
+    font-size: 14px;
+    color: #718096;
+}

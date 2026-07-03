@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Invoice;
 use App\Models\CategoryProduct;
 use App\Models\Booking;
+use App\Models\BankTransaction;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -106,7 +107,106 @@ class CashierController extends Controller
                 'product.unit',
                 'pa.available_qty'
             ]);
-
         return response()->json($products);
+    }
+
+    public function checkPayment(Request $request)
+    {
+        $tableId = $request->query('table_id');
+        $amount = (float) $request->query('amount');
+
+        if (!$tableId || !$amount) {
+            return response()->json(['success' => false, 'message' => 'Missing parameter'], 400);
+        }
+
+        $table = Table::find($tableId);
+        if (!$table) {
+            return response()->json(['success' => false, 'message' => 'Table not found'], 404);
+        }
+
+        $tableName = $table->name;
+        $tableNameNoSign = $this->removeVietnameseSign($tableName);
+
+        // Tìm giao dịch khớp tiền và nội dung (ToiBenQuan-Bàn 1 hoặc ToiBenQuan-Ban 1, v.v...)
+        $transaction = BankTransaction::where('status', 'pending')
+            ->where('amount', $amount)
+            ->where(function ($query) use ($tableName, $tableNameNoSign) {
+                $query->where('description', 'like', "%ToiBenQuan-{$tableName}%")
+                      ->orWhere('description', 'like', "%ToiBenQuan-{$tableNameNoSign}%")
+                      ->orWhere('description', 'like', "%ToiBenQuan " . $tableName . "%")
+                      ->orWhere('description', 'like', "%ToiBenQuan " . $tableNameNoSign . "%")
+                      ->orWhere(function ($q) use ($tableName, $tableNameNoSign) {
+                          $q->where('description', 'like', '%ToiBenQuan%')
+                            ->where(function ($q2) use ($tableName, $tableNameNoSign) {
+                                $q2->where('description', 'like', "%{$tableName}%")
+                                   ->orWhere('description', 'like', "%{$tableNameNoSign}%");
+                            });
+                      });
+            })
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if ($transaction) {
+            // Đánh dấu giao dịch đã được xử lý để tránh trùng khớp lần sau
+            $transaction->update(['status' => 'processed']);
+
+            return response()->json([
+                'success' => true,
+                'transaction' => $transaction
+            ]);
+        }
+
+        return response()->json(['success' => false]);
+    }
+
+    public function simulatePayment(Request $request)
+    {
+        $tableId = $request->input('table_id');
+        $amount = (float) $request->input('amount');
+
+        if (!$tableId || !$amount) {
+            return response()->json(['success' => false, 'message' => 'Missing parameter'], 400);
+        }
+
+        $table = Table::find($tableId);
+        if (!$table) {
+            return response()->json(['success' => false, 'message' => 'Table not found'], 404);
+        }
+
+        $description = "ToiBenQuan-" . $table->name;
+
+        $transaction = BankTransaction::create([
+            'gateway_transaction_id' => 'SIMULATED_' . time() . '_' . rand(1000, 9999),
+            'amount' => $amount,
+            'description' => $description,
+            'reference_code' => 'REF' . time(),
+            'account_number' => '8410113801888',
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Simulated transaction created successfully',
+            'data' => $transaction
+        ]);
+    }
+
+    private function removeVietnameseSign($str)
+    {
+        $str = preg_replace("/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/", "a", $str);
+        $str = preg_replace("/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/", "e", $str);
+        $str = preg_replace("/(ì|í|ị|ỉ|ĩ)/", "i", $str);
+        $str = preg_replace("/(ò|ó|ọ|ỏ|ã|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/", "o", $str);
+        $str = preg_replace("/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/", "u", $str);
+        $str = preg_replace("/(ỳ|ý|ỵ|ỷ|ỹ)/", "y", $str);
+        $str = preg_replace("/(đ)/", "d", $str);
+        $str = preg_replace("/(À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ)/", "A", $str);
+        $str = preg_replace("/(È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ)/", "E", $str);
+        $str = preg_replace("/(Ì|Í|Ị|Ỉ|Ĩ)/", "I", $str);
+        $str = preg_replace("/(Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ)/", "O", $str);
+        $str = preg_replace("/(Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ)/", "U", $str);
+        $str = preg_replace("/(Ỳ|Ý|Ỵ|Ỷ|Ỹ)/", "Y", $str);
+        $str = preg_replace("/(Đ)/", "D", $str);
+        return $str;
     }
 }

@@ -6,9 +6,11 @@
     </div>
 
     <div class="header-mid">
+        {{--
         <a href="#" class="link">Thanh toán</a>
         <a href="#" class="link">Vay vốn</a>
         <a href="#" class="link">Hỗ trợ</a>
+        --}}
     </div>
 
     <div class="header-right">

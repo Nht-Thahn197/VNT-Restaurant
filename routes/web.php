@@ -105,6 +105,8 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::get('/cashier', [CashierController::class, 'index'])->name('pos.cashier');
     Route::post('/cashier/start-serving', [CashierController::class, 'startServing']);
     Route::post('/cashier/remove-serving', [CashierController::class, 'removeServing']);
+    Route::get('/cashier/check-payment', [CashierController::class, 'checkPayment']);
+    Route::post('/cashier/simulate-payment', [CashierController::class, 'simulatePayment']);
     Route::get('/cashier/servicing-count', function () {
         return response()->json([
             'count' => \App\Models\Invoice::where('status', 'serving')->count()
@@ -244,6 +246,10 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::post('/invoice/{id}/cancel', [InvoiceController::class, 'cancel'])->middleware('can:cancel_invoice')
         ->name('pos.invoice.cancel');
 
+    // VNPAY
+    Route::post('/vnpay/create-payment', [App\Http\Controllers\VNPAYController::class, 'createPayment'])->name('pos.vnpay.create');
+    Route::get('/vnpay/return', [App\Http\Controllers\VNPAYController::class, 'vnpayReturn'])->name('pos.vnpay.return');
+
     // IMPORT
     Route::get('/import', [ImportController::class, 'index'])->name('pos.import')->middleware('can:view_import');
     Route::get('/import/create', [ImportController::class, 'create'])->name('import.detail')->middleware('can:view_import');
@@ -334,4 +340,43 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::put('/news/{id}', [NewsController::class, 'update'])->name('news.admin.update')->middleware('can:update_news');
     Route::delete('/news/{id}', [NewsController::class, 'destroy'])->name('news.admin.delete')->middleware('can:delete_news');
 
+});
+
+Route::get('/test-vnpay-signature', function() {
+    $vnp_HashSecret = config('vnpay.hash_secret');
+    $inputData = [
+        "vnp_Version" => "2.1.0",
+        "vnp_TmnCode" => config('vnpay.tmn_code'),
+        "vnp_Amount" => 43000000,
+        "vnp_Command" => "pay",
+        "vnp_CreateDate" => "20260703161436",
+        "vnp_CurrCode" => "VND",
+        "vnp_IpAddr" => "127.0.0.1",
+        "vnp_Locale" => "vn",
+        "vnp_OrderInfo" => "Thanh toan hoa don POS 114",
+        "vnp_OrderType" => "other",
+        "vnp_ReturnUrl" => "http://localhost/pos/vnpay/return",
+        "vnp_TxnRef" => "114_1783067123",
+    ];
+    ksort($inputData);
+    $hashdata = "";
+    $i = 0;
+    foreach ($inputData as $key => $value) {
+        if ($i == 1) {
+            $hashdata .= '&' . urlencode($key) . "=" . urlencode($value);
+        } else {
+            $hashdata .= urlencode($key) . "=" . urlencode($value);
+            $i = 1;
+        }
+    }
+    $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
+    $inputData['vnp_SecureHash'] = $vnpSecureHash;
+    $vnp_Url = config('vnpay.url') . "?" . http_build_query($inputData, '', '&', PHP_QUERY_RFC1738);
+    return response()->json([
+        'hashdata' => $hashdata,
+        'vnpSecureHash' => $vnpSecureHash,
+        'url' => $vnp_Url,
+        'tmn' => config('vnpay.tmn_code'),
+        'secret' => config('vnpay.hash_secret')
+    ]);
 });

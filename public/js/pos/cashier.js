@@ -167,6 +167,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const vietqrImg = document.getElementById('vietqrImg');
     const payMethodRadios = document.querySelectorAll('input[name="pay_method"]');
 
+    let paymentPollInterval = null;
+
+    function startPaymentPolling(tableId, amount) {
+        if (paymentPollInterval) clearInterval(paymentPollInterval);
+        
+        console.log(`Starting payment polling for Table: ${tableId}, Amount: ${amount}`);
+        
+        paymentPollInterval = setInterval(async () => {
+            try {
+                const response = await fetch(`${BASE_URL}/pos/cashier/check-payment?table_id=${tableId}&amount=${amount}`, {
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    clearInterval(paymentPollInterval);
+                    paymentPollInterval = null;
+                    
+                    showToast('Đã nhận được tiền chuyển khoản thành công!', 'success');
+                    
+                    const confirmPayBtn = document.querySelector('.btn-confirm-pay');
+                    if (confirmPayBtn) {
+                        confirmPayBtn.click();
+                    }
+                }
+            } catch (err) {
+                console.error('Lỗi khi check trạng thái chuyển khoản:', err);
+            }
+        }, 3000);
+    }
+
+    function stopPaymentPolling() {
+        if (paymentPollInterval) {
+            console.log('Stopping payment polling');
+            clearInterval(paymentPollInterval);
+            paymentPollInterval = null;
+        }
+    }
+
 payMethodRadios.forEach(radio => {
     radio.addEventListener('change', () => {
         if (radio.value === 'transfer' && radio.checked) {
@@ -182,8 +221,13 @@ payMethodRadios.forEach(radio => {
             vietqrImg.src = generateVietQR(amount, desc);
             qrTransferBox.style.display = 'block';
 
+            if (table) {
+                startPaymentPolling(table.id, amount);
+            }
+
         } else {
             qrTransferBox.style.display = 'none';
+            stopPaymentPolling();
         }
     });
 });
@@ -1126,6 +1170,7 @@ payMethodRadios.forEach(radio => {
 
     function closePayDrawer() {
         payDrawer.classList.remove('show');
+        stopPaymentPolling();
         setTimeout(() => {
             payOverlay.style.display = 'none';
         }, 300);
@@ -1153,6 +1198,9 @@ payMethodRadios.forEach(radio => {
             const table = getSelectedTable();
             const desc = table ? `ToiBenQuan-${table.name}` : 'ToiBenQuan';
             vietqrImg.src = generateVietQR(amount, desc);
+            if (table) {
+                startPaymentPolling(table.id, amount);
+            }
         }
     }
 
@@ -1385,6 +1433,42 @@ payMethodRadios.forEach(radio => {
                 showToast('Vui lòng chọn phương thức thanh toán', 'warning');
                 return;
             }
+
+        if (paymentMethod === 'card') {
+            showToast('Đang chuyển hướng sang cổng thanh toán VNPAY...', 'info');
+            const vnpayUrl = document.querySelector('meta[name="vnpay-create-url"]').getAttribute('content');
+            fetch(vnpayUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    table_id: currentTableId,
+                    time_start: startTime,
+                    items: items,
+                    total: total,
+                    discount: discount,
+                    pay_amount: payAmount,
+                    payment_method: 'card',
+                    promotion_id: selectedPromotion ? selectedPromotion.id : null
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    showToast(data.message || 'Lỗi tạo liên kết thanh toán', 'error');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Lỗi kết nối máy chủ', 'error');
+            });
+            return;
+        }
+
         const checkoutUrl = document
         .querySelector('meta[name="checkout-url"]')
         .getAttribute('content');
@@ -1409,6 +1493,7 @@ payMethodRadios.forEach(radio => {
         .then(res => {
             if (res.success) {
                 showToast('Thanh toán thành công', 'success');
+                window.cardPaymentApproved = false;
 
                 if (res.updated_products && Array.isArray(res.updated_products)) {
                     res.updated_products.forEach(p => {
@@ -1481,6 +1566,49 @@ payMethodRadios.forEach(radio => {
         paginateTables();
     }
 
-    
+    // Check URL parameters for VNPAY callback results
+    const urlParams = new URLSearchParams(window.location.search);
+    const checkoutSuccess = urlParams.get('checkout_success');
+    const checkoutError = urlParams.get('checkout_error');
+    const callbackTableId = urlParams.get('table_id');
+
+    if (checkoutSuccess === '1' && callbackTableId) {
+        showToast('Thanh toán qua VNPAY thành công!', 'success');
+        
+        // Dọn dẹp giỏ hàng cục bộ của bàn
+        localStorage.removeItem(`order_${callbackTableId}`);
+        localStorage.removeItem(`order_start_${callbackTableId}`);
+        
+        // Reset giao diện bàn
+        tableItems.forEach(t => {
+            if (t.dataset.id == callbackTableId) {
+                t.classList.remove('active', 'using');
+            }
+        });
+        
+        selectedTableBtn.textContent = 'Chưa chọn bàn';
+        selectedTableBtn.disabled = true;
+        selectedTableBtn.classList.remove('active');
+        localStorage.removeItem('selectedTable');
+
+        // Cập nhật số lượng bàn đang phục vụ
+        updateServicingCount();
+        
+        // Làm sạch URL để tránh lặp lại hành động khi load lại trang
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+    } else if (checkoutError === '1' && callbackTableId) {
+        showToast('Thanh toán qua VNPAY thất bại hoặc bị hủy!', 'error');
+        
+        // Chọn lại bàn đó để thu ngân thấy tiếp
+        const tableElement = document.querySelector(`.table-item[data-id="${callbackTableId}"]`);
+        if (tableElement) {
+            setSelectedTable(tableElement);
+        }
+        
+        // Làm sạch URL
+        const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+    }
 });
 

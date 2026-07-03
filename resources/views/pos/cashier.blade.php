@@ -5,6 +5,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="base-url" content="{{ url('/') }}">
         <meta name="checkout-url" content="{{ route('pos.checkout') }}">
+        <meta name="vnpay-create-url" content="{{ route('pos.vnpay.create') }}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <meta name="search-product-url" content="{{ route('pos.search.product') }}">
@@ -15,6 +16,7 @@
         <link rel="shortcut icon" href="{{ asset('favicon-pos.ico') }}">
         <link rel="stylesheet" href="{{ asset('css/pos/cashier.css') }}">
         <link rel="stylesheet" href="{{ asset('css/pos/responsive.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/pos/card_payment.css') }}">
         <title>Tới Bến Quán - Thu Ngân</title>
     </head>
     <body>
@@ -419,7 +421,7 @@
             const BASE_URL = "{{ url('/') }}";
         </script>
         <script src="{{ asset('js/pos/common/toast.js') }}"></script>
-        <script src="{{ asset('js/pos/cashier.js') }}"></script>
+        <script src="{{ asset('js/pos/cashier.js') }}?v={{ time() }}"></script>
         <script>
             const APP_URL = "{{ url('/') }}";
         </script>
