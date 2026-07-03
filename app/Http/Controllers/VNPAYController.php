@@ -112,7 +112,6 @@ class VNPAYController extends Controller
             
             Log::info('VNPAY HashData: ' . $hashdata);
             Log::info('VNPAY Url: ' . $vnp_Url);
-            file_put_contents(base_path('vnpay_debug.log'), "HashData: " . $hashdata . "\nUrl: " . $vnp_Url . "\n\n", FILE_APPEND);
 
             return response()->json([
                 'success' => true,
