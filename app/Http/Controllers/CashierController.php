@@ -102,6 +102,7 @@ class CashierController extends Controller
             ->limit(10)
             ->get([
                 'product.id',
+                'product.code',
                 'product.name',
                 'product.price',
                 'product.unit',
@@ -188,6 +189,23 @@ class CashierController extends Controller
             'success' => true,
             'message' => 'Simulated transaction created successfully',
             'data' => $transaction
+        ]);
+    }
+
+    public function updateProductPrice(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:product,id',
+            'new_price' => 'required|numeric|min:0',
+        ]);
+
+        $product = Product::findOrFail($request->product_id);
+        $product->price = $request->new_price;
+        $product->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật giá bán thành công.',
         ]);
     }
 

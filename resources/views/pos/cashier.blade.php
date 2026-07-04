@@ -14,9 +14,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <link rel="shortcut icon" href="{{ asset('favicon-pos.ico') }}">
-        <link rel="stylesheet" href="{{ asset('css/pos/cashier.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/pos/responsive.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/pos/card_payment.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/pos/cashier.css') }}?v={{ time() }}">
+        <link rel="stylesheet" href="{{ asset('css/pos/responsive.css') }}?v={{ time() }}">
+        <link rel="stylesheet" href="{{ asset('css/pos/card_payment.css') }}?v={{ time() }}">
         <title>Tới Bến Quán - Thu Ngân</title>
     </head>
     <body>
@@ -131,6 +131,7 @@
                             <div class="menu-item {{ ($product->available_qty !== null && $product->available_qty <= 0) ? 'out-of-stock' : '' }}" data-category="{{ $product->category_id }}" data-name="{{ strtolower($product->name) }}" 
                                 data-type="{{ $product->type_menu }}" data-id="{{ $product->id }}" 
                                 data-price="{{ $product->price }}" data-unit="{{ $product->unit }}"
+                                data-code="{{ $product->code }}"
                                 data-available="{{ $product->available_qty !== null ? $product->available_qty : 'null' }}">
                                 <img src="{{ asset($product->img ?? 'images/product/default-product.png') }}" class="detail-img">
                                 <h4>{{ $product->name }}</h4>
@@ -399,6 +400,55 @@
                 </div>
             </div>
         </div>
+
+        <!-- PRICE EDIT MODAL -->
+        <div id="priceEditModal" class="modal">
+            <div class="modal-content" style="max-width: 500px; border-radius: 16px;">
+                <div class="modal-header">
+                    <h3 id="pemProductTitle">SP000107 - Bò Húc (Lon)</h3>
+                    <span class="close-modal" id="closePriceEditModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="pemProductId">
+                    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 10px;">
+                        <!-- Bảng giá -->
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-weight: 500; color: #475569;">Bảng giá</span>
+                            <span style="font-weight: 600; color: #0f172a;">Bảng giá chung</span>
+                        </div>
+                        <!-- Giá bán -->
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-weight: 500; color: #475569;">Giá bán <i class="fas fa-info-circle" style="font-size: 12px; color: #94a3b8;" title="Giá bán chung trong hệ thống"></i></span>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <button type="button" id="pemEditBasePriceBtn" style="border: none; background: none; color: #0066ff; font-weight: 600; cursor: pointer; padding: 0; font-size: 15px; text-decoration: underline;">Sửa giá bán</button>
+                                <span id="pemBasePriceText" style="font-weight: 600; color: #0f172a; font-size: 16px;">25,000</span>
+                            </div>
+                        </div>
+                        <!-- Giảm giá -->
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-weight: 500; color: #475569;">Giảm giá</span>
+                            <div style="display: flex; align-items: center; border: 1px solid #d1d5db; border-radius: 8px; overflow: hidden; background: #fff;">
+                                <div style="display: flex; background: #f3f4f6; border-right: 1px solid #d1d5db; padding: 2px;">
+                                    <button type="button" id="pemDiscountTypeVND" class="pem-discount-type-btn active" style="border: none; background: #0066ff; color: #fff; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">VND</button>
+                                    <button type="button" id="pemDiscountTypePercent" class="pem-discount-type-btn" style="border: none; background: transparent; color: #4b5563; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">%</button>
+                                </div>
+                                <input type="number" id="pemDiscountValue" value="0" style="border: none; outline: none; padding: 6px 12px; width: 120px; font-weight: 600; text-align: right;" min="0">
+                            </div>
+                        </div>
+                        <!-- Giá mới -->
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-weight: 500; color: #475569;">Giá mới</span>
+                            <input type="text" id="pemNewPriceInput" readonly style="border: 1px solid #e5e7eb; outline: none; background: #f9fafb; padding: 8px 12px; border-radius: 8px; width: 160px; font-weight: 700; text-align: right; font-size: 16px; color: #22c55e;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; border-top: 1px solid #f3f4f6; padding-top: 15px;">
+                    <button class="btn-cancel" id="pemCancelBtn" style="background: #9ca3af; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Bỏ qua</button>
+                    <button class="btn-update" id="pemSaveBtn" style="background: #0066ff; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Lưu lại</button>
+                </div>
+            </div>
+        </div>
+
         <div class="app-confirm-overlay" id="appConfirmOverlay" aria-hidden="true">
             <div class="app-confirm-dialog" id="appConfirmDialog" role="dialog" aria-modal="true" aria-labelledby="appConfirmTitle" aria-describedby="appConfirmMessage" tabindex="-1">
                 <div class="app-confirm-header">

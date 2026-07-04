@@ -365,8 +365,16 @@ payMethodRadios.forEach(radio => {
             const availableWidth = Math.max(0, menuGridWidth - paddingLeft - paddingRight);
             const availableHeight = Math.max(0, menuGridHeight - paddingTop - paddingBottom);
 
-            const menuColumns = Math.floor((availableWidth + menuGap) / (menuItemMinWidth + menuGap));
-            const menuRows = Math.floor((availableHeight + menuGap) / (menuItemHeight + menuGap));
+            const gridTemplateColumns = style.gridTemplateColumns;
+            let menuColumns = 0;
+            if (gridTemplateColumns && gridTemplateColumns !== 'none' && gridTemplateColumns !== '') {
+                menuColumns = gridTemplateColumns.trim().split(/\s+/).length;
+            }
+            if (menuColumns <= 0) {
+                menuColumns = Math.max(1, Math.floor((availableWidth + menuGap) / (menuItemMinWidth + menuGap)));
+            }
+
+            const menuRows = Math.max(1, Math.floor((availableHeight + menuGap) / (menuItemHeight + menuGap)));
 
             if (menuColumns > 0 && menuRows > 0) {
                 menuPerPage = menuColumns * menuRows;
@@ -501,15 +509,10 @@ payMethodRadios.forEach(radio => {
         if (!list) return;
         const items = list.querySelectorAll('li');
         if (!items.length) return;
-        const gapValue = parseFloat(getComputedStyle(list).gap || '0') || 0;
-        const containerWidth = categoryScroll.clientWidth;
-        if (containerWidth <= 0) return;
-        const itemWidth = Math.floor((containerWidth - (CAT_VISIBLE_COUNT - 1) * gapValue) / CAT_VISIBLE_COUNT);
-        if (itemWidth <= 0) return;
         items.forEach(item => {
-            item.style.flex = `0 0 ${itemWidth}px`;
-            item.style.maxWidth = `${itemWidth}px`;
-            item.style.minWidth = `${itemWidth}px`;
+            item.style.flex = '';
+            item.style.maxWidth = '';
+            item.style.minWidth = '';
         });
         updateCategoryScrollButtons();
     }
@@ -778,6 +781,7 @@ payMethodRadios.forEach(radio => {
                         return `
                             <div class="search-item ${isOutOfStock ? 'out-of-stock' : ''}"
                                 data-id="${p.id}"
+                                data-code="${p.code || ''}"
                                 data-name="${p.name}"
                                 data-unit="${p.unit}"
                                 data-price="${p.price}"
@@ -791,28 +795,29 @@ payMethodRadios.forEach(radio => {
                     searchResult.style.display = 'block';
                 });
         }, 300);
-    });
-
-    searchResult.addEventListener('click', (e) => {
-        const item = e.target.closest('.search-item');
-        if (!item) return;
-        const availableStr = item.dataset.available;
-        if (availableStr !== 'null') {
-            const available = parseFloat(availableStr || '0');
-            if (available <= 0) {
-                showToast('Món này không đủ tồn kho', 'error');
-                return;
-            }
-        }
-        addProduct({
-            id: item.dataset.id,
-            name: item.dataset.name,
-            unit: item.dataset.unit,
-            price: Number(item.dataset.price),
-        });
-
-        searchInput.value = '';
-        searchResult.style.display = 'none';
+     });
+ 
+     searchResult.addEventListener('click', (e) => {
+         const item = e.target.closest('.search-item');
+         if (!item) return;
+         const availableStr = item.dataset.available;
+         if (availableStr !== 'null') {
+             const available = parseFloat(availableStr || '0');
+             if (available <= 0) {
+                 showToast('Món này không đủ tồn kho', 'error');
+                 return;
+             }
+         }
+         addProduct({
+             id: item.dataset.id,
+             name: item.dataset.name,
+             unit: item.dataset.unit,
+             price: Number(item.dataset.price),
+             code: item.dataset.code,
+         });
+ 
+         searchInput.value = '';
+         searchResult.style.display = 'none';
     });
 
     document.addEventListener('click', (e) => {
@@ -857,25 +862,48 @@ payMethodRadios.forEach(radio => {
         hadItemsBefore = true;
 
         items.forEach((item, index) => {
+            // Safeguards
+            if (item.basePrice === undefined) item.basePrice = item.price;
+            if (item.discountValue === undefined) item.discountValue = 0;
+            if (item.discountType === undefined) item.discountType = 'vnd';
+
+            // Check if item is running out (stock <= 3)
+            const menuItem = document.querySelector(`.menu-item[data-id="${item.id}"]`);
+            let isRunningOut = false;
+            if (menuItem) {
+                const availableStr = menuItem.dataset.available;
+                if (availableStr !== 'null') {
+                    const available = parseFloat(availableStr || '0');
+                    if (available <= 3) {
+                        isRunningOut = true;
+                    }
+                }
+            }
+
             const itemTotal = item.qty * item.price;
             const div = document.createElement('div');
             div.className = 'order-item';
             div.dataset.id = item.id;
             div.innerHTML = `
-                <div class="oi-stt">${index + 1}</div>
-                <div class="oi-name">
-                    <strong>${item.name}</strong>
-                    <small>${item.unit}</small>
+                <div class="oi-info">
+                    <div class="oi-title"><strong>${index + 1}. ${item.name}</strong></div>
+                    <div class="oi-unit">${item.unit}</div>
                 </div>
-                <div class="oi-qty">
-                    <button class="btn-minus">−</button>
-                    <input type="text" value="${item.qty}" readonly>
-                    <button class="btn-plus">+</button>
+                <div class="oi-qty-wrapper">
+                    <div class="oi-qty-pill">
+                        <button type="button" class="btn-minus">−</button>
+                        <span class="qty-val">${item.qty}</span>
+                        <button type="button" class="btn-plus">+</button>
+                        ${isRunningOut ? '<span class="oi-warning-badge" title="Món sắp hết tồn kho (còn dưới 3)">!</span>' : ''}
+                    </div>
                 </div>
-                <div class="oi-price">${formatPrice(item.price)}</div>
-                <div class="oi-total">${formatPrice(itemTotal)}</div>
-                <div class="oi-remove">
-                    <button title="Xóa món">×</button>
+                <div class="oi-price-wrapper">
+                    <div class="oi-price-text">${formatPrice(item.price)}</div>
+                    <div class="oi-price-pill" title="Nhấn để sửa/giảm giá">${formatPrice(item.price)}</div>
+                </div>
+                <div class="oi-total-wrapper">
+                    <div class="oi-total-text">${formatPrice(itemTotal)}</div>
+                    <button type="button" class="btn-action-remove" title="Xóa món"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
             `;
 
@@ -908,17 +936,224 @@ payMethodRadios.forEach(radio => {
                 renderOrderList();
             };
 
-            div.querySelector('.oi-remove button').onclick = () => {
+            div.querySelector('.btn-action-remove').onclick = () => {
                 delete orderItems[item.id];
                 saveOrder();
                 updateTableStatus();
                 renderOrderList();
             };
+
+            div.querySelector('.oi-price-pill').onclick = () => {
+                openPriceEditModal(item);
+            };
+
             orderList.appendChild(div);
         });
         updateNotifyBtn(true);
         updateTotal();
     }
+
+    /* ================= PRICE EDIT MODAL LOGIC ================= */
+    const priceEditModal = document.getElementById('priceEditModal');
+    const closePriceEditModal = document.getElementById('closePriceEditModal');
+    const pemProductTitle = document.getElementById('pemProductTitle');
+    const pemProductId = document.getElementById('pemProductId');
+    const pemBasePriceText = document.getElementById('pemBasePriceText');
+    const pemEditBasePriceBtn = document.getElementById('pemEditBasePriceBtn');
+    const pemDiscountTypeVND = document.getElementById('pemDiscountTypeVND');
+    const pemDiscountTypePercent = document.getElementById('pemDiscountTypePercent');
+    const pemDiscountValue = document.getElementById('pemDiscountValue');
+    const pemNewPriceInput = document.getElementById('pemNewPriceInput');
+    const pemCancelBtn = document.getElementById('pemCancelBtn');
+    const pemSaveBtn = document.getElementById('pemSaveBtn');
+
+    let currentEditingItem = null;
+    let currentDiscountType = 'vnd';
+
+    function openPriceEditModal(item) {
+        currentEditingItem = item;
+        
+        if (item.basePrice === undefined) item.basePrice = item.price;
+        if (item.discountValue === undefined) item.discountValue = 0;
+        if (item.discountType === undefined) item.discountType = 'vnd';
+
+        pemProductId.value = item.id;
+        pemProductTitle.textContent = `${item.code || 'SP'} - ${item.name} (${item.unit})`;
+        pemBasePriceText.textContent = formatPrice(item.basePrice);
+        pemDiscountValue.value = item.discountValue;
+        
+        setDiscountType(item.discountType);
+        calculateNewPrice();
+
+        priceEditModal.classList.add('active');
+    }
+
+    function setDiscountType(type) {
+        currentDiscountType = type;
+        if (type === 'vnd') {
+            pemDiscountTypeVND.classList.add('active');
+            pemDiscountTypeVND.style.background = '#0066ff';
+            pemDiscountTypeVND.style.color = '#fff';
+            
+            pemDiscountTypePercent.classList.remove('active');
+            pemDiscountTypePercent.style.background = 'transparent';
+            pemDiscountTypePercent.style.color = '#4b5563';
+        } else {
+            pemDiscountTypePercent.classList.add('active');
+            pemDiscountTypePercent.style.background = '#0066ff';
+            pemDiscountTypePercent.style.color = '#fff';
+            
+            pemDiscountTypeVND.classList.remove('active');
+            pemDiscountTypeVND.style.background = 'transparent';
+            pemDiscountTypeVND.style.color = '#4b5563';
+        }
+        calculateNewPrice();
+    }
+
+    function calculateNewPrice() {
+        if (!currentEditingItem) return;
+        const basePrice = currentEditingItem.basePrice;
+        const discountVal = parseFloat(pemDiscountValue.value || '0') || 0;
+        let newPrice = basePrice;
+
+        if (currentDiscountType === 'percent') {
+            newPrice = basePrice * (1 - discountVal / 100);
+        } else {
+            newPrice = basePrice - discountVal;
+        }
+
+        newPrice = Math.max(0, Math.round(newPrice));
+        pemNewPriceInput.value = formatPrice(newPrice);
+    }
+
+    pemDiscountValue.addEventListener('input', calculateNewPrice);
+    pemDiscountTypeVND.addEventListener('click', () => setDiscountType('vnd'));
+    pemDiscountTypePercent.addEventListener('click', () => setDiscountType('percent'));
+
+    function closePEM() {
+        priceEditModal.classList.remove('active');
+        currentEditingItem = null;
+    }
+    closePriceEditModal.addEventListener('click', closePEM);
+    pemCancelBtn.addEventListener('click', closePEM);
+
+    pemSaveBtn.addEventListener('click', () => {
+        if (!currentEditingItem) return;
+        
+        const discountVal = parseFloat(pemDiscountValue.value || '0') || 0;
+        const basePrice = currentEditingItem.basePrice;
+        let newPrice = basePrice;
+
+        if (currentDiscountType === 'percent') {
+            newPrice = basePrice * (1 - discountVal / 100);
+        } else {
+            newPrice = basePrice - discountVal;
+        }
+        newPrice = Math.max(0, Math.round(newPrice));
+
+        currentEditingItem.discountValue = discountVal;
+        currentEditingItem.discountType = currentDiscountType;
+        currentEditingItem.price = newPrice;
+
+        saveOrder();
+        renderOrderList();
+        closePEM();
+        showToast('Đã áp dụng giảm giá/sửa giá cho món', 'success');
+    });
+
+    pemEditBasePriceBtn.addEventListener('click', async () => {
+        if (!currentEditingItem) return;
+        
+        const currentBase = currentEditingItem.basePrice;
+        const newBaseStr = prompt(`Nhập giá bán mới cho [${currentEditingItem.name}] (Giá hiện tại: ${formatPrice(currentBase)}):`, currentBase);
+        
+        if (newBaseStr === null) return;
+        const newBase = parseFloat(newBaseStr.replace(/,/g, '').trim());
+        if (isNaN(newBase) || newBase < 0) {
+            showToast('Giá bán không hợp lệ', 'error');
+            return;
+        }
+
+        try {
+            const updateUrl = `${BASE_URL}/pos/cashier/update-product-price`;
+            const response = await fetch(updateUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    product_id: currentEditingItem.id,
+                    new_price: newBase
+                })
+            });
+
+            const result = await response.json();
+            if (!result.success) {
+                showToast(result.message || 'Cập nhật giá bán thất bại', 'error');
+                return;
+            }
+
+            showToast('Đã cập nhật giá bán mới vào hệ thống', 'success');
+
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('order_') && !key.startsWith('order_start_')) {
+                    try {
+                        const savedOrder = JSON.parse(localStorage.getItem(key));
+                        if (savedOrder && savedOrder[currentEditingItem.id]) {
+                            const ordItem = savedOrder[currentEditingItem.id];
+                            ordItem.basePrice = newBase;
+                            
+                            const discVal = ordItem.discountValue || 0;
+                            const discType = ordItem.discountType || 'vnd';
+                            let finalP = newBase;
+                            if (discType === 'percent') {
+                                finalP = newBase * (1 - discVal / 100);
+                            } else {
+                                finalP = newBase - discVal;
+                            }
+                            ordItem.price = Math.max(0, Math.round(finalP));
+                            
+                            localStorage.setItem(key, JSON.stringify(savedOrder));
+                        }
+                    } catch (e) {
+                        console.error('Error updating localStorage key:', key, e);
+                    }
+                }
+            }
+
+            if (orderItems[currentEditingItem.id]) {
+                orderItems[currentEditingItem.id].basePrice = newBase;
+                const discVal = orderItems[currentEditingItem.id].discountValue || 0;
+                const discType = orderItems[currentEditingItem.id].discountType || 'vnd';
+                let finalP = newBase;
+                if (discType === 'percent') {
+                    finalP = newBase * (1 - discVal / 100);
+                } else {
+                    finalP = newBase - discVal;
+                }
+                orderItems[currentEditingItem.id].price = Math.max(0, Math.round(finalP));
+            }
+
+            const menuItem = document.querySelector(`.menu-item[data-id="${currentEditingItem.id}"]`);
+            if (menuItem) {
+                menuItem.dataset.price = newBase;
+                const pTag = menuItem.querySelector('p');
+                if (pTag) {
+                    pTag.textContent = `${menuItem.dataset.unit} - ${formatPrice(newBase)}`;
+                }
+            }
+
+            pemBasePriceText.textContent = formatPrice(newBase);
+            calculateNewPrice();
+            renderOrderList();
+
+        } catch (error) {
+            console.error('Error updating base price:', error);
+            showToast('Lỗi kết nối máy chủ', 'error');
+        }
+    });
 
     function updateTableStatus() {
         tableItems.forEach(table => {
@@ -1016,7 +1251,8 @@ payMethodRadios.forEach(radio => {
                 unit: product.unit,
                 price: product.price,
                 qty: 1,
-                type: product.type_menu
+                type: product.type_menu,
+                code: product.code || ''
             };
         }
         saveOrder();
@@ -1040,7 +1276,8 @@ payMethodRadios.forEach(radio => {
                 name: item.querySelector('h4').textContent,
                 unit: item.dataset.unit,
                 price: Number(item.dataset.price),
-                type_menu: item.dataset.type
+                type_menu: item.dataset.type,
+                code: item.dataset.code || ''
             });
         });
     });

@@ -118,14 +118,15 @@ svg {
     padding: 8px;
   }
 
-  .left-panel {
+  .left-panel,
+  .right-panel {
+    flex: 1 1 0;
+    width: calc((100% - 8px) / 2);
     height: calc(100vh - 16px);
     height: calc(100dvh - 16px);
   }
 
   .right-panel {
-    flex: 0 0 clamp(380px, 31vw, 420px);
-    width: clamp(380px, 31vw, 420px);
     height: calc(100vh - 16px);
     height: calc(100dvh - 16px);
   }

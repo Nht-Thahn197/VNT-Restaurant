@@ -914,119 +914,189 @@ body {
 }
 
 .order-item {
-    display: grid;
-    grid-template-columns: 
-        36px
-        2.2fr
-        120px
-        90px
-        90px
-        36px; 
+    display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     background: #fff;
-    border-radius: 10px;
-    padding: 10px 12px;
-    box-shadow: 0 2px 6px rgba(0,0,0,.05);
-    transition: all .2s ease;
-}
-
-.order-item + .order-item {
-    margin-top: 6px;
-}
-
-.order-item > * {
-    min-width: 0;
+    padding: 10px 14px;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.15s ease;
 }
 
 .order-item:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    background: #f0f6ff;
+    border-top: 1px solid #d0e1ff;
+    border-bottom: 1px solid #d0e1ff;
 }
 
-.oi-stt {
-    text-align: center;
-    font-weight: 600;
+.oi-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.oi-title {
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.oi-unit {
+    font-size: 12px;
     color: #64748b;
 }
 
-.oi-name strong {
-    display: block;
-    font-size: 15px;
-    color: #0f172a;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.oi-name small {
-    font-size: 12px;
+.oi-note {
+    font-size: 11px;
     color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
 }
 
-.oi-qty {
+.oi-qty-wrapper {
+    flex: 0 0 auto;
+}
+
+.oi-qty-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 86px;
+    height: 32px;
+    border: 1px solid #0066ff;
+    border-radius: 999px;
+    background: #fff;
+    padding: 0 6px;
+    position: relative;
+}
+
+.oi-qty-pill button {
+    border: none;
+    background: transparent;
+    color: #000;
+    font-size: 14px;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-}
-
-.oi-qty button {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: #e2e8f0;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all .15s;
-}
-
-.oi-qty button:hover {
-    background: #cbd5f5;
-}
-
-.oi-qty input {
-    width: 42px;
-    height: 28px;
-    text-align: center;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
     font-weight: 600;
+}
+
+.oi-qty-pill button:hover {
+    color: #0066ff;
+}
+
+.oi-qty-pill .qty-val {
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+}
+
+.oi-warning-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid #dc2626;
+    background: #fff;
+    color: #dc2626;
+    font-size: 10px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.oi-price-wrapper {
+    flex: 0 0 96px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.oi-price-text {
+    font-size: 14px;
+    color: #0f172a;
+    font-weight: 500;
+}
+
+.oi-price-pill {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 90px;
+    height: 32px;
+    border: 1px solid #0066ff;
+    border-radius: 999px;
+    background: #fff;
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.oi-price-pill:hover {
     background: #f8fafc;
 }
 
-/* ================= PRICE ================= */
-.oi-price {
-    text-align: right;
+.order-item:hover .oi-price-text {
+    display: none;
+}
+
+.order-item:hover .oi-price-pill {
+    display: flex;
+}
+
+.oi-total-wrapper {
+    flex: 0 0 110px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.oi-total-text {
     font-size: 14px;
-    color: #475569;
-    white-space: nowrap;
-}
-
-/* ================= TOTAL ================= */
-.oi-total {
-    text-align: right;
-    font-size: 15px;
+    color: #0f172a;
     font-weight: 700;
-    color: #16a34a;
-    white-space: nowrap;
 }
 
-/* ================= REMOVE ================= */
-.oi-remove button {
-    width: 28px;
-    height: 28px;
+.oi-total-wrapper .btn-action-remove {
+    display: none;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     border: none;
     background: #fee2e2;
     color: #dc2626;
-    font-size: 16px;
+    font-size: 13px;
     cursor: pointer;
-    transition: all .15s;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
 }
 
-.oi-remove button:hover {
+.oi-total-wrapper .btn-action-remove:hover {
     background: #fecaca;
+    color: #b91c1c;
+}
+
+.order-item:hover .oi-total-text {
+    display: none;
+}
+
+.order-item:hover .btn-action-remove {
+    display: flex;
 }
 
 .order-summary {

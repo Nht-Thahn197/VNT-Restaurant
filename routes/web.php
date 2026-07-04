@@ -107,6 +107,7 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     Route::post('/cashier/remove-serving', [CashierController::class, 'removeServing']);
     Route::get('/cashier/check-payment', [CashierController::class, 'checkPayment']);
     Route::post('/cashier/simulate-payment', [CashierController::class, 'simulatePayment']);
+    Route::post('/cashier/update-product-price', [CashierController::class, 'updateProductPrice']);
     Route::get('/cashier/servicing-count', function () {
         return response()->json([
             'count' => \App\Models\Invoice::where('status', 'serving')->count()
