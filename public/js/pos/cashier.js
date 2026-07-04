@@ -1690,7 +1690,22 @@ payMethodRadios.forEach(radio => {
             },
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
+        .then(async res => {
+            const text = await res.text();
+            let data = {};
+
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (error) {
+                throw new Error('Máy chủ không trả về JSON hợp lệ.');
+            }
+
+            if (!res.ok) {
+                throw new Error(data.message || 'Không tạo được thanh toán VNPAY.');
+            }
+
+            return data;
+        })
         .then(res => {
             if (res.success && res.redirect_url) {
                 window.location.href = res.redirect_url;
@@ -1761,7 +1776,7 @@ payMethodRadios.forEach(radio => {
                 return;
             }
 
-        if (paymentMethod === 'card') {
+        if (false && paymentMethod === 'card') {
             showToast('Đang chuyển hướng sang cổng thanh toán VNPAY...', 'info');
             const vnpayUrl = document.querySelector('meta[name="vnpay-create-url"]').getAttribute('content');
             fetch(vnpayUrl, {

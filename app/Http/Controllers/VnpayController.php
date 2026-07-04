@@ -28,33 +28,40 @@ class VnpayController extends Controller
             'bank_code' => 'nullable|string|max:20',
         ]);
 
-        $bankCode = $data['bank_code'] ?? null;
-        unset($data['bank_code']);
+        try {
+            $bankCode = $data['bank_code'] ?? null;
+            unset($data['bank_code']);
 
-        $data = $this->normalizeCheckoutData($data);
-        $txnRef = $this->makeTxnRef((int) $data['table_id']);
+            $data = $this->normalizeCheckoutData($data);
+            $txnRef = $this->makeTxnRef((int) $data['table_id']);
 
-        Cache::put($this->cacheKey($txnRef), [
-            'status' => 'pending',
-            'checkout' => $data,
-            'staff_id' => Auth::guard('staff')->id(),
-            'amount' => (int) round($data['pay_amount']),
-            'created_at' => now()->toIso8601String(),
-        ], now()->addHours(3));
+            Cache::put($this->cacheKey($txnRef), [
+                'status' => 'pending',
+                'checkout' => $data,
+                'staff_id' => Auth::guard('staff')->id(),
+                'amount' => (int) round($data['pay_amount']),
+                'created_at' => now()->toIso8601String(),
+            ], now()->addHours(3));
 
-        $paymentUrl = $vnpay->createPaymentUrl(
-            $txnRef,
-            (int) round($data['pay_amount']),
-            'Thanh toan hoa don ' . $txnRef,
-            $request,
-            $bankCode
-        );
+            $paymentUrl = $vnpay->createPaymentUrl(
+                $txnRef,
+                (int) round($data['pay_amount']),
+                'Thanh toan hoa don ' . $txnRef,
+                $request,
+                $bankCode
+            );
 
-        return response()->json([
-            'success' => true,
-            'txn_ref' => $txnRef,
-            'redirect_url' => $paymentUrl,
-        ]);
+            return response()->json([
+                'success' => true,
+                'txn_ref' => $txnRef,
+                'redirect_url' => $paymentUrl,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function return(Request $request, VnpayService $vnpay, InvoiceCheckoutService $checkoutService)
