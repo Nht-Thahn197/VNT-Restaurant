@@ -39,6 +39,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\NewsController;
+use App\Http\Controllers\VnpayController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -61,6 +62,9 @@ Route::post('/contact', [ContactController::class, 'store'])->name('contact.stor
 Route::get('/booking', [CustomerBookingController::class, 'index'])
     ->name('customer.booking');
 Route::post('/booking/store', [CustomerBookingController::class, 'store']);
+
+Route::get('/vnpay/return', [VnpayController::class, 'return'])->name('vnpay.return');
+Route::get('/vnpay/ipn', [VnpayController::class, 'ipn'])->name('vnpay.ipn');
 
 // LOGIN
 Route::prefix('pos')->group(function () {
@@ -244,12 +248,9 @@ Route::prefix('pos')->middleware('auth:staff')->group(function () {
     // INVOICE
     Route::get('/invoice', [InvoiceController::class, 'index'])->name('pos.invoice')->middleware('can:view_invoice');
     Route::post('/checkout', [InvoiceController::class, 'checkout'])->name('pos.checkout')->middleware('can:view_invoice');
+    Route::post('/vnpay/create-payment', [VnpayController::class, 'createPayment'])->name('pos.vnpay.create')->middleware('can:view_invoice');
     Route::post('/invoice/{id}/cancel', [InvoiceController::class, 'cancel'])->middleware('can:cancel_invoice')
         ->name('pos.invoice.cancel');
-
-    // VNPAY
-    Route::post('/vnpay/create-payment', [App\Http\Controllers\VNPAYController::class, 'createPayment'])->name('pos.vnpay.create');
-    Route::get('/vnpay/return', [App\Http\Controllers\VNPAYController::class, 'vnpayReturn'])->name('pos.vnpay.return');
 
     // IMPORT
     Route::get('/import', [ImportController::class, 'index'])->name('pos.import')->middleware('can:view_import');

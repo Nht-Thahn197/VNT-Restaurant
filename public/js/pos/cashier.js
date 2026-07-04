@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = document
     .querySelector('meta[name="csrf-token"]')
     ?.getAttribute('content');
+    const vnpayCreateUrl = document
+        .querySelector('meta[name="vnpay-create-url"]')
+        ?.getAttribute('content');
     
     /* ================= ELEMENT ================= */
     const tabLinks = document.querySelectorAll('.nav-tabs li a');
@@ -751,6 +754,54 @@ payMethodRadios.forEach(radio => {
         }
     }
 
+    function clearOrderState(tableId) {
+        if (!tableId) return;
+
+        localStorage.removeItem(`order_${tableId}`);
+        localStorage.removeItem(`order_start_${tableId}`);
+
+        const selectedTable = getSelectedTable();
+        if (selectedTable && String(selectedTable.id) === String(tableId)) {
+            localStorage.removeItem('selectedTable');
+        }
+    }
+
+    function clearSelectedTableUI(tableId) {
+        tableItems.forEach(t => {
+            if (!tableId || String(t.dataset.id) === String(tableId)) {
+                t.classList.remove('active', 'using');
+            }
+        });
+        selectedTableBtn.textContent = 'Chưa chọn bàn';
+        selectedTableBtn.disabled = true;
+        selectedTableBtn.classList.remove('active');
+    }
+
+    function handleVnpayReturnResult() {
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('vnpay_status');
+
+        if (!status) return;
+
+        const tableId = params.get('table_id');
+
+        if (status === 'success') {
+            clearOrderState(tableId);
+            clearSelectedTableUI(tableId);
+            orderItems = {};
+            showToast('Thanh toán VNPAY thành công', 'success', 5000);
+        } else if (status === 'invalid_signature') {
+            showToast('VNPAY trả về sai chữ ký. Vui lòng kiểm tra cấu hình.', 'error', 6000);
+        } else if (status === 'error') {
+            showToast(params.get('message') || 'Không thể cập nhật hóa đơn VNPAY', 'error', 6000);
+        } else {
+            showToast('Giao dịch VNPAY chưa thành công', 'warning', 5000);
+        }
+
+        const cleanUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, cleanUrl);
+    }
+
     /* ================= SEARCH PRODUCT ================= */
     searchInput.addEventListener('input', () => {
         const keyword = searchInput.value.trim();
@@ -1355,6 +1406,7 @@ payMethodRadios.forEach(radio => {
     }
 
     /* ================= INIT ================= */
+    handleVnpayReturnResult();
     loadOrder();
     updateTableStatus();
     renderOrderList();
@@ -1619,7 +1671,45 @@ payMethodRadios.forEach(radio => {
         promotionPopup.style.display = 'none';
     });
 
-    document.querySelector('.btn-confirm-pay').addEventListener('click', () => {
+    function startVnpayPayment(payload, button) {
+        if (!vnpayCreateUrl) {
+            showToast('Chưa cấu hình URL tạo thanh toán VNPAY', 'error');
+            return;
+        }
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Đang kết nối VNPAY...';
+
+        fetch(vnpayCreateUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success && res.redirect_url) {
+                window.location.href = res.redirect_url;
+                return;
+            }
+
+            button.disabled = false;
+            button.textContent = originalText;
+            showToast(res.message || 'Không tạo được thanh toán VNPAY', 'error');
+        })
+        .catch(err => {
+            console.error(err);
+            button.disabled = false;
+            button.textContent = originalText;
+            showToast('Lỗi kết nối VNPAY', 'error');
+        });
+    }
+
+    document.querySelector('.btn-confirm-pay').addEventListener('click', (event) => {
         const table = getSelectedTable();
         if (!table) {
             showToast('Chưa chọn bàn', 'warning');
@@ -1709,22 +1799,29 @@ payMethodRadios.forEach(radio => {
         const checkoutUrl = document
         .querySelector('meta[name="checkout-url"]')
         .getAttribute('content');
+        const checkoutPayload = {
+            table_id: currentTableId,
+            time_start: startTime,
+            items: items,
+            total: total,
+            discount: discount,
+            pay_amount: payAmount,
+            payment_method: paymentMethod,
+            promotion_id: selectedPromotion ? selectedPromotion.id : null
+        };
+
+        if (paymentMethod === 'card') {
+            startVnpayPayment(checkoutPayload, event.currentTarget);
+            return;
+        }
+
         fetch(checkoutUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
-            body: JSON.stringify({
-                table_id: currentTableId,
-                time_start: startTime,
-                items: items,
-                total: total,
-                discount: discount,
-                pay_amount: payAmount,
-                payment_method: paymentMethod,
-                promotion_id: selectedPromotion ? selectedPromotion.id : null
-            })
+            body: JSON.stringify(checkoutPayload)
         })
         .then(res => res.json())
         .then(res => {
