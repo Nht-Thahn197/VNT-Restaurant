@@ -826,6 +826,16 @@ body {
     background: rgba(0,0,0,0.5);
 }
 
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active .modal-content {
+    margin: 0 auto;
+}
+
 .modal-content {
     background: white; 
     margin: 10% auto; 
@@ -899,6 +909,61 @@ body {
 .close-modal { 
     cursor: pointer; 
     font-size: 20px; 
+}
+
+.price-system-modal {
+    z-index: 2100;
+}
+
+.price-system-modal .modal-content {
+    width: min(420px, calc(100vw - 28px));
+    border-radius: 14px;
+}
+
+.base-price-product {
+    margin-bottom: 14px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.base-price-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.base-price-field label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.base-price-value,
+.base-price-input {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #dbe3ef;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: right;
+}
+
+.base-price-input {
+    background: #fff;
+    border-color: #0066ff;
+    outline: none;
+}
+
+.base-price-note {
+    margin: 2px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 .order-list {
@@ -1022,6 +1087,7 @@ body {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    cursor: pointer;
 }
 
 .oi-price-text {
@@ -1375,12 +1441,15 @@ body {
 }
 
 #discountValue::-webkit-outer-spin-button,
-#discountValue::-webkit-inner-spin-button {
+#discountValue::-webkit-inner-spin-button,
+#pemDiscountValue::-webkit-outer-spin-button,
+#pemDiscountValue::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-#discountValue {
+#discountValue,
+#pemDiscountValue {
     -moz-appearance: textfield;
 }
 

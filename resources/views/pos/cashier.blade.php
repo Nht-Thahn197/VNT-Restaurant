@@ -432,7 +432,7 @@
                                     <button type="button" id="pemDiscountTypeVND" class="pem-discount-type-btn active" style="border: none; background: #0066ff; color: #fff; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">VND</button>
                                     <button type="button" id="pemDiscountTypePercent" class="pem-discount-type-btn" style="border: none; background: transparent; color: #4b5563; font-weight: 600; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-size: 12px;">%</button>
                                 </div>
-                                <input type="number" id="pemDiscountValue" value="0" style="border: none; outline: none; padding: 6px 12px; width: 120px; font-weight: 600; text-align: right;" min="0">
+                                <input type="text" inputmode="decimal" id="pemDiscountValue" value="0" autocomplete="off" style="border: none; outline: none; padding: 6px 12px; width: 120px; font-weight: 600; text-align: right;">
                             </div>
                         </div>
                         <!-- Giá mới -->
@@ -445,6 +445,37 @@
                 <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; border-top: 1px solid #f3f4f6; padding-top: 15px;">
                     <button class="btn-cancel" id="pemCancelBtn" style="background: #9ca3af; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Bỏ qua</button>
                     <button class="btn-update" id="pemSaveBtn" style="background: #0066ff; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">Lưu lại</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="basePriceModal" class="modal price-system-modal" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Sửa giá bán</h3>
+                    <span class="close-modal" id="closeBasePriceModal">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="base-price-product" id="bpmProductName"></div>
+
+                    <div class="base-price-field">
+                        <label>Giá hiện tại</label>
+                        <div class="base-price-value" id="bpmCurrentPrice">0</div>
+                    </div>
+
+                    <div class="base-price-field">
+                        <label for="bpmNewPriceInput">Giá bán mới</label>
+                        <input type="text" inputmode="numeric" id="bpmNewPriceInput" class="base-price-input" autocomplete="off">
+                    </div>
+
+                    <p class="base-price-note">
+                        Giá mới sẽ áp dụng cho sản phẩm và các bàn chưa thanh toán đang có món này.
+                        Hóa đơn đã thanh toán vẫn giữ giá đã ghi nhận.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" id="bpmCancelBtn">Bỏ qua</button>
+                    <button type="button" class="btn-update" id="bpmSaveBtn">Lưu giá mới</button>
                 </div>
             </div>
         </div>

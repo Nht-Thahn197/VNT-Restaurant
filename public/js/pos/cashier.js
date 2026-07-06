@@ -719,6 +719,36 @@ payMethodRadios.forEach(radio => {
         return Number(num || 0).toLocaleString('vi-VN');
     }
 
+    function parseMoneyValue(value) {
+        const numeric = String(value ?? '').replace(/[^\d]/g, '');
+        return numeric ? Number(numeric) : NaN;
+    }
+
+    function calculateDiscountedPrice(basePrice, discountValue = 0, discountType = 'vnd') {
+        const base = Math.max(0, Number(basePrice || 0));
+        const discount = Math.max(0, Number(discountValue || 0));
+        let price = base;
+
+        if (discountType === 'percent') {
+            price = base * (1 - Math.min(discount, 100) / 100);
+        } else {
+            price = base - discount;
+        }
+
+        return Math.max(0, Math.round(price));
+    }
+
+    function applyBasePriceToOrderItem(item, newBasePrice) {
+        if (!item) return;
+
+        item.basePrice = newBasePrice;
+        item.price = calculateDiscountedPrice(
+            newBasePrice,
+            item.discountValue || 0,
+            item.discountType || 'vnd'
+        );
+    }
+
     function getSelectedTable() {
         return JSON.parse(localStorage.getItem('selectedTable'));
     }
@@ -994,7 +1024,7 @@ payMethodRadios.forEach(radio => {
                 renderOrderList();
             };
 
-            div.querySelector('.oi-price-pill').onclick = () => {
+            div.querySelector('.oi-price-wrapper').onclick = () => {
                 openPriceEditModal(item);
             };
 
@@ -1017,6 +1047,13 @@ payMethodRadios.forEach(radio => {
     const pemNewPriceInput = document.getElementById('pemNewPriceInput');
     const pemCancelBtn = document.getElementById('pemCancelBtn');
     const pemSaveBtn = document.getElementById('pemSaveBtn');
+    const basePriceModal = document.getElementById('basePriceModal');
+    const closeBasePriceModal = document.getElementById('closeBasePriceModal');
+    const bpmProductName = document.getElementById('bpmProductName');
+    const bpmCurrentPrice = document.getElementById('bpmCurrentPrice');
+    const bpmNewPriceInput = document.getElementById('bpmNewPriceInput');
+    const bpmCancelBtn = document.getElementById('bpmCancelBtn');
+    const bpmSaveBtn = document.getElementById('bpmSaveBtn');
 
     let currentEditingItem = null;
     let currentDiscountType = 'vnd';
@@ -1063,17 +1100,11 @@ payMethodRadios.forEach(radio => {
 
     function calculateNewPrice() {
         if (!currentEditingItem) return;
-        const basePrice = currentEditingItem.basePrice;
-        const discountVal = parseFloat(pemDiscountValue.value || '0') || 0;
-        let newPrice = basePrice;
-
-        if (currentDiscountType === 'percent') {
-            newPrice = basePrice * (1 - discountVal / 100);
-        } else {
-            newPrice = basePrice - discountVal;
-        }
-
-        newPrice = Math.max(0, Math.round(newPrice));
+        const newPrice = calculateDiscountedPrice(
+            currentEditingItem.basePrice,
+            pemDiscountValue.value || 0,
+            currentDiscountType
+        );
         pemNewPriceInput.value = formatPrice(newPrice);
     }
 
@@ -1083,6 +1114,7 @@ payMethodRadios.forEach(radio => {
 
     function closePEM() {
         priceEditModal.classList.remove('active');
+        closeBasePriceEditor();
         currentEditingItem = null;
     }
     closePriceEditModal.addEventListener('click', closePEM);
@@ -1091,16 +1123,12 @@ payMethodRadios.forEach(radio => {
     pemSaveBtn.addEventListener('click', () => {
         if (!currentEditingItem) return;
         
-        const discountVal = parseFloat(pemDiscountValue.value || '0') || 0;
-        const basePrice = currentEditingItem.basePrice;
-        let newPrice = basePrice;
-
-        if (currentDiscountType === 'percent') {
-            newPrice = basePrice * (1 - discountVal / 100);
-        } else {
-            newPrice = basePrice - discountVal;
-        }
-        newPrice = Math.max(0, Math.round(newPrice));
+        const discountVal = Math.max(0, Number(pemDiscountValue.value || 0));
+        const newPrice = calculateDiscountedPrice(
+            currentEditingItem.basePrice,
+            discountVal,
+            currentDiscountType
+        );
 
         currentEditingItem.discountValue = discountVal;
         currentEditingItem.discountType = currentDiscountType;
@@ -1112,25 +1140,102 @@ payMethodRadios.forEach(radio => {
         showToast('Đã áp dụng giảm giá/sửa giá cho món', 'success');
     });
 
-    pemEditBasePriceBtn.addEventListener('click', async () => {
+    function openBasePriceModal() {
+        if (!currentEditingItem || !basePriceModal) return;
+
+        const currentBase = Number(currentEditingItem.basePrice || currentEditingItem.price || 0);
+        bpmProductName.textContent = `${currentEditingItem.code || 'SP'} - ${currentEditingItem.name} (${currentEditingItem.unit})`;
+        bpmCurrentPrice.textContent = formatPrice(currentBase);
+        bpmNewPriceInput.value = formatPrice(currentBase);
+        basePriceModal.classList.add('active');
+        basePriceModal.setAttribute('aria-hidden', 'false');
+
+        setTimeout(() => {
+            bpmNewPriceInput.focus();
+            bpmNewPriceInput.select();
+        }, 0);
+    }
+
+    function closeBasePriceEditor() {
+        if (!basePriceModal) return;
+
+        basePriceModal.classList.remove('active');
+        basePriceModal.setAttribute('aria-hidden', 'true');
+    }
+
+    function updateMenuProductPrice(productId, newBasePrice) {
+        document.querySelectorAll(`.menu-item[data-id="${productId}"]`).forEach(menuItem => {
+            menuItem.dataset.price = newBasePrice;
+            const pTag = menuItem.querySelector('p');
+            if (pTag) {
+                pTag.textContent = `${menuItem.dataset.unit} - ${formatPrice(newBasePrice)}`;
+            }
+        });
+    }
+
+    function updateUnpaidOrdersProductPrice(productId, newBasePrice) {
+        let updatedOrders = 0;
+        const keys = [];
+
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('order_') && !key.startsWith('order_start_')) {
+                keys.push(key);
+            }
+        }
+
+        keys.forEach(key => {
+            try {
+                const savedOrder = JSON.parse(localStorage.getItem(key));
+                if (!savedOrder || !savedOrder[productId]) return;
+
+                applyBasePriceToOrderItem(savedOrder[productId], newBasePrice);
+                localStorage.setItem(key, JSON.stringify(savedOrder));
+                updatedOrders++;
+            } catch (e) {
+                console.error('Error updating localStorage key:', key, e);
+            }
+        });
+
+        if (orderItems[productId]) {
+            applyBasePriceToOrderItem(orderItems[productId], newBasePrice);
+            saveOrder();
+        }
+
+        return updatedOrders;
+    }
+
+    pemEditBasePriceBtn.addEventListener('click', openBasePriceModal);
+    closeBasePriceModal?.addEventListener('click', closeBasePriceEditor);
+    bpmCancelBtn?.addEventListener('click', closeBasePriceEditor);
+    basePriceModal?.addEventListener('click', (event) => {
+        if (event.target === basePriceModal) closeBasePriceEditor();
+    });
+
+    bpmNewPriceInput?.addEventListener('input', () => {
+        const value = parseMoneyValue(bpmNewPriceInput.value);
+        bpmNewPriceInput.value = Number.isFinite(value) ? formatPrice(value) : '';
+    });
+
+    bpmSaveBtn?.addEventListener('click', async () => {
         if (!currentEditingItem) return;
-        
-        const currentBase = currentEditingItem.basePrice;
-        const newBaseStr = prompt(`Nhập giá bán mới cho [${currentEditingItem.name}] (Giá hiện tại: ${formatPrice(currentBase)}):`, currentBase);
-        
-        if (newBaseStr === null) return;
-        const newBase = parseFloat(newBaseStr.replace(/,/g, '').trim());
-        if (isNaN(newBase) || newBase < 0) {
+
+        const newBase = parseMoneyValue(bpmNewPriceInput.value);
+        if (!Number.isFinite(newBase) || newBase < 0) {
             showToast('Giá bán không hợp lệ', 'error');
             return;
         }
 
+        const originalText = bpmSaveBtn.textContent;
+        bpmSaveBtn.disabled = true;
+        bpmSaveBtn.textContent = 'Đang lưu...';
+
         try {
-            const updateUrl = `${BASE_URL}/pos/cashier/update-product-price`;
-            const response = await fetch(updateUrl, {
+            const response = await fetch(`${BASE_URL}/pos/cashier/update-product-price`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
                 body: JSON.stringify({
@@ -1140,69 +1245,30 @@ payMethodRadios.forEach(radio => {
             });
 
             const result = await response.json();
-            if (!result.success) {
+            if (!response.ok || !result.success) {
                 showToast(result.message || 'Cập nhật giá bán thất bại', 'error');
                 return;
             }
 
-            showToast('Đã cập nhật giá bán mới vào hệ thống', 'success');
+            const savedBase = Number(result.new_price ?? newBase);
+            const updatedOrders = updateUnpaidOrdersProductPrice(String(currentEditingItem.id), savedBase);
 
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('order_') && !key.startsWith('order_start_')) {
-                    try {
-                        const savedOrder = JSON.parse(localStorage.getItem(key));
-                        if (savedOrder && savedOrder[currentEditingItem.id]) {
-                            const ordItem = savedOrder[currentEditingItem.id];
-                            ordItem.basePrice = newBase;
-                            
-                            const discVal = ordItem.discountValue || 0;
-                            const discType = ordItem.discountType || 'vnd';
-                            let finalP = newBase;
-                            if (discType === 'percent') {
-                                finalP = newBase * (1 - discVal / 100);
-                            } else {
-                                finalP = newBase - discVal;
-                            }
-                            ordItem.price = Math.max(0, Math.round(finalP));
-                            
-                            localStorage.setItem(key, JSON.stringify(savedOrder));
-                        }
-                    } catch (e) {
-                        console.error('Error updating localStorage key:', key, e);
-                    }
-                }
-            }
-
-            if (orderItems[currentEditingItem.id]) {
-                orderItems[currentEditingItem.id].basePrice = newBase;
-                const discVal = orderItems[currentEditingItem.id].discountValue || 0;
-                const discType = orderItems[currentEditingItem.id].discountType || 'vnd';
-                let finalP = newBase;
-                if (discType === 'percent') {
-                    finalP = newBase * (1 - discVal / 100);
-                } else {
-                    finalP = newBase - discVal;
-                }
-                orderItems[currentEditingItem.id].price = Math.max(0, Math.round(finalP));
-            }
-
-            const menuItem = document.querySelector(`.menu-item[data-id="${currentEditingItem.id}"]`);
-            if (menuItem) {
-                menuItem.dataset.price = newBase;
-                const pTag = menuItem.querySelector('p');
-                if (pTag) {
-                    pTag.textContent = `${menuItem.dataset.unit} - ${formatPrice(newBase)}`;
-                }
-            }
-
-            pemBasePriceText.textContent = formatPrice(newBase);
+            updateMenuProductPrice(currentEditingItem.id, savedBase);
+            pemBasePriceText.textContent = formatPrice(savedBase);
+            bpmCurrentPrice.textContent = formatPrice(savedBase);
             calculateNewPrice();
             renderOrderList();
+            renderPayOrder();
+            closeBasePriceEditor();
 
+            const tableText = updatedOrders > 0 ? ` và ${updatedOrders} đơn chưa thanh toán` : '';
+            showToast(`Đã cập nhật giá bán mới${tableText}`, 'success');
         } catch (error) {
             console.error('Error updating base price:', error);
             showToast('Lỗi kết nối máy chủ', 'error');
+        } finally {
+            bpmSaveBtn.disabled = false;
+            bpmSaveBtn.textContent = originalText;
         }
     });
 
@@ -1300,10 +1366,13 @@ payMethodRadios.forEach(radio => {
                 id: product.id,
                 name: product.name,
                 unit: product.unit,
+                basePrice: product.price,
                 price: product.price,
                 qty: 1,
                 type: product.type_menu,
-                code: product.code || ''
+                code: product.code || '',
+                discountValue: 0,
+                discountType: 'vnd'
             };
         }
         saveOrder();
@@ -1366,9 +1435,13 @@ payMethodRadios.forEach(radio => {
                             id: pId,
                             name: item.product_name || item.name,
                             qty: parseInt(item.qty) || 1,
+                            basePrice: parseFloat(item.price) || 0,
                             price: parseFloat(item.price) || 0,
                             unit: item.unit || 'Món',
-                            type: item.type_menu || 'Food'
+                            type: item.type_menu || 'Food',
+                            code: item.code || '',
+                            discountValue: 0,
+                            discountType: 'vnd'
                         };
                     });
                     saveOrder();

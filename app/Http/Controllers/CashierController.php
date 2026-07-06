@@ -194,18 +194,62 @@ class CashierController extends Controller
 
     public function updateProductPrice(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'product_id' => 'required|exists:product,id',
             'new_price' => 'required|numeric|min:0',
         ]);
 
-        $product = Product::findOrFail($request->product_id);
-        $product->price = $request->new_price;
-        $product->save();
+        $result = DB::transaction(function () use ($validated) {
+            $newPrice = (float) $validated['new_price'];
+            $product = Product::lockForUpdate()->findOrFail($validated['product_id']);
+            $product->price = $newPrice;
+            $product->save();
+
+            $servingInvoiceIds = DB::table('invoice_detail as d')
+                ->join('invoice as i', 'i.id', '=', 'd.invoice_id')
+                ->where('d.product_id', $product->id)
+                ->whereIn('i.status', ['serving', 'pending_payment'])
+                ->pluck('i.id')
+                ->unique()
+                ->values();
+
+            $updatedServingDetails = 0;
+            if ($servingInvoiceIds->isNotEmpty()) {
+                $updatedServingDetails = DB::table('invoice_detail')
+                    ->whereIn('invoice_id', $servingInvoiceIds)
+                    ->where('product_id', $product->id)
+                    ->update(['price' => $newPrice]);
+
+                foreach ($servingInvoiceIds as $invoiceId) {
+                    $total = (float) DB::table('invoice_detail')
+                        ->where('invoice_id', $invoiceId)
+                        ->selectRaw('COALESCE(SUM(quantity * price), 0) as total')
+                        ->value('total');
+
+                    $invoice = Invoice::where('id', $invoiceId)
+                        ->whereIn('status', ['serving', 'pending_payment'])
+                        ->first();
+
+                    if ($invoice) {
+                        $discount = (float) ($invoice->discount ?? 0);
+                        $invoice->total = $total;
+                        $invoice->pay_amount = max($total - $discount, 0);
+                        $invoice->save();
+                    }
+                }
+            }
+
+            return [
+                'new_price' => $newPrice,
+                'updated_serving_details' => $updatedServingDetails,
+            ];
+        });
 
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật giá bán thành công.',
+            'new_price' => $result['new_price'],
+            'updated_serving_details' => $result['updated_serving_details'],
         ]);
     }
 
