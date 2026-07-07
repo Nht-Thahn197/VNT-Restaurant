@@ -50,24 +50,31 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        $data = $request->validate([
+            'product_name' => 'required|string|max:150',
+            'category_id' => 'required|integer|exists:category_product,id',
+            'type_menu_id' => 'required|in:Food,Drink,Other',
+            'price' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'img' => 'nullable|image|max:5120',
+            'ingredients' => 'nullable|string',
+        ]);
+
         $imgPath = null;
 
         if ($request->hasFile('img')) {
-            $image = $request->file('img');
-            $filename = Str::slug($request->product_name) . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/product'), $filename);
-            $imgPath = 'images/product/' . $filename;
+            $imgPath = $this->storeProductImage($request->file('img'), $data['product_name']);
         }
         $id = DB::table('product')->insertGetId([
-            'name' => $request->product_name,
-            'category_id' => $request->category_id,
-            'price' => $request->price,
-            'unit' => $request->unit,
-            'type_menu' => $request->type_menu_id,
+            'name' => $data['product_name'],
+            'category_id' => $data['category_id'],
+            'price' => $data['price'],
+            'unit' => $data['unit'],
+            'type_menu' => $data['type_menu_id'],
             'img' => $imgPath,
         ]);
 
-        $ingredients = json_decode($request->ingredients, true);
+        $ingredients = json_decode($request->input('ingredients', '[]'), true);
 
         if ($ingredients && is_array($ingredients)) {
             foreach ($ingredients as $ing) {
@@ -84,6 +91,16 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+        $data = $request->validate([
+            'product_name' => 'required|string|max:150',
+            'category_id' => 'required|integer|exists:category_product,id',
+            'type_menu_id' => 'required|in:Food,Drink,Other',
+            'price' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'img' => 'nullable|image|max:5120',
+            'ingredients' => 'nullable|string',
+        ]);
+
         $product = DB::table('product')->where('id', $id)->first();
 
         $imgPath = $product->img;
@@ -102,26 +119,22 @@ class ProductController extends Controller
                 unlink(public_path($product->img));
             }
 
-            $image = $request->file('img');
-            $filename = Str::slug($request->product_name) . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images/product'), $filename);
-
-            $imgPath = 'images/product/' . $filename;
+            $imgPath = $this->storeProductImage($request->file('img'), $data['product_name']);
         }
 
         $updateData = [
-            'name'        => $request->product_name,
-            'category_id' => $request->category_id,
-            'price'       => $request->price,
-            'unit'        => $request->unit,
-            'type_menu'   => $request->type_menu_id,
+            'name'        => $data['product_name'],
+            'category_id' => $data['category_id'],
+            'price'       => $data['price'],
+            'unit'        => $data['unit'],
+            'type_menu'   => $data['type_menu_id'],
             'img'         => $imgPath,
         ];
 
         DB::table('product')->where('id', $id)->update($updateData);
         DB::table('recipe')->where('product_id', $id)->delete();
 
-        $ingredients = json_decode($request->ingredients, true);
+        $ingredients = json_decode($request->input('ingredients', '[]'), true);
 
         if ($ingredients && is_array($ingredients)) {
             foreach ($ingredients as $ing) {
@@ -134,6 +147,42 @@ class ProductController extends Controller
         }
 
         return response()->json(['status' => true]);
+    }
+
+    protected function storeProductImage($image, string $productName): string
+    {
+        $directory = public_path('images/product');
+        $this->ensureProductImageDirectory($directory);
+
+        $baseName = Str::slug($productName);
+        if ($baseName === '') {
+            $baseName = Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'product';
+        }
+
+        $extension = $image->getClientOriginalExtension();
+        $filename = $baseName . '-' . now()->format('YmdHis') . '-' . Str::random(6);
+        if ($extension) {
+            $filename .= '.' . $extension;
+        }
+
+        $image->move($directory, $filename);
+
+        return 'images/product/' . $filename;
+    }
+
+    protected function ensureProductImageDirectory(string $directory): void
+    {
+        if (! is_dir($directory) && ! mkdir($directory, 0775, true) && ! is_dir($directory)) {
+            throw new \RuntimeException('Cannot create product image directory: ' . $directory);
+        }
+
+        if (! is_writable($directory)) {
+            @chmod($directory, 0775);
+        }
+
+        if (! is_writable($directory)) {
+            throw new \RuntimeException('Cannot write product image directory: ' . $directory);
+        }
     }
 
 

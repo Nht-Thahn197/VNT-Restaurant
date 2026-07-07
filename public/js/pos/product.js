@@ -17,6 +17,41 @@ const POS_BASE_URL = `${BASE_URL}/pos`;
 
 var productSelectControls = [];
 
+function getProductErrorMessage(payload, status) {
+  if (payload && payload.errors) {
+    const firstField = Object.keys(payload.errors)[0];
+    if (firstField && payload.errors[firstField] && payload.errors[firstField][0]) {
+      return payload.errors[firstField][0];
+    }
+  }
+
+  if (payload && payload.message) {
+    return payload.message;
+  }
+
+  return `HTTP ${status}`;
+}
+
+async function readProductResponse(response) {
+  const text = await response.text();
+  let payload = {};
+
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch (error) {
+      const message = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+      throw new Error(message || `HTTP ${response.status}`);
+    }
+  }
+
+  if (!response.ok) {
+    throw new Error(getProductErrorMessage(payload, response.status));
+  }
+
+  return payload;
+}
+
 var closeProductSelectMenus = function () {
   productSelectControls.forEach(function (control) {
     control.close();
@@ -485,8 +520,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const url = editingProductId ? `${POS_BASE_URL}/products/${editingProductId}/update` : `${POS_BASE_URL}/products/store`;
         try {
-          const res = await fetch(url, { method: 'POST', body: formData });
-          const data = await res.json();
+          const res = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+          const data = await readProductResponse(res);
           if (data.status) {
             showToast('Lưu sản phẩm thành công', 'success');
             closeProductForm();
@@ -494,10 +535,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 location.reload();
             }, 800);
           } else {
-            showToast('Lưu thất bại', 'error');
+            showToast(data.message || 'Luu that bai', 'error');
           }
         } catch (err) { console.error('Lỗi lưu sản phẩm:', err); 
-          showToast('Lỗi server!', 'error');
+          showToast(err.message || 'Loi server!', 'error');
         }
       });
     });
