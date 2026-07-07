@@ -16,6 +16,8 @@ class InvoiceDetail extends Model
         'product_id',
         'quantity',
         'price',
+        'unit_price',
+        'item_discount',
         'created_at',
     ];
     

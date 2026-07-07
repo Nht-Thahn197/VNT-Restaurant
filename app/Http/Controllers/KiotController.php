@@ -33,76 +33,26 @@ class KiotController extends Controller
 
     public function revenue(Request $request)
     {
-        $mode  = $request->mode;
-        $range = $request->range;
+        $mode  = $request->mode ?? 'hour';
+        $range = $request->range ?? 'today';
 
         [$from, $to] = $this->resolveRange($range);
 
-        $query = Invoice::where('status', 'completed')
-            ->whereBetween('time_end', [$from, $to]);
-
-        if ($mode === 'hour') {
-            $data = $query
-                ->selectRaw('HOUR(time_end) as label, SUM(pay_amount) as total')
-                ->groupByRaw('HOUR(time_end)')
-                ->orderBy('label')
-                ->get();
-        }
-
-        if ($mode === 'day') {
-            $data = $query
-                ->selectRaw('DATE(time_end) as label, SUM(pay_amount) as total')
-                ->groupByRaw('DATE(time_end)')
-                ->orderBy('label')
-                ->get();
-        }
-
-        if ($mode === 'weekday') {
-            $data = $query
-                ->selectRaw('DAYOFWEEK(time_end) as label, SUM(pay_amount) as total')
-                ->groupByRaw('DAYOFWEEK(time_end)')
-                ->orderBy('label')
-                ->get();
-        }
-
-        return response()->json($data);
+        return response()->json(
+            $this->buildInvoiceSeries($mode, $range, $from, $to, 'SUM(pay_amount)')
+        );
     }
 
     public function orders(Request $request)
     {
-        $mode  = $request->mode;
-        $range = $request->range;
+        $mode  = $request->mode ?? 'hour';
+        $range = $request->range ?? 'today';
 
         [$from, $to] = $this->resolveRange($range);
 
-        $query = Invoice::where('status', 'completed')
-            ->whereBetween('time_end', [$from, $to]);
-
-        if ($mode === 'hour') {
-            $data = $query
-                ->selectRaw('HOUR(time_end) as label, COUNT(*) as total')
-                ->groupByRaw('HOUR(time_end)')
-                ->orderBy('label')
-                ->get();
-        }
-
-        if ($mode === 'day') {
-            $data = $query
-                ->selectRaw('DATE(time_end) as label, COUNT(*) as total')
-                ->groupByRaw('DATE(time_end)')
-                ->orderBy('label')
-                ->get();
-        }
-
-        if ($mode === 'weekday') {
-            $data = $query
-                ->selectRaw('DAYOFWEEK(time_end) as label, COUNT(*) as total')
-                ->groupByRaw('DAYOFWEEK(time_end)')
-                ->orderBy('label')
-                ->get();
-        }
-
-        return response()->json($data);
+        return response()->json(
+            $this->buildInvoiceSeries($mode, $range, $from, $to, 'COUNT(*)')
+        );
     }
 
     public function products(Request $request)
@@ -135,24 +85,120 @@ class KiotController extends Controller
 
     private function resolveRange($range)
     {
+        $now = now();
+
         switch ($range) {
             case 'today':
-                return [now()->startOfDay(), now()->endOfDay()];
+                return [$now->copy()->startOfDay(), $now->copy()->endOfDay()];
             case 'yesterday':
                 return [
-                    now()->subDay()->startOfDay(),
-                    now()->subDay()->endOfDay()
+                    $now->copy()->subDay()->startOfDay(),
+                    $now->copy()->subDay()->endOfDay()
                 ];
             case '7days':
-                return [now()->subDays(6)->startOfDay(), now()->endOfDay()];
+                return [$now->copy()->subDays(6)->startOfDay(), $now->copy()->endOfDay()];
             case 'this_month':
-                return [now()->startOfMonth(), now()->endOfMonth()];
+                return [$now->copy()->startOfMonth(), $now->copy()->endOfMonth()];
             case 'last_month':
                 return [
-                    now()->subMonth()->startOfMonth(),
-                    now()->subMonth()->endOfMonth()
+                    $now->copy()->subMonth()->startOfMonth(),
+                    $now->copy()->subMonth()->endOfMonth()
                 ];
         }
+
+        return [$now->copy()->startOfDay(), $now->copy()->endOfDay()];
+    }
+
+    private function buildInvoiceSeries(string $mode, string $range, Carbon $from, Carbon $to, string $aggregate): array
+    {
+        $mode = in_array($mode, ['hour', 'day', 'weekday'], true) ? $mode : 'hour';
+
+        $labelExpression = match ($mode) {
+            'day' => 'DATE(time_end)',
+            'weekday' => 'DAYOFWEEK(time_end)',
+            default => 'HOUR(time_end)',
+        };
+
+        $totals = Invoice::where('status', 'completed')
+            ->whereBetween('time_end', [$from, $to])
+            ->selectRaw($labelExpression . ' as label, ' . $aggregate . ' as total')
+            ->groupByRaw($labelExpression)
+            ->pluck('total', 'label')
+            ->mapWithKeys(function ($total, $label) {
+                return [(string) $label => (float) $total];
+            });
+
+        if ($mode === 'hour') {
+            return $this->fillHourSeries($totals);
+        }
+
+        if ($mode === 'weekday') {
+            return $this->fillWeekdaySeries($totals, $range, $from);
+        }
+
+        return $this->fillDaySeries($totals, $range, $from, $to);
+    }
+
+    private function fillHourSeries($totals): array
+    {
+        $series = [];
+
+        for ($hour = 0; $hour <= 23; $hour++) {
+            $series[] = [
+                'label' => $hour,
+                'total' => (float) ($totals[(string) $hour] ?? 0),
+            ];
+        }
+
+        return $series;
+    }
+
+    private function fillDaySeries($totals, string $range, Carbon $from, Carbon $to): array
+    {
+        $series = [];
+
+        $cursor = $from->copy()->startOfDay();
+        $end = $to->copy()->startOfDay();
+
+        while ($cursor->lte($end)) {
+            $key = $cursor->toDateString();
+            $series[] = [
+                'label' => $key,
+                'total' => (float) ($totals[$key] ?? 0),
+            ];
+            $cursor->addDay();
+        }
+
+        return $series;
+    }
+
+    private function fillWeekdaySeries($totals, string $range, Carbon $from): array
+    {
+        if (in_array($range, ['today', 'yesterday'], true)) {
+            $label = $this->mysqlDayOfWeek($from);
+
+            return [[
+                'label' => $label,
+                'total' => (float) ($totals[(string) $label] ?? 0),
+            ]];
+        }
+
+        $series = [];
+        for ($weekday = 2; $weekday <= 7; $weekday++) {
+            $series[] = [
+                'label' => $weekday,
+                'total' => (float) ($totals[(string) $weekday] ?? 0),
+            ];
+        }
+
+        return $series;
+    }
+
+    private function mysqlDayOfWeek(Carbon $date): int
+    {
+        return $date->dayOfWeek === Carbon::SUNDAY
+            ? 1
+            : $date->dayOfWeek + 1;
     }
 
 }

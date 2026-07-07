@@ -193,6 +193,39 @@
                                 })
                                 ->filter()
                                 ->implode(' ');
+
+                            $displayTotal = (float) ($invoice->total ?? 0);
+                            $displayDiscount = (float) ($invoice->discount ?? 0);
+                            $displayPayAmount = (float) ($invoice->pay_amount ?? max($displayTotal - $displayDiscount, 0));
+
+                            if ($invoice->details->isNotEmpty()) {
+                                $detailTotal = 0;
+                                $detailDiscount = 0;
+
+                                foreach ($invoice->details as $detailItem) {
+                                    $quantity = (float) ($detailItem->quantity ?? 0);
+                                    $salePrice = (float) ($detailItem->price ?? 0);
+                                    $itemDiscount = (float) ($detailItem->item_discount ?? 0);
+                                    $unitPrice = (float) ($detailItem->unit_price ?? 0);
+
+                                    if ($unitPrice <= 0 && $salePrice > 0) {
+                                        $unitPrice = $salePrice + $itemDiscount;
+                                    }
+
+                                    if ($itemDiscount <= 0 && $unitPrice > $salePrice) {
+                                        $itemDiscount = $unitPrice - $salePrice;
+                                    }
+
+                                    $detailTotal += $quantity * $unitPrice;
+                                    $detailDiscount += $quantity * $itemDiscount;
+                                }
+
+                                if ($detailTotal > 0) {
+                                    $displayTotal = $detailTotal;
+                                    $displayDiscount = max($detailDiscount, $displayTotal - $displayPayAmount, 0);
+                                    $displayPayAmount = max($displayTotal - $displayDiscount, 0);
+                                }
+                            }
                         @endphp
                         <tr
                             class="invoice-row"
@@ -212,9 +245,9 @@
                             <td>{{ $invoice->time_start ? $invoice->time_start->format('d/m/Y H:i') : '-' }}</td>
                             <td>{{ $invoice->time_end ? $invoice->time_end->format('d/m/Y H:i') : '-' }}</td>
                             <td>{{ $invoice->user ? $invoice->user->name : '-' }}</td>
-                            <td class="money" data-value="{{ $invoice->total ?? 0 }}">{{ number_format($invoice->total ?? 0, 0, ',', '.') }}</td>
-                            <td class="discount" data-value="{{ $invoice->discount ?? 0 }}">{{ number_format($invoice->discount ?? 0, 0, ',', '.') }}</td>
-                            <td class="final" data-value="{{ $invoice->pay_amount ?? 0 }}">{{ number_format($invoice->pay_amount ?? 0, 0, ',', '.') }}</td>
+                            <td class="money" data-value="{{ $displayTotal }}">{{ number_format($displayTotal, 0, ',', '.') }}</td>
+                            <td class="discount" data-value="{{ $displayDiscount }}">{{ number_format($displayDiscount, 0, ',', '.') }}</td>
+                            <td class="final" data-value="{{ $displayPayAmount }}">{{ number_format($displayPayAmount, 0, ',', '.') }}</td>
                             <td>
                                 @switch($invoice->status)
                                     @case('completed')
@@ -232,23 +265,51 @@
                             <td class="detail" colspan="9">
                                 <div class="detail-box">
                                     <table class="detail-table">
+                                        <colgroup>
+                                            <col class="detail-col-code">
+                                            <col class="detail-col-name">
+                                            <col class="detail-col-qty">
+                                            <col class="detail-col-money">
+                                            <col class="detail-col-money">
+                                            <col class="detail-col-money">
+                                            <col class="detail-col-total">
+                                        </colgroup>
                                         <thead>
                                             <tr>
                                                 <th>Mã hàng</th>
                                                 <th>Tên hàng</th>
-                                                <th>Đơn giá</th>
                                                 <th>Số lượng</th>
+                                                <th>Đơn giá</th>
+                                                <th>Giảm giá</th>
+                                                <th>Giá bán</th>
                                                 <th>Thành tiền</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach ($invoice->details as $item)
+                                                @php
+                                                    $salePrice = (float) ($item->price ?? 0);
+                                                    $itemDiscount = (float) ($item->item_discount ?? 0);
+                                                    $unitPrice = (float) ($item->unit_price ?? 0);
+
+                                                    if ($unitPrice <= 0 && $salePrice > 0) {
+                                                        $unitPrice = $salePrice + $itemDiscount;
+                                                    }
+
+                                                    if ($itemDiscount <= 0 && $unitPrice > $salePrice) {
+                                                        $itemDiscount = $unitPrice - $salePrice;
+                                                    }
+
+                                                    $lineTotal = $item->quantity * $salePrice;
+                                                @endphp
                                                 <tr>
                                                     <td>{{ $item->product->code ?? '-' }}</td>
                                                     <td>{{ $item->product->name ?? '-' }}</td>
-                                                    <td>{{ number_format($item->price, 0, ',', '.') }}</td>
-                                                    <td>{{ $item->quantity }}</td>
-                                                    <td>{{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
+                                                    <td class="qty-cell">{{ $item->quantity }}</td>
+                                                    <td class="money-cell">{{ number_format($unitPrice, 0, ',', '.') }}</td>
+                                                    <td class="money-cell">{{ number_format($itemDiscount, 0, ',', '.') }}</td>
+                                                    <td class="money-cell">{{ number_format($salePrice, 0, ',', '.') }}</td>
+                                                    <td class="money-cell">{{ number_format($lineTotal, 0, ',', '.') }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>

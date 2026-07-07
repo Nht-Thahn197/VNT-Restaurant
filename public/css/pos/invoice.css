@@ -337,6 +337,27 @@
 .detail-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.detail-col-code {
+  width: 15%;
+}
+
+.detail-col-name {
+  width: 28%;
+}
+
+.detail-col-qty {
+  width: 9%;
+}
+
+.detail-col-money {
+  width: 12%;
+}
+
+.detail-col-total {
+  width: 12%;
 }
 
 .detail-table th {
@@ -348,6 +369,22 @@
 .detail-table td {
   padding: 8px;
   border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.detail-table th:nth-child(3),
+.detail-table .qty-cell {
+  text-align: center;
+}
+
+.detail-table th:nth-child(n + 4),
+.detail-table .money-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.detail-table .money-cell {
+  font-variant-numeric: tabular-nums;
 }
 
 .detail-actions {

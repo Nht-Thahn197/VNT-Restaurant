@@ -738,6 +738,41 @@ payMethodRadios.forEach(radio => {
         return Math.max(0, Math.round(price));
     }
 
+    function calculateItemDiscountAmount(item) {
+        const base = Math.max(0, Number(item.basePrice ?? item.price ?? 0));
+        const salePrice = Math.max(0, Number(item.price ?? base));
+
+        return Math.max(0, Math.round(base - salePrice));
+    }
+
+    function calculateOrderTotals() {
+        return Object.values(orderItems).reduce((totals, item) => {
+            const qty = Math.max(0, Number(item.qty || 0));
+            const unitPrice = Math.max(0, Number(item.basePrice ?? item.price ?? 0));
+            const salePrice = Math.max(0, Number(item.price ?? unitPrice));
+            const itemDiscount = Math.max(0, unitPrice - salePrice);
+
+            totals.grossTotal += qty * unitPrice;
+            totals.itemDiscountTotal += qty * itemDiscount;
+            totals.netTotal += qty * salePrice;
+
+            return totals;
+        }, {
+            grossTotal: 0,
+            itemDiscountTotal: 0,
+            netTotal: 0
+        });
+    }
+
+    function getOrderLevelDiscount() {
+        const totals = calculateOrderTotals();
+        const discount = promotionDiscount > 0
+            ? promotionDiscount
+            : discountAmount;
+
+        return Math.min(Math.max(0, Number(discount || 0)), totals.netTotal);
+    }
+
     function applyBasePriceToOrderItem(item, newBasePrice) {
         if (!item) return;
 
@@ -1539,24 +1574,17 @@ payMethodRadios.forEach(radio => {
     }
 
     function updatePayAmount() {
-        const total = Object.values(orderItems)
-            .reduce((s, i) => s + i.qty * i.price, 0);
+        const totals = calculateOrderTotals();
+        const orderDiscount = getOrderLevelDiscount();
+        const totalDiscount = Math.min(totals.itemDiscountTotal + orderDiscount, totals.grossTotal);
+        const needPay = Math.max(totals.grossTotal - totalDiscount, 0);
 
-        let discount = 0;
-
-        if (promotionDiscount > 0) {
-            discount = promotionDiscount;
-        } else {
-            discount = Number(discountInput.value || 0);
-        }
-
-        discount = Math.min(discount, total);
-
-        document.getElementById('sumPrice').textContent = formatPrice(total);
-        document.getElementById('needPay').textContent = formatPrice(total - discount);
+        document.getElementById('sumPrice').textContent = formatPrice(totals.grossTotal);
+        document.getElementById('needPay').textContent = formatPrice(needPay);
+        discountBtn.textContent = totalDiscount > 0 ? `${formatPrice(totalDiscount)}đ` : '0';
         const transferRadio = document.querySelector('input[name="pay_method"][value="transfer"]');
         if (transferRadio.checked) {
-            const amount = Math.max(total - discount, 0);
+            const amount = needPay;
             const table = getSelectedTable();
             const desc = table ? `ToiBenQuan-${table.name}` : 'ToiBenQuan';
             vietqrImg.src = generateVietQR(amount, desc);
@@ -1573,7 +1601,6 @@ payMethodRadios.forEach(radio => {
         const discountInput = document.getElementById('discountInput');
         payOrderList.innerHTML = '';
 
-        let sum = 0;
         const groups = {};
         Object.values(orderItems).forEach(item => {
             const type = typeMap[item.type] || 'Khác';
@@ -1592,7 +1619,6 @@ payMethodRadios.forEach(radio => {
             `;
             groups[type].forEach(item => {
                 const total = item.qty * item.price;
-                sum += total;
                 groupDiv.innerHTML += `
                     <div class="pay-item">
                         <div class="name">
@@ -1607,14 +1633,13 @@ payMethodRadios.forEach(radio => {
             });
             payOrderList.appendChild(groupDiv);
         });
-        sumPriceEl.textContent = formatPrice(sum);
-        needPayEl.textContent = formatPrice(sum);
+        const totals = calculateOrderTotals();
+        sumPriceEl.textContent = formatPrice(totals.grossTotal);
+        needPayEl.textContent = formatPrice(totals.netTotal - getOrderLevelDiscount());
         updatePayAmount();
 
         discountInput.oninput = () => {
-            const discount = Number(discountInput.value || 0);
-            const needPay = Math.max(sum - discount, 0);
-            needPayEl.textContent = formatPrice(needPay);
+            updatePayAmount();
         };
     }
     discountBtn.addEventListener('click', () => {
@@ -1634,8 +1659,7 @@ payMethodRadios.forEach(radio => {
     });
 
     discountSave.addEventListener('click', () => {
-        const totalSum = Object.values(orderItems)
-            .reduce((s, i) => s + i.qty * i.price, 0);
+        const totalSum = calculateOrderTotals().netTotal;
         let val = Number(discountValue.value || 0);
         if (discountType === 'percent') {
             if (val > 100) val = 100;
@@ -1647,7 +1671,7 @@ payMethodRadios.forEach(radio => {
         }
         discountInput.value = discountAmount;
         const needPayEl = document.getElementById('needPay');
-        needPayEl.textContent = formatPrice(totalSum - discountAmount);
+        needPayEl.textContent = formatPrice(Math.max(totalSum - discountAmount, 0));
         discountPopup.style.display = 'none';
 
         promotionDiscount = 0;
@@ -1717,8 +1741,7 @@ payMethodRadios.forEach(radio => {
     function applyPromotion(promo) {
         selectedPromotion = promo;
 
-        const total = Object.values(orderItems)
-            .reduce((s, i) => s + i.qty * i.price, 0);
+        const total = calculateOrderTotals().netTotal;
 
         let discount = 0;
 
@@ -1809,11 +1832,18 @@ payMethodRadios.forEach(radio => {
             showToast('Không tìm thấy thời gian bắt đầu', 'warning');
             return;
         }
-        const items = Object.values(orderItems).map(item => ({
-            product_id: item.id,
-            qty: item.qty,
-            price: item.price
-        }));
+        const items = Object.values(orderItems).map(item => {
+            const unitPrice = Math.max(0, Number(item.basePrice ?? item.price ?? 0));
+            const salePrice = Math.max(0, Number(item.price ?? unitPrice));
+
+            return {
+                product_id: item.id,
+                qty: item.qty,
+                unit_price: unitPrice,
+                item_discount: calculateItemDiscountAmount(item),
+                price: salePrice
+            };
+        });
         if (!items.length) {
             showToast('Chưa có món', 'warning');
             return;
@@ -1838,10 +1868,10 @@ payMethodRadios.forEach(radio => {
                 showToast(`${item.name} không đủ tồn kho, hiện còn ${item.current_qty}`, 'error');
             });
         }
-        const total = Object.values(orderItems).reduce((sum, item) => sum + item.qty * item.price, 0);
-        const discount = promotionDiscount > 0
-            ? promotionDiscount
-            : discountAmount;
+        const totals = calculateOrderTotals();
+        const orderDiscount = getOrderLevelDiscount();
+        const discount = Math.min(totals.itemDiscountTotal + orderDiscount, totals.grossTotal);
+        const total = totals.grossTotal;
         const payAmount = Math.max(total - discount, 0);
         const paymentMethod = getPayMethod();
             if (!paymentMethod) {

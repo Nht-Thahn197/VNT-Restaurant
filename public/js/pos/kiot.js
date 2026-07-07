@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (currentMode === 'hour') {
-                return `${label}h`;
+                return `${String(label).padStart(2, '0')}h`;
             }
 
             if (currentMode === 'day') {
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         data: values,
                         backgroundColor: '#0A8BD6',
                         borderRadius: 6,
-                        barThickness: 36
+                        maxBarThickness: 36
                     }]
                 },
                 options: {

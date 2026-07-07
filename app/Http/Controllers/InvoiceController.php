@@ -35,6 +35,8 @@ class InvoiceController extends Controller
             'items.*.product_id' => 'required|integer',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'items.*.unit_price' => 'nullable|numeric|min:0',
+            'items.*.item_discount' => 'nullable|numeric|min:0',
             'total' => 'required|numeric|min:0',
             'discount' => 'required|numeric|min:0',
             'pay_amount' => 'required|numeric|min:0',

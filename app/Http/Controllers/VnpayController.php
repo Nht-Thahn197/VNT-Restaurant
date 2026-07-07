@@ -20,6 +20,8 @@ class VnpayController extends Controller
             'items.*.product_id' => 'required|integer',
             'items.*.qty' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'items.*.unit_price' => 'nullable|numeric|min:0',
+            'items.*.item_discount' => 'nullable|numeric|min:0',
             'total' => 'required|numeric|min:0',
             'discount' => 'required|numeric|min:0',
             'pay_amount' => 'required|numeric|min:1',
@@ -133,17 +135,50 @@ class VnpayController extends Controller
         $data['payment_method'] = 'card';
         $data['table_id'] = (int) $data['table_id'];
         $data['promotion_id'] = $data['promotion_id'] ?? null;
-        $data['total'] = (float) $data['total'];
-        $data['discount'] = (float) $data['discount'];
-        $data['pay_amount'] = (float) $data['pay_amount'];
+        $submittedTotal = (float) $data['total'];
+        $submittedDiscount = max(0, (float) $data['discount']);
 
         $data['items'] = array_map(static function (array $item) {
+            $price = max(0, (float) $item['price']);
+            $submittedDiscount = array_key_exists('item_discount', $item)
+                ? max(0, (float) $item['item_discount'])
+                : 0;
+            $unitPrice = array_key_exists('unit_price', $item)
+                ? max(0, (float) $item['unit_price'])
+                : $price + $submittedDiscount;
+
+            if ($unitPrice < $price) {
+                $unitPrice = $price;
+            }
+
             return [
                 'product_id' => (int) $item['product_id'],
                 'qty' => (int) $item['qty'],
-                'price' => (float) $item['price'],
+                'price' => $price,
+                'unit_price' => $unitPrice,
+                'item_discount' => max($unitPrice - $price, 0),
             ];
         }, $data['items']);
+
+        $grossTotal = 0;
+        $itemDiscountTotal = 0;
+        $netTotal = 0;
+
+        foreach ($data['items'] as $item) {
+            $qty = max(1, (int) $item['qty']);
+            $grossTotal += $qty * $item['unit_price'];
+            $itemDiscountTotal += $qty * $item['item_discount'];
+            $netTotal += $qty * $item['price'];
+        }
+
+        $orderDiscount = $submittedTotal >= ($grossTotal - 0.01)
+            ? max($submittedDiscount - $itemDiscountTotal, 0)
+            : $submittedDiscount;
+        $orderDiscount = min($orderDiscount, $netTotal);
+
+        $data['total'] = $grossTotal;
+        $data['discount'] = min($itemDiscountTotal + $orderDiscount, $grossTotal);
+        $data['pay_amount'] = max($data['total'] - $data['discount'], 0);
 
         return $data;
     }
